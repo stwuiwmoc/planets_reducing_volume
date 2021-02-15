@@ -165,7 +165,6 @@ def drop_recovery(array_drop, loc_drop, pixel):
     recovery = recovery_1d.reshape((pixel,pixel))
     return recovery
 
-
 # function for plot ----------------------------------------------------------
 def pv_micron(array, digits):
     #input is [mm], output is [um]
