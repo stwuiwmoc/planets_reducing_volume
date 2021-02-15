@@ -146,7 +146,7 @@ def zer_term_plot(fig, title, position, zer):
     return ax
 
 if __name__ == '__main__':
-    file_num = 33
+    file_num = 11
     px = 256
     m1_radi = 1850/2    
     zer_order = 21
@@ -171,33 +171,35 @@ if __name__ == '__main__':
         
         diff = tf * kriging(df0, dfxx)
         diff_drop, loc_drop = nan_drop(diff, mask)
-        
         opration_matrix[i] = diff_drop/1000 #[mm] -> [m]
         
-        """
         zer, fit = pr.prop_fit_zernikes(diff/1000, tf, px/2, zer_order, xc=px/2, yc=px/2, FIT=True) 
         zer_opration_matrix[i] = zer
+        
         diff = mask * diff
         fit = mask * fit * 1000 # [m] -> [mm]
-        
+
         fig = plt.figure(figsize=(11,10))
-    
-        ax_df = df_plot(fig, "raw : " + num, 221, df0, dfxx)        
+        ax_df = df_plot(fig, "raw : " + num, 111, df0, dfxx)        
         ax_dz = image_plot(fig, "Kriging", 222, diff, diff, False)
         ax_zer = zer_term_plot(fig, "zernike terms", 223, zer)
         ax_fit = image_plot(fig, "zernike fitting", 224, fit, diff, False)
         
+        """
+        fig = plt.figure(figsize=(8,7))
+        ax_for_ppt = image_plot(fig, "F"+ num, 111, mask*diff, mask*diff, False)
         fig.tight_layout()
+        """
         
         picname = mkfolder() + "WT03_F" + num + ".png"
         fig.savefig(picname)
         fig.clf()
-        """
+        
         print(num)
     
     
     save_fname = "WT03_256_opration_matrix[m].csv"
-    np.savetxt(save_fname, opration_matrix, delimiter=",")
+    #np.savetxt(save_fname, opration_matrix, delimiter=",")
     
     #zer_save_fname = "WT03_zer_opration_matrix[m].csv"
     #np.savetxt(zer_save_fname, zer_opration_matrix, delimiter=",")
