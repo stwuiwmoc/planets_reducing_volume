@@ -465,13 +465,13 @@ if __name__ == '__main__':
         title_t = "\n" + title_res_str[option_wh] + "\n"\
             + "Black = WH 1-11 / Red = WH 12-22 / Blue = WH 23-33"
         
-        fig = plt.figure(figsize=(10,20))
+        fig = plt.figure(figsize=(10,22))
         ax_raw = image_plot(fig, title_raw, 421, raw, raw)
         ax_f = image_plot(fig, title_f, 422, filtered, raw)
         ax_d = image_plot(fig, title_d, 423, para_diff, raw)
         ax_i = image_plot(fig, title_i, 424, err_m, err_m)
         ax_rep = image_plot(fig, title_rep, 425, reprod, err_m)
-        ax_res = image_plot(fig, title_res, 426, residual, err_m)
+        ax_res = image_plot(fig, title_res, 426, residual, residual)
         ax_torque = torque_plot(fig, title_t, 414, force)
         
         fig.tight_layout()
