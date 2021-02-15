@@ -463,9 +463,7 @@ if __name__ == '__main__':
                         + "( Ignore lower " + str(ignore_offset*100) + " %)"
         
         title_t = "\n" + title_res_str[option_wh] + "\n"\
-            + "Black = WH 1-11\n"\
-                + "Red = WH 12-22\n"\
-                    + " Blue = WH 23-33"
+            + "Black = WH 1-11 / Red = WH 12-22 / Blue = WH 23-33"
         
         fig = plt.figure(figsize=(10,20))
         ax_raw = image_plot(fig, title_raw, 421, raw, raw)
