@@ -33,10 +33,11 @@ def mkfolder(suffix = ""):
     -------
     str ( script name + suffix )
     """
-    name = os.path.basename(__file__)
-    name = name.replace(".py", "") + suffix
-    os.makedirs(name, exist_ok=True)
-    return name
+    filename = os.path.basename(__file__)
+    filename = filename.replace(".py", "") + suffix
+    folder = "mkfolder/" + filename + "/"
+    os.makedirs(folder, exist_ok=True)
+    return folder
 
 def dat_read(fname):
     # 鏡面異常を表す dat file を読み出して成形
@@ -154,15 +155,15 @@ if __name__ == '__main__':
     
     # parametar --------------------------------------------------------------
     # o 回転角[mrad], p 曲率半径[mm], q 軸外し距離[mm] 
-    o0, do = 0, 0
-    p0, dp = 8666, 1
-    q0, dq = 1800, 1
+    o0, do = 0, 1
+    p0, dp = 8666, 0
+    q0, dq = 1800, 0
     
     init = [o0 + do, p0 + dp, q0 + dq]
     
     m1_radi= 1850/2
     
-    zer_order = 12
+    zer_order = 21
     #-------------------------------------------------------------------------    
     
     o_t, p_t, q_t = init
