@@ -72,8 +72,8 @@ def cz1(o, p, aqx, cx, cy):
     -------
     cz1 : 2D-mesh-array [mm]
         input された o, p, q での切り取り放物面
-
     """
+    
     phi = o / 1000 # [mrad] -> [rad] への換算
     
     a = 1/(2*p)
@@ -266,11 +266,11 @@ if __name__ == '__main__':
         loop_range = [option_raw, option_raw + 1]
         
     if option_loop == 1:    
-    
-        option_filter = 0
-        filter_param = 0
-        option_ideal = 0
-        option_wh = 2
+        option_filter = int(input("filter select\nNon filter : 0, Mean : 1, Gaussian : 2, Median : 3\nInput filter_num -> "))
+        filter_param = int(input("Input filter size or sigma  -> "))
+        option_ideal = int(input("Ideal Surface Minimize\nSkip : 0, Minimize : 1\nInput -> "))
+        option_wh = int(input("Warping Harness Minimize\nSkip : 0, Minimize(zer) : 1, Minimize(256^2) : 2\nInput -> "))
+        
         loop_range = [2, 21 + 1]
         
     else:
@@ -357,34 +357,39 @@ if __name__ == '__main__':
         err_m = err_m - offset
         
         # WH minimize-------------------------------------------------------------
-           
+        px_s = 256
+        xx_256, yy_256 = np.meshgrid(np.linspace(-m1_radi, m1_radi, px_s),np.linspace(-m1_radi, m1_radi, px_s))
+        tf_256 = np.where(xx_256**2+yy_256**2<=m1_radi**2, True, False)  
+        mask_256 = np.where(tf_256==True, 1, np.nan)
+        
+        
         if option_wh == 1:
             print("\nStart Warping Harness minimize")
-            err_zer = 10**3 * pr.prop_fit_zernikes(err_m/1000, tf, px/2, zer_order, xc=px/2, yc=px/2)
+            err_256 = mask_256 * image_resize(np.nan_to_num(err_m, nan=0), px_s)
             
-            om = 10**3 * np.genfromtxt("zer_opration_matrix[m].csv", delimiter=",").T
+            err_zer = pr.prop_fit_zernikes(err_256/1000, tf_256, px_s/2, zer_order, xc=px_s/2, yc=px_s/2)
             
-            om_inv = np.linalg.pinv(om * 10**6) * 10**6
+            om = np.genfromtxt("WT03_zer_opration_matrix[m].csv", delimiter=",").T
+            
+            om_inv = np.linalg.pinv(om * 10**9) * 10**9
             
             force = np.dot(om_inv, err_zer)
             
             reprod_zer = np.dot(om, force)
-            reprod = mask * zer_2_image(zer_order, reprod_zer)
+            reprod = mask * zer_2_image(zer_order, reprod_zer * 10**3)
             
         if option_wh == 2:
             print("\nStart Warping Harness minimize")    
             
-            xx_256, yy_256 = np.meshgrid(np.linspace(-m1_radi, m1_radi, 256),np.linspace(-m1_radi, m1_radi, 256))
-            mask_256 = np.where(xx_256**2+yy_256**2<=m1_radi**2, 1, np.nan)
-            err_256 = mask_256 * image_resize(np.nan_to_num(err_m, nan=0), 256)
+            err_256 = mask_256 * image_resize(np.nan_to_num(err_m, nan=0), px_s)
             err_drop, loc_drop = nan_drop(err_256, mask_256)
             
-            om = 10**3 * np.genfromtxt("WT03_256_opration_matrix[m].csv", delimiter=",").T
-            om_inv = np.linalg.pinv(om * 10**6) * 10**6
-            force = np.dot(om_inv, err_drop)
+            om = np.genfromtxt("WT03_256_opration_matrix[m].csv", delimiter=",").T
+            om_inv = np.linalg.pinv(om * 10**9) * 10**9
+            force = np.dot(om_inv, err_drop/1000)
             
             reprod_drop = np.dot(om, force)
-            reprod_256 = drop_recovery(reprod_drop, loc_drop, 256)
+            reprod_256 = drop_recovery(reprod_drop, loc_drop, px_s) * 10**3
             reprod = mask * image_resize(reprod_256, px)
             
         if option_wh == 3:
