@@ -251,7 +251,7 @@ if __name__ == '__main__':
     m1_radi = 1850/2
     px = 1023
     xx, yy = np.meshgrid(np.linspace(-m1_radi, m1_radi, px),np.linspace(-m1_radi, m1_radi, px))
-    zer_order = 21
+    zer_order = 10
     
     # option -----------------------------------------------------------------
     option_loop = int(input("Input : 0, Loop : 1\nInput Code type -> "))
@@ -407,10 +407,10 @@ if __name__ == '__main__':
         if option_wh == 4:
             print("\nStart Warping Harness minimize")
             
-            err_zer = pr.prop_fit_zernikes(err_256/1000, tf_256, px_s/2, zer_order, xc=px_s/2, yc=px_s/2)
+            err_zer = pr.prop_fit_zernikes(err_m/1000, tf, px/2, zer_order, xc=px/2, yc=px/2)
             err_zer_drop = np.delete(err_zer, [0], 0) # piston, tilt成分を除去 
             
-            om = np.genfromtxt("WT03_zer_opration_matrix[m].csv", delimiter=",").T
+            om = np.genfromtxt("WT03_zer10_opration_matrix[m].csv", delimiter=",").T
             om_drop = np.delete(om, [0], 0) # piston, tilt成分を除去 
             
             om_inv = sp.linalg.pinv2(om_drop * 10**9) * 10**9
@@ -488,7 +488,8 @@ if __name__ == '__main__':
                         + "( Ignore lower " + str(ignore_offset*100) + " %)"
         
         title_t = "\n" + title_res_str[option_wh] + "\n"\
-            + "Black = WH 1-11 / Red = WH 12-22 / Blue = WH 23-33"
+            + "Black = WH 1-11 / Red = WH 12-22 / Blue = WH 23-33" + "\n"\
+                + "Mean force : " + str(round(force.mean() * 0.2, 2)) + " [N]"
         
         fig = plt.figure(figsize=(10,22))
         ax_raw = image_plot(fig, title_raw, 421, raw, raw)
