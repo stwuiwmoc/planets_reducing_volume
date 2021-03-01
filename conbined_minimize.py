@@ -354,24 +354,24 @@ if __name__ == '__main__':
         
         offset = volume(err_m, 2)[3]
         
-        err_m = err_m - offset
+        #err_m = err_m - offset
         
         # WH minimize-------------------------------------------------------------
         px_s = 256
         xx_256, yy_256 = np.meshgrid(np.linspace(-m1_radi, m1_radi, px_s),np.linspace(-m1_radi, m1_radi, px_s))
         tf_256 = np.where(xx_256**2+yy_256**2<=m1_radi**2, True, False)  
         mask_256 = np.where(tf_256==True, 1, np.nan)
-        
+        err_256 = mask_256 * image_resize(np.nan_to_num(err_m, nan=0), px_s)
         
         if option_wh == 1:
             print("\nStart Warping Harness minimize")
-            err_256 = mask_256 * image_resize(np.nan_to_num(err_m, nan=0), px_s)
             
             err_zer = pr.prop_fit_zernikes(err_256/1000, tf_256, px_s/2, zer_order, xc=px_s/2, yc=px_s/2)
             
             om = np.genfromtxt("WT03_zer_opration_matrix[m].csv", delimiter=",").T
             
-            om_inv = np.linalg.pinv(om * 10**9) * 10**9
+            
+            om_inv = sp.linalg.pinv2(om * 10**9) * 10**9
             
             force = np.dot(om_inv, err_zer)
             
@@ -381,11 +381,10 @@ if __name__ == '__main__':
         if option_wh == 2:
             print("\nStart Warping Harness minimize")    
             
-            err_256 = mask_256 * image_resize(np.nan_to_num(err_m, nan=0), px_s)
             err_drop, loc_drop = nan_drop(err_256, mask_256)
             
             om = np.genfromtxt("WT03_256_opration_matrix[m].csv", delimiter=",").T
-            om_inv = np.linalg.pinv(om * 10**9) * 10**9
+            om_inv = sp.linalg.pinv(om * 10**9) * 10**9
             force = np.dot(om_inv, err_drop/1000)
             
             reprod_drop = np.dot(om, force)
@@ -404,7 +403,26 @@ if __name__ == '__main__':
             
             reprod_small = np.dot(om, force).reshape((256,256))
             reprod = mask * image_resize(reprod_small, px)
+        
+        if option_wh == 4:
+            print("\nStart Warping Harness minimize")
             
+            err_zer = pr.prop_fit_zernikes(err_256/1000, tf_256, px_s/2, zer_order, xc=px_s/2, yc=px_s/2)
+            err_zer_drop = np.delete(err_zer, [0], 0) # piston, tilt成分を除去 
+            
+            om = np.genfromtxt("WT03_zer_opration_matrix[m].csv", delimiter=",").T
+            om_drop = np.delete(om, [0], 0) # piston, tilt成分を除去 
+            
+            om_inv = sp.linalg.pinv2(om_drop * 10**9) * 10**9
+            
+            force = np.dot(om_inv, err_zer_drop)
+            
+            reprod_zer_drop = np.dot(om_drop, force)
+            #reprod_zer = np.insert(reprod_zer_drop, 0, err_zer[0:3])
+            reprod_zer = np.insert(reprod_zer_drop, 0, [0])
+            
+            reprod = mask * zer_2_image(zer_order, reprod_zer * 10**3)
+        
         
         if option_wh == 0:
             force = np.zeros(33)
@@ -459,7 +477,9 @@ if __name__ == '__main__':
         title_res_str = ["Skipped (Same as above result)",
                          "Warping Harness Minimize (zernike)",
                          "Warping Harness Minimize (256^2)",
-                         "Warping Harness Minimize (zer_inv + 256^2)"]
+                         "Warping Harness Minimize (zer_inv + 256^2)",
+                         "Warping Harness Minimize (zer_custom)"]
+        
         
         title_res = "\n" + title_res_str[option_wh] + "\n"\
             + "P-V = " + assess_res[0] + r" [$\mu$m]  RMS = " + assess_res[1] + r" [$\mu$m]" + "\n"\
