@@ -271,7 +271,7 @@ if __name__ == '__main__':
         option_ideal = int(input("Ideal Surface Minimize\nSkip : 0, Minimize : 1\nInput -> "))
         option_wh = int(input("Warping Harness Minimize\nSkip : 0, Minimize(zer) : 1, Minimize(256^2) : 2\nInput -> "))
         
-        loop_range = [2, 21 + 1]
+        loop_range = [2, zer_order + 1]
         
     else:
         pass
@@ -407,7 +407,7 @@ if __name__ == '__main__':
         if option_wh == 4:
             print("\nStart Warping Harness minimize")
             
-            err_zer = pr.prop_fit_zernikes(err_m/1000, tf, px/2, zer_order, xc=px/2, yc=px/2)
+            err_zer = pr.prop_fit_zernikes(err_256/1000, tf_256, px_s/2, zer_order, xc=px_s/2, yc=px_s/2)
             err_zer_drop = np.delete(err_zer, [0], 0) # piston, tilt成分を除去 
             
             om = np.genfromtxt("WT03_zer10_opration_matrix[m].csv", delimiter=",").T
@@ -489,7 +489,7 @@ if __name__ == '__main__':
         
         title_t = "\n" + title_res_str[option_wh] + "\n"\
             + "Black = WH 1-11 / Red = WH 12-22 / Blue = WH 23-33" + "\n"\
-                + "Mean force : " + str(round(force.mean() * 0.2, 2)) + " [N]"
+                + "Force RMS : " + str(round(force.std() * 0.2, 2)) + " [N]"
         
         fig = plt.figure(figsize=(10,22))
         ax_raw = image_plot(fig, title_raw, 421, raw, raw)
