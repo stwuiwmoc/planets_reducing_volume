@@ -146,10 +146,10 @@ def zer_term_plot(fig, title, position, zer):
     return ax
 
 if __name__ == '__main__':
-    file_num = 3
+    file_num = 33
     px = 256
     m1_radi = 1850/2    
-    zer_order = 21
+    zer_order = 10
     
     x_arr = y_arr = np.linspace(-m1_radi, m1_radi, px)
     xx, yy = np.meshgrid(x_arr, y_arr)
@@ -170,16 +170,16 @@ if __name__ == '__main__':
         dfxx = read(data_fname)
         
         diff = tf * kriging(df0, dfxx) / 1000 # [mm] -> [m]
-        diff_drop, loc_drop = nan_drop(diff, mask)
-        opration_matrix[i] = diff_drop
-        
         zer, fit = pr.prop_fit_zernikes(diff, tf, px/2, zer_order, xc=px/2, yc=px/2, FIT=True) 
         zer_opration_matrix[i] = zer
+        
+        """
+        diff_drop, loc_drop = nan_drop(diff, mask)
+        opration_matrix[i] = diff_drop
         
         diff = mask * diff * 1000 # [m] -> [mm]
         fit = mask * fit * 1000 # [m] -> [mm]
 
-        """
         fig = plt.figure(figsize=(11,10))
         ax_df = df_plot(fig, "raw : " + num, 221, df0, dfxx)        
         ax_dz = image_plot(fig, "Kriging", 222, diff, diff, False)
@@ -197,10 +197,10 @@ if __name__ == '__main__':
         
         print(num)
     
+    """
     save_fname = "WT03_256_opration_matrix[m].csv"
     np.savetxt(save_fname, opration_matrix, delimiter=",")
+    """
     
-    zer_save_fname = "WT03_zer_opration_matrix[m].csv"
+    zer_save_fname = "WT03_zer10_opration_matrix[m].csv"
     np.savetxt(zer_save_fname, zer_opration_matrix, delimiter=",")
-    """
-    """
