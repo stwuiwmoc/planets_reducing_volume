@@ -146,7 +146,7 @@ def zer_term_plot(fig, title, position, zer):
     return ax
 
 if __name__ == '__main__':
-    file_num = 33
+    file_num = 3
     px = 256
     m1_radi = 1850/2    
     zer_order = 21
@@ -179,21 +179,21 @@ if __name__ == '__main__':
         diff = mask * diff * 1000 # [m] -> [mm]
         fit = mask * fit * 1000 # [m] -> [mm]
 
+        """
         fig = plt.figure(figsize=(11,10))
         ax_df = df_plot(fig, "raw : " + num, 221, df0, dfxx)        
         ax_dz = image_plot(fig, "Kriging", 222, diff, diff, False)
         ax_zer = zer_term_plot(fig, "zernike terms", 223, zer)
         ax_fit = image_plot(fig, "zernike fitting", 224, fit, diff, False)
         
-        """
         fig = plt.figure(figsize=(8,7))
         ax_for_ppt = image_plot(fig, "F"+ num, 111, mask*diff, mask*diff, False)
         fig.tight_layout()
-        """
         
         picname = mkfolder() + "WT03_F" + num + ".png"
         fig.savefig(picname)
         fig.clf()
+        """
         
         print(num)
     
