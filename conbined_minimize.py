@@ -506,4 +506,8 @@ if __name__ == '__main__':
         #picname = mkfolder() + "wh" + str(option_wh) + "_r" + str(option_raw).zfill(2) + "-rotate45_id" + str(option_ideal) + "_f" + str(option_filter) + str(filter_param) + ".png"
         
         fig.savefig(picname)
-        #fig.clf()    
+        if option_ideal == 1:
+            fig.clf()
+        
+        
+        
