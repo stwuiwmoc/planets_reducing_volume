@@ -33,10 +33,11 @@ def mkfolder(suffix = ""):
     -------
     str ( script name + suffix )
     """
-    name = os.path.basename(__file__)
-    name = name.replace(".py", "") + suffix
-    os.makedirs(name, exist_ok=True)
-    return name
+    filename = os.path.basename(__file__)
+    filename = filename.replace(".py", "") + suffix
+    folder = "mkfolder/" + filename + "/"
+    os.makedirs(folder, exist_ok=True)
+    return folder
 
 def dat_read(fname):
     # 鏡面異常を表す dat file を読み出して成形
@@ -138,7 +139,7 @@ def image_resize(array, new_px):
 if __name__ == '__main__':
     
     px = 1023
-    m1_radi, dr = 1850/2, 50
+    m1_radi, dr = 1850/2, 0
     r = m1_radi - dr
     
     
@@ -147,6 +148,7 @@ if __name__ == '__main__':
     xx, yy = np.meshgrid(x_arr, y_arr)
   
     raw = dat_read("digitFig01.csv")
+    #tf = np.where(xx**2+yy**2<m1_radi**2, True, False)
     tf = ~np.isnan(raw)
     mask = np.where(tf==True, 1, np.nan)
     raw_0f = np.where(tf==True, raw, 0)
@@ -154,7 +156,7 @@ if __name__ == '__main__':
     g_sigma = 10
     gaussian = mask * sp.ndimage.filters.gaussian_filter(raw_0f, g_sigma)
     
-    m_size = 40
+    m_size = 10
     mean = mask * sp.ndimage.filters.uniform_filter(raw_0f, m_size)
     
     new_px = 256
@@ -188,8 +190,8 @@ if __name__ == '__main__':
     title_e = "error " + str(px) + " px\n" + assess_e[0] + " / " + assess_e[1] + " / " + assess_e[2] + " / " + assess_e[3]
     
     ax_raw = image_plot(fig, title_raw, 231, raw, raw)
-    ax_g = image_plot(fig, title_g, 232, gaussian, raw)
-    ax_m = image_plot(fig, title_m, 233, mean, raw)
+    ax_g = image_plot(fig, title_g, 232, gaussian, raw_0f)
+    ax_m = image_plot(fig, title_m, 233, mean, raw_0f)
     ax_d = image_plot(fig, title_d, 234, downscale, downscale)
     ax_u = image_plot(fig, title_u, 235, upscale, raw)
     ax_e = image_plot(fig, title_e, 236, error, error)
