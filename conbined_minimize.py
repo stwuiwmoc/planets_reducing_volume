@@ -237,7 +237,7 @@ def torque_plot(fig, title, position, force):
     return ax
 
 if __name__ == '__main__':
-    # parametar --------------------------------------------------------------
+    ## parametar --------------------------------------------------------------
    
     # o 回転角[mrad], p 曲率半径[mm], q 軸外し距離[mm]     
     o0, do = 0, 0
@@ -253,7 +253,7 @@ if __name__ == '__main__':
     xx, yy = np.meshgrid(np.linspace(-m1_radi, m1_radi, px),np.linspace(-m1_radi, m1_radi, px))
     zer_order = 10
     
-    # option -----------------------------------------------------------------
+    ## option -----------------------------------------------------------------
     option_loop = int(input("Input : 0, Loop : 1\nInput Code type -> "))
 
     if option_loop == 0:
@@ -281,27 +281,33 @@ if __name__ == '__main__':
         option_raw = i
 
 
-        # 対象データ入力 -----------------------------------------------------------
+        ## 対象データ入力 -----------------------------------------------------------
         if option_raw == 0:    
             raw = dat_read("digitFig01.csv") # dat file 読み出し
             #raw = raw[:,::-1].T #   反時計回りに 0.5*pi 回転
             #raw = raw[::-1, ::-1] # 反時計回りに 1.0*pi 回転
             #raw = raw[::-1, :].T #  反時計回りに 1.5*pi 回転
-        
+            """
             tf = ~np.isnan(raw)
             mask = np.where(tf==True, 1, np.nan)
-        
+            """
         else:
+            
+            raw = zer_raw(zer_order, option_raw)
+            """
             tf = np.where(xx**2+yy**2<m1_radi**2, True, False)
             mask = np.where(tf==True, 1, np.nan)
-            raw = mask * zer_raw(zer_order, option_raw)
-            """
+
             img = PIL.Image.fromarray(raw)
             img_45 = img.rotate(45)
             raw = mask * np.asarray(img_45)
             """
-            
-        # フィルタ処理 -----------------------------------------------------------  
+        
+        ## フチの処理 ------------------------------------------------------------
+        tf = np.where(xx**2+yy**2<m1_radi**2, True, False)
+        
+        
+        ## フィルタ処理 -----------------------------------------------------------  
         mask = np.where(tf==True, 1, np.nan)
         raw_0f = np.where(tf==True, raw, 0)
         
@@ -321,7 +327,7 @@ if __name__ == '__main__':
         else:
             pass
         
-        # 理想鏡面での最小化--------------------------------------------------
+        ## 理想鏡面での最小化--------------------------------------------------
         
         init = [o0 + do, p0 + dp, q0 + dq] # 理想鏡面最小化での初期値
         
@@ -356,7 +362,7 @@ if __name__ == '__main__':
         
         #err_m = err_m - offset
         
-        # WH minimize-------------------------------------------------------------
+        ## WH minimize-------------------------------------------------------------
         px_s = 256
         xx_256, yy_256 = np.meshgrid(np.linspace(-m1_radi, m1_radi, px_s),np.linspace(-m1_radi, m1_radi, px_s))
         tf_256 = np.where(xx_256**2+yy_256**2<=m1_radi**2, True, False)  
@@ -404,7 +410,7 @@ if __name__ == '__main__':
             pass
         
         residual = err_m - reprod
-        # figure plot ------------------------------------------------------------
+        ## figure plot ------------------------------------------------------------
         assess_raw = assess(raw, 2)
         assess_f = assess(filtered, 2)
         assess_i = assess(err_m, 2)
