@@ -290,14 +290,16 @@ if __name__ == '__main__':
             #raw = raw[:,::-1].T #   反時計回りに 0.5*pi 回転
             #raw = raw[::-1, ::-1] # 反時計回りに 1.0*pi 回転
             #raw = raw[::-1, :].T #  反時計回りに 1.5*pi 回転
+            tf_raw = ~np.isnan(raw)
+            raw_0f = np.where(tf_raw==True, raw, 0)
             """
-            tf = ~np.isnan(raw)
             mask = np.where(tf==True, 1, np.nan)
             """
         else:
             
             raw = zer_raw(zer_order, option_raw)
             raw = np.where(xx**2+yy**2<m1_radi**2, raw, np.nan)
+            raw_0f = np.where(~np.isnan(raw)==True, raw, 0)
             """
             tf = np.where(xx**2+yy**2<m1_radi**2, True, False)
 
@@ -313,7 +315,7 @@ if __name__ == '__main__':
         
         
         ## フィルタ処理 -----------------------------------------------------------  
-        raw_0f = np.where(tf==True, raw, 0)
+        raw_0f = np.where(tf==True, raw_0f, 0)
         
         if option_filter == 0:
             filter_param = 0
