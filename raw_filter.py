@@ -12,7 +12,6 @@ import pandas as pd
 import os
 import time
 import proper as pr
-import cv2
 import scipy as sp
 import pykrige as krg
 import PIL
@@ -139,7 +138,7 @@ def image_resize(array, new_px):
 if __name__ == '__main__':
     
     px = 1023
-    m1_radi, dr = 1850/2, 0
+    m1_radi, dr = 1850/2, 50
     r = m1_radi - dr
     
     
