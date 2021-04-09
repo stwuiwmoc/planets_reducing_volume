@@ -244,6 +244,9 @@ if __name__ == '__main__':
     p0, dp = 8667, 0
     q0, dq = 1800, 0
     
+    # フチを無視する長さ [mm] 半径に対して計算
+    ignore_radi = 75
+    
     # 研磨量計算時に下位 %を無視して offset を設定 入力は％ではなく小数
     ignore_offset = 0.02
     
@@ -294,9 +297,9 @@ if __name__ == '__main__':
         else:
             
             raw = zer_raw(zer_order, option_raw)
+            raw = np.where(xx**2+yy**2<m1_radi**2, raw, np.nan)
             """
             tf = np.where(xx**2+yy**2<m1_radi**2, True, False)
-            mask = np.where(tf==True, 1, np.nan)
 
             img = PIL.Image.fromarray(raw)
             img_45 = img.rotate(45)
@@ -304,19 +307,20 @@ if __name__ == '__main__':
             """
         
         ## フチの処理 ------------------------------------------------------------
-        tf = np.where(xx**2+yy**2<m1_radi**2, True, False)
+        valid_radi = m1_radi - ignore_radi # 有効半径
+        tf = np.where(xx**2+yy**2<valid_radi**2, True, False)
+        mask = np.where(tf==True, 1, np.nan)
         
         
         ## フィルタ処理 -----------------------------------------------------------  
-        mask = np.where(tf==True, 1, np.nan)
         raw_0f = np.where(tf==True, raw, 0)
         
         if option_filter == 0:
             filter_param = 0
-            filtered = raw
+            filtered = mask * raw
             
         if option_filter == 1:
-            filtered = mask * sp.ndimage.filters.uniform_filter(raw_0f, filter_param)
+            filtered = mask * sp.ndimage.filters.uniform_filter(raw_0f, size=filter_param)
         
         if option_filter == 2:
             filtered = mask * sp.ndimage.filters.gaussian_filter(raw_0f, filter_param)
@@ -420,10 +424,11 @@ if __name__ == '__main__':
         title_raw_str[0] = "Raw"
         
         title_raw = title_raw_str[option_raw] + "\n"\
-            + "P-V = " + assess_raw[0] + r" [$\mu$m]  RMS = " + assess_raw[1] + r" [$\mu$m]" + "\n"\
-                + "Removed = " + assess_raw[2] + r" [mm$^3$]" + "\n"\
-                    + " with offset = " + assess_raw[3] + r" [$\mu$m]" + "\n"\
-                        + "( Ignore lower " + str(ignore_offset*100) + " %)"
+            + "Aperture = " + str(2*m1_radi) + " [mm]\n"\
+                + "P-V = " + assess_raw[0] + r" [$\mu$m]  RMS = " + assess_raw[1] + r" [$\mu$m]" + "\n"\
+                    + "Removed = " + assess_raw[2] + r" [mm$^3$]" + "\n"\
+                        + " with offset = " + assess_raw[3] + r" [$\mu$m]" + "\n"\
+                            + "( Ignore lower " + str(ignore_offset*100) + " %)"
         
         title_filter_str = ["Non filter", 
                       "Mean filter (size " + str(filter_param) + r"$\times$" + str(filter_param) + "px)",
@@ -431,10 +436,11 @@ if __name__ == '__main__':
                       "Median filter (size " + str(filter_param) + r"$\times$" + str(filter_param) + "px)"]
         
         title_f = title_filter_str[option_filter] +"\n"\
-            + "P-V = " + assess_f[0] + r" [$\mu$m]  RMS = " + assess_f[1] + r" [$\mu$m]" + "\n"\
-                + "Removed = " + assess_f[2] + r" [mm$^3$]" + "\n"\
-                    + " with offset = " + assess_f[3] + r" [$\mu$m]" + "\n"\
-                        + "( Ignore lower " + str(ignore_offset*100) + " %)"
+            + "Effective Aperture = " + str(2*valid_radi) + " [mm]\n"\
+                + "P-V = " + assess_f[0] + r" [$\mu$m]  RMS = " + assess_f[1] + r" [$\mu$m]" + "\n"\
+                    + "Removed = " + assess_f[2] + r" [mm$^3$]" + "\n"\
+                        + " with offset = " + assess_f[3] + r" [$\mu$m]" + "\n"\
+                            + "( Ignore lower " + str(ignore_offset*100) + " %)"
         
         title_d = "\n" + "Minimized Parabola\n"\
             + "p=" + str(round(p_m, 3)) + " [mm]\n"\
@@ -484,6 +490,9 @@ if __name__ == '__main__':
         #picname = mkfolder() + "wh" + str(option_wh) + "_r" + str(option_raw).zfill(2) + "-rotate45_id" + str(option_ideal) + "_f" + str(option_filter) + str(filter_param) + ".png"
         
         fig.savefig(picname)
+        if option_ideal == 0:
+            fig.show()
+        
         if option_ideal == 1:
             fig.clf()
         
