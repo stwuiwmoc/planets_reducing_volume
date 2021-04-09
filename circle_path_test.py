@@ -100,11 +100,11 @@ if __name__ == '__main__':
     # o 回転角[mrad], p 曲率半径[mm], q 軸外し距離[mm]
     o0, do = 0, 0
     p0, dp = 8667, 0
-    q0, dq = 1800, 0
+    q0, dq = 1800, 1
 
     # constant ---------------------------------------------------------------
     m1_radi = 1850/2
-
+    """
     print("deg is 11.89")
     print("r = ", m1_radi, "\n")
     print("0 kn : ", cz1(0, p0, 1800, m1_radi, 0))
@@ -132,3 +132,11 @@ if __name__ == '__main__':
 
     print("9 kn : ", cz1_theta(0, p0, 1800, 0, -m1_radi, 11.73))
     print("9 yh : ", hanamura_z(11.73, p0, 0, -m1_radi), "\n")
+    """
+    print("q=",q0)
+    print("0 kn : ", cz1(0, p0, q0, m1_radi, 0))
+    print("0 yh : ", hanamura_z(np.rad2deg(np.arctan(q0/p0)), p0, m1_radi, 0), "\n")
+
+    print("q=",q0+dq)
+    print("0 kn : ", cz1(0, p0, q0+dq, m1_radi, 0))
+    print("0 yh : ", hanamura_z(np.rad2deg(np.arctan((q0+dq)/p0)), p0, m1_radi, 0), "\n")
