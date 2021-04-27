@@ -245,7 +245,7 @@ if __name__ == '__main__':
     q0, dq = 1800, 0
     
     # フチを無視する長さ [mm] 半径に対して計算
-    ignore_radi = 75
+    ignore_radi = 50
     
     # 研磨量計算時に下位 %を無視して offset を設定 入力は％ではなく小数
     ignore_offset = 0.02
