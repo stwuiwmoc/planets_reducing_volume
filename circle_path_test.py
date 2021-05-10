@@ -6,6 +6,27 @@ Created on Tue Mar  2 22:45:51 2021
 """
 
 import numpy as np
+import matplotlib.pyplot as plt
+import conbined_minimize as cb
+import pandas as pd
+
+def mkfolder(suffix = ""):
+    import os
+    """    
+    Parameters
+    ----------
+    suffix : str, optional
+        The default is "".
+
+    Returns
+    -------
+    str ( script name + suffix )
+    """
+    filename = os.path.basename(__file__)
+    filename = filename.replace(".py", "") + suffix
+    folder = "mkfolder/" + filename + "/"
+    os.makedirs(folder, exist_ok=True)
+    return folder
 
 def cz1(o, p, aqx, cx, cy):
     """
@@ -133,6 +154,7 @@ if __name__ == '__main__':
     print("9 kn : ", cz1_theta(0, p0, 1800, 0, -m1_radi, 11.73))
     print("9 yh : ", hanamura_z(11.73, p0, 0, -m1_radi), "\n")
     """
+    
     print("q=",q0)
     print("0 kn : ", cz1(0, p0, q0, m1_radi, 0))
     print("0 yh : ", hanamura_z(np.rad2deg(np.arctan(q0/p0)), p0, m1_radi, 0), "\n")
@@ -140,3 +162,25 @@ if __name__ == '__main__':
     print("q=",q0+dq)
     print("0 kn : ", cz1(0, p0, q0+dq, m1_radi, 0))
     print("0 yh : ", hanamura_z(np.rad2deg(np.arctan((q0+dq)/p0)), p0, m1_radi, 0), "\n")
+    
+    r = 875
+    theta = np.linspace(0, 2*np.pi, 1000)
+    theta = np.arange(0, 2*np.pi, 0.01)
+    x_circle = r*np.cos(theta)
+    y_circle = r*np.sin(theta)
+    
+    px = 1023
+    xx, yy = np.meshgrid(np.linspace(-m1_radi, m1_radi, px),np.linspace(-m1_radi, m1_radi, px)) 
+    #tf = np.where(xx**2+yy**2<m1_radi**2, 1, np.nan)
+    tf = np.where(xx**2+yy**2<875**2, 1, np.nan)
+    
+    circle_path = cz1(o0, p0, q0, x_circle, y_circle)
+    surf = tf * cz1(o0, p0, q0, xx, yy)
+    raw = tf * cb.dat_read("digitFig01.csv") # dat file 読み出し
+    
+    plt.plot(theta, circle_path)
+    fig = plt.figure(figsize=(10,20))
+    ax1 = cb.image_plot(fig, "", 211, surf, surf)
+    ax2 = cb.image_plot(fig, "", 212, raw, raw)
+    df = pd.DataFrame(np.array([theta, circle_path]).T, columns=["theta[rad]", "z(r="+str(r)+")"])
+    df.to_csv(mkfolder() + "circle_path.csv", index=False)
