@@ -218,21 +218,22 @@ def image_plot(fig, title, position, c, c_scale, cb_micron=True):
     return ax
 
 def torque_plot(fig, title, position, force):
-    # input force [N] 
+    # input force [mm] 
     fs = 15
-    x = np.arange(1, 12)
-    torque = force * 0.20 # FEM上でのforce[N] -> 現実のmotorの配置でのForce[N]
+    x = np.arange(1, 13)
+    
+    torque = force
     
     ax = fig.add_subplot(position)
-    ax.plot(x, torque[0:11], color="black", marker="s", linewidth=1)
-    ax.plot(x, torque[11:22], color="red", marker="s", linewidth=1)
-    ax.plot(x, torque[22:33], color="blue", marker="s", linewidth=1)
+    ax.plot(x, torque[0:12], color="black", marker="s", linewidth=1)
+    ax.plot(x, torque[12:24], color="red", marker="s", linewidth=1)
+    ax.plot(x, torque[24:36], color="blue", marker="s", linewidth=1)
     
     ax.set_title(title, fontsize=fs)
     ax.grid()
-    ax.set_xlabel("Warping Harness Number", fontsize=fs)
+    ax.set_xlabel("Support Point Number", fontsize=fs)
     ax.set_xticks(x)
-    ax.set_ylabel("Support Motor Force [N]", fontsize=fs)
+    ax.set_ylabel("Motor drive amount [mm]", fontsize=fs)
     
     return ax
 
@@ -394,7 +395,7 @@ if __name__ == '__main__':
             err_zer = pr.prop_fit_zernikes(err_256/1000, tf_256, px_s/2, zer_order, xc=px_s/2, yc=px_s/2)
             err_zer_drop = np.delete(err_zer, [0], 0) # piston, tilt成分を除去 
             
-            om = np.genfromtxt("WT03_zer10_opration_matrix[m].csv", delimiter=",").T
+            om = np.genfromtxt("WT06_zer10_opration_matrix[m].csv", delimiter=",").T
             om_drop = np.delete(om, [0], 0) # piston, tilt成分を除去 
             
             om_inv = sp.linalg.pinv2(om_drop * 10**9) * 10**9
@@ -458,13 +459,13 @@ if __name__ == '__main__':
                     + " with offset = " + assess_i[3] + r" [$\mu$m]" + "\n"\
                         + "( Ignore lower " + str(ignore_offset*100) + " %)"
     
-        title_rep = "Warping Harness Reproduction"
+        title_rep = "Active Support Reproduction"
         
         title_res_str = ["Skipped (Same as above result)",
                          "Warping Harness Minimize (zernike)",
                          "Warping Harness Minimize (256^2)",
                          "Warping Harness Minimize (zer_inv + 256^2)",
-                         "Warping Harness Minimize (zer_custom)"]
+                         "Active Support Minimize"]
         
         
         title_res = "\n" + title_res_str[option_wh] + "\n"\
@@ -474,8 +475,8 @@ if __name__ == '__main__':
                         + "( Ignore lower " + str(ignore_offset*100) + " %)"
         
         title_t = "\n" + title_res_str[option_wh] + "\n"\
-            + "Black = WH 1-11 / Red = WH 12-22 / Blue = WH 23-33" + "\n"\
-                + "Force RMS : " + str(round(force.std() * 0.2, 2)) + " [N]"
+            + "Black = WH 1-12 / Red = WH 13-24 / Blue = WH 25-36" + "\n"\
+                + "Step RMS : " + str(round(force.std(), 2))
         
         fig = plt.figure(figsize=(10,22))
         ax_raw = image_plot(fig, title_raw, 421, raw, raw)
