@@ -139,7 +139,7 @@ def image_resize(array, new_px):
 if __name__ == '__main__':
     
     px = 1023
-    m1_radi, dr = 1850/2, 0
+    m1_radi, dr = 1850/2, 75
     r = m1_radi - dr
     
     
@@ -148,10 +148,10 @@ if __name__ == '__main__':
     xx, yy = np.meshgrid(x_arr, y_arr)
   
     raw = dat_read("digitFig01.csv")
-    #tf = np.where(xx**2+yy**2<m1_radi**2, True, False)
-    tf = ~np.isnan(raw)
+    tf_raw = ~np.isnan(raw)
+    raw_0f = np.where(tf_raw==True, raw, 0)
+    tf = np.where(xx**2+yy**2<r**2, True, False)
     mask = np.where(tf==True, 1, np.nan)
-    raw_0f = np.where(tf==True, raw, 0)
     
     g_sigma = 10
     gaussian = mask * sp.ndimage.filters.gaussian_filter(raw_0f, g_sigma)
@@ -197,5 +197,5 @@ if __name__ == '__main__':
     ax_e = image_plot(fig, title_e, 236, error, error)
     
     fig.tight_layout()
-    picname = mkfolder() + "/g" + str(g_sigma) + "m" + str(m_size) + ".png"
+    picname = mkfolder() + "g" + str(g_sigma) + "m" + str(m_size) + ".png"
     fig.savefig(picname)
