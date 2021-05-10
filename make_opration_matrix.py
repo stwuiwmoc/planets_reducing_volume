@@ -16,6 +16,7 @@ import pandas as pd
 import os
 import pykrige as krg
 import proper as pr
+import scipy as sp
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
@@ -73,6 +74,17 @@ def kriging(df_0, dfxx):
     ok_module = krg.ok.OrdinaryKriging(x, y, dw)
     z, sigmasq = ok_module.execute("grid", x_arr, y_arr) #格子点にdwをfitting
     return z
+
+def fem_interpolate(df_0, dfxx):
+    # input [mm] -> output [mm]    
+    #mesh型のデータを格子点gridに補完
+    x_old = dfxx["x"]
+    y_old = dfxx["y"]
+    dw_old = dfxx["dz"] - df_0["dz"]
+    
+    xy_old = np.stack([x_old, y_old], axis=1)
+    dw_new = sp.interpolate.griddata(xy_old, dw_old, (xx, yy), method="linear", fill_value=0)
+    return dw_new
 
 def nan_drop(masked_array_2d, mask_2d):
     # input 2d-array, mask -> output np.nanを除いた1d-array, 復元用のloc-1d
@@ -146,8 +158,8 @@ def zer_term_plot(fig, title, position, zer):
     return ax
 
 if __name__ == '__main__':
-    file_num = 33
-    px = 256
+    file_num = 36
+    px = 512
     m1_radi = 1850/2    
     zer_order = 10
     
@@ -160,29 +172,35 @@ if __name__ == '__main__':
     zer_opration_matrix = np.empty((file_num, zer_order))
     opration_matrix = np.empty((file_num, tf.sum()))
     
-    df0 = read("_Fxx/PM3.5_36ptAxWT03_F00.smesh.txt")
+    df0 = read("_Fxx/PM3.5_36ptAxWT06_F00.smesh.txt")
+    
+    act_tuning = np.array([ 37.,  37.,  20.,  20., -38.,  38.,  37.,  37.,  20.,  20., -38.,
+        38.,  37.,  37.,  20.,  20., -38.,  38.,  37.,  37.,  20.,  20.,
+       -38.,  38.,  37.,  37.,  20.,  20., -38.,  38.,  37.,  37.,  20.,
+        20., -38.,  38.])
 
     for i in range(0, file_num):
         
         num = str(i+1).zfill(2)
         
-        data_fname = "_Fxx/PM3.5_36ptAxWT03_F" + num + ".smesh.txt"
+        data_fname = "_Fxx/PM3.5_36ptAxWT06_F" + num + ".smesh.txt"
         dfxx = read(data_fname)
         
-        diff = tf * kriging(df0, dfxx) / 1000 # [mm] -> [m]
+        diff = act_tuning[i] * tf * fem_interpolate(df0, dfxx) / 1000 # [mm] -> [m]
         zer, fit = pr.prop_fit_zernikes(diff, tf, px/2, zer_order, xc=px/2, yc=px/2, FIT=True) 
         zer_opration_matrix[i] = zer
         
         """
         diff_drop, loc_drop = nan_drop(diff, mask)
         opration_matrix[i] = diff_drop
+        """
         
         diff = mask * diff * 1000 # [m] -> [mm]
         fit = mask * fit * 1000 # [m] -> [mm]
 
         fig = plt.figure(figsize=(11,10))
-        ax_df = df_plot(fig, "raw : " + num, 221, df0, dfxx)        
-        ax_dz = image_plot(fig, "Kriging", 222, diff, diff, False)
+        ax_df = df_plot(fig, "act" + num + " : 0.05 [Nm]", 221, df0, dfxx)        
+        ax_dz = image_plot(fig, "act" + num + " : 1 [mm] ( x" +str(act_tuning[i]) + " )" , 222, diff, diff, False)
         ax_zer = zer_term_plot(fig, "zernike terms", 223, zer)
         ax_fit = image_plot(fig, "zernike fitting", 224, fit, diff, False)
         
@@ -190,10 +208,9 @@ if __name__ == '__main__':
         ax_for_ppt = image_plot(fig, "F"+ num, 111, mask*diff, mask*diff, False)
         fig.tight_layout()
         
-        picname = mkfolder() + "WT03_F" + num + ".png"
+        picname = mkfolder() + "WT06_F" + num + ".png"
         fig.savefig(picname)
         fig.clf()
-        """
         
         print(num)
     
@@ -202,5 +219,5 @@ if __name__ == '__main__':
     np.savetxt(save_fname, opration_matrix, delimiter=",")
     """
     
-    zer_save_fname = "WT03_zer10_opration_matrix[m].csv"
+    zer_save_fname = "WT06_zer10_opration_matrix[m].csv"
     np.savetxt(zer_save_fname, zer_opration_matrix, delimiter=",")
