@@ -27,10 +27,15 @@
 1. 同階層ディレクトリに、csv形式で曲面形状測定結果と駆動行列を配置します
     - 駆動行列はmake_opration_matrix.pyと_Fxxフォルダ内の有限要素法解析データを用いて作成できます。追加ライブラリは必要ありません。
 2. ファイルを実行すると、IPythonコンソールで入力が促されます。
-3. Input code type : 一つの曲面形状について最適化するか、zernike多項式第10項までの各項全てに対して最適化するかを選択します。
+3. Input code type
+    - 一つの曲面形状について最適化するか、zernike多項式第10項までの各項全てに対して最適化するかを選択します。
     - Input data type : 上記でInputを選択した場合、何に対して最適化するかを決定します。
-4. filter select : 曲面形状に対して適用する平滑化フィルタの種類を選択します。
-5. Input filter size or sigma : 平滑化フィルタの平滑化サイズ（ガウシアンフィルタの場合はσ）を入力します。
-6. Ideal Surface Minimize : 3パラメーターの調整による最適化を行うかどうかを選択します。
-7. Warping Harness Minimize : 駆動行列による最適化を行うかどうかを選択します。
-8. 最適化が開始し、図が /mkfokder/combined_minimize/ に出力されます。
+4. filter select
+    - 曲面形状に対して適用する平滑化フィルタの種類を選択します。
+6. Input filter size or sigma
+    - 平滑化フィルタの平滑化サイズ（ガウシアンフィルタの場合はσ）を入力します。
+7. Ideal Surface Minimize
+    - 3パラメーターの調整による最適化を行うかどうかを選択します。
+8. Warping Harness Minimize
+    - 駆動行列による最適化を行うかどうかを選択します。
+9. 最適化が開始し、図が /mkfokder/combined_minimize/ に出力されます。
