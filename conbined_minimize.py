@@ -294,8 +294,11 @@ if __name__ == '__main__':
             tf_raw = ~np.isnan(raw)
             raw_0f = np.where(tf_raw==True, raw, 0)
             """
-            mask = np.where(tf==True, 1, np.nan)
+            img = PIL.Image.fromarray(raw_0f)
+            img_45 = img.rotate(-45)
+            raw_0f = np.asarray(img_45)
             """
+
         else:
             
             raw = zer_raw(zer_order, option_raw)
@@ -304,9 +307,6 @@ if __name__ == '__main__':
             """
             tf = np.where(xx**2+yy**2<m1_radi**2, True, False)
 
-            img = PIL.Image.fromarray(raw)
-            img_45 = img.rotate(45)
-            raw = mask * np.asarray(img_45)
             """
         
         ## フチの処理 ------------------------------------------------------------
@@ -493,6 +493,8 @@ if __name__ == '__main__':
         #picname = mkfolder() + "wh" + str(option_wh) + "_r" + str(option_raw).zfill(2) + "-rotate45_id" + str(option_ideal) + "_f" + str(option_filter) + str(filter_param) + ".png"
         
         fig.savefig(picname)
+        
+        print("\nReduced rate = ", 1 - float(assess_res[2])/float(assess_f[2]), "\n")
         if option_ideal == 0:
             fig.show()
         
