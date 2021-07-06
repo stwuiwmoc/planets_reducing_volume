@@ -221,7 +221,6 @@ def torque_plot(fig, title, position, force):
     # input force [mm] 
     fs = 15
     x = np.arange(1, 13)
-    
     torque = force
     
     ax = fig.add_subplot(position)
@@ -410,7 +409,7 @@ if __name__ == '__main__':
         
         
         if option_wh == 0:
-            force = np.zeros(33)
+            force = np.zeros(36)
             reprod = mask * np.zeros((px,px))
         
         else:
