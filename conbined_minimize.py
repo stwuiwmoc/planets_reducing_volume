@@ -221,6 +221,14 @@ def torque_plot(fig, title, position, force):
     # input force [mm] 
     fs = 15
     x = np.arange(1, 13)
+    x_str = []
+    for i in range(12):
+        text = ""
+        for j in range(3):
+            num = str(12*j + i + 1).zfill(2)
+            text = text + "\n" + num
+        x_str.append(text)
+
     torque = force
     
     ax = fig.add_subplot(position)
@@ -232,6 +240,7 @@ def torque_plot(fig, title, position, force):
     ax.grid()
     ax.set_xlabel("Support Point Number", fontsize=fs)
     ax.set_xticks(x)
+    ax.set_xticklabels(x_str)
     ax.set_ylabel("Motor drive amount [mm]", fontsize=fs)
     
     return ax
