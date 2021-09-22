@@ -18,7 +18,7 @@ def psuedo(array):
     return a_pinv
 
 if __name__ == '__main__':
-    a = 10**3 * np.genfromtxt("zer_opration_matrix[m].csv", delimiter=",")
+    a = 10**3 * np.genfromtxt("reduce_polishing_code_pparc\WT03_zer10_opration_matrix[m].csv", delimiter=",")
     b = a * 10**6
     
     #a_pinv = psuedo(a)

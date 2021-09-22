@@ -125,7 +125,7 @@ if __name__ == '__main__':
 
     # constant ---------------------------------------------------------------
     m1_radi = 1850/2
-    """
+    
     print("deg is 11.89")
     print("r = ", m1_radi, "\n")
     print("0 kn : ", cz1(0, p0, 1800, m1_radi, 0))
@@ -153,7 +153,7 @@ if __name__ == '__main__':
 
     print("9 kn : ", cz1_theta(0, p0, 1800, 0, -m1_radi, 11.73))
     print("9 yh : ", hanamura_z(11.73, p0, 0, -m1_radi), "\n")
-    """
+    
     
     print("q=",q0)
     print("0 kn : ", cz1(0, p0, q0, m1_radi, 0))

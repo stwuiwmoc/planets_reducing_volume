@@ -233,16 +233,17 @@ def torque_plot(fig, title, position, force):
     
     ax = fig.add_subplot(position)
     ax.plot(x, torque[0:12], color="black", marker="s", linewidth=1)
-    ax.plot(x, torque[12:24], color="red", marker="s", linewidth=1)
-    ax.plot(x, torque[24:36], color="blue", marker="s", linewidth=1)
+    ax.plot(x, torque[12:24], color="green", marker="o", linewidth=1)
+    ax.plot(x, torque[24:36], color="darkviolet", marker="^", linewidth=1)
     
     ax.set_title(title, fontsize=fs)
     ax.grid()
-    ax.set_xlabel("Support Point Number", fontsize=fs)
+    ax.set_xlabel("Motor Number", fontsize=fs)
     ax.set_xticks(x)
     ax.set_xticklabels(x_str)
     ax.set_ylabel("Motor drive amount [mm]", fontsize=fs)
     
+    ax.hlines([5, -5], xmin=1, xmax=12, color ="red", linestyle="dashed")
     return ax
 
 if __name__ == '__main__':
@@ -380,7 +381,7 @@ if __name__ == '__main__':
         ## WH minimize-------------------------------------------------------------
         px_s = 256
         xx_256, yy_256 = np.meshgrid(np.linspace(-m1_radi, m1_radi, px_s),np.linspace(-m1_radi, m1_radi, px_s))
-        tf_256 = np.where(xx_256**2+yy_256**2<=m1_radi**2, True, False)  
+        tf_256 = np.where(xx_256**2+yy_256**2<=valid_radi**2, True, False)  
         mask_256 = np.where(tf_256==True, 1, np.nan)
         err_256 = mask_256 * image_resize(np.nan_to_num(err_m, nan=0), px_s)
                     
@@ -400,7 +401,8 @@ if __name__ == '__main__':
         if option_wh == 4:
             print("\nStart Warping Harness minimize")
             
-            err_zer = pr.prop_fit_zernikes(err_256/1000, tf_256, px_s/2, zer_order, xc=px_s/2, yc=px_s/2)
+            err_meaned = err_256 - np.nanmean(err_256)
+            err_zer = pr.prop_fit_zernikes(err_meaned/1000, tf_256, px_s/2, zer_order, xc=px_s/2, yc=px_s/2)
             err_zer_drop = np.delete(err_zer, [0], 0) # piston, tilt成分を除去 
             
             om = np.genfromtxt("WT06_zer10_opration_matrix[m].csv", delimiter=",").T
@@ -483,7 +485,7 @@ if __name__ == '__main__':
                         + "( Ignore lower " + str(ignore_offset*100) + " %)"
         
         title_t = "\n" + title_res_str[option_wh] + "\n"\
-            + "Black = WH 1-12 / Red = WH 13-24 / Blue = WH 25-36" + "\n"\
+            + "Black = WH 1-12 / Green = WH 13-24 / Purple = WH 25-36" + "\n"\
                 + "Step RMS : " + str(round(force.std(), 2))
         
         fig = plt.figure(figsize=(10,22))
@@ -510,4 +512,11 @@ if __name__ == '__main__':
             fig.clf()
         
         
+        fig2 = plt.figure(figsize=(25, 5))
+        gs = fig2.add_gridspec(1, 17)
         
+        ax2_i = image_plot(fig2, "Target_shape", gs[0, 0:4], err_m, err_m)
+        ax2_rep = image_plot(fig2, title_rep, gs[0, 5:9], reprod, err_m)
+        ax2_torque = torque_plot(fig2, title_t, gs[0, 10:], force)
+        fig.tight_layout()
+    
