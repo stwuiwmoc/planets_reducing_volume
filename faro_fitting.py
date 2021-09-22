@@ -76,9 +76,23 @@ def CircleFitting(x,y):
 
 def minimize_func(X, Param):
     o, p, q, z= X
-    surf = Param
-    ideal = cb.cz1(o, p, q, xx, yy)
-    return np.nansum(abs(surf - ideal + z))
+    surf, x, y = Param
+    ideal = cb.cz1(o, p, q, x, y) + z
+    return np.nansum(abs(surf - ideal))
+
+def cz1_result(OptimizeResult, x, y):
+    o, p, q, z = OptimizeResult["x"]
+    return cb.cz1(o, p, q, x, y) + z
+
+def Optimize(surf):
+    x = surf[0]
+    y = surf[1]
+    param = (surf, x, y)
+    result = sp.optimize.minimize(minimize_func, x0=(0.1,8667,1800, 0), 
+                                   args=(param,), method="Powell")
+    
+    surf_diff = [x, y, surf[2] - cz1_result(result, x, y)]
+    return result, surf_diff
     
 
 def scatter2d(fig, title, position, ndarray):
@@ -114,32 +128,29 @@ if __name__ == '__main__':
     mask = np.where(xx**2+yy**2<valid_radi**2, 1, np.nan)
         
     
-    
-    
     side_raw1 = read_faro("_PLANETS_faro/鏡側面（円筒）.txt",[0,0])
     center_fit = CircleFitting(side_raw1[0], side_raw1[1])
     side_raw2 = read_faro("_PLANETS_faro/鏡側面（円筒）.txt",[center_fit[0],center_fit[1]])
     
     surf1_raw = read_faro("_PLANETS_faro/鏡面上1回目.txt", center_fit)
     surf2_raw = read_faro("_PLANETS_faro/鏡面上（アキシャルパッド上）.txt", center_fit)
-    
-    surf1_fit = faro_interpolate(surf1_raw)
-    surf2_fit = faro_interpolate(surf2_raw)
-    
-    surf1_pre = mask * (surf1_fit - np.nanmin(surf1_fit))
-    surf2_pre = mask * (surf2_fit - np.nanmin(surf2_fit))
+     
+    surf1_pre = surf1_raw
+    surf1_pre[2] = surf1_raw[2] - surf1_raw[2].min()
+    surf2_pre = surf2_raw
+    surf2_pre[2] = surf2_raw[2] - surf2_raw[2].min()
+    surf3_pre = np.concatenate([surf1_pre, surf2_pre], axis=1)
     
     start_time = time.time()
+    result1, surf1_diff = Optimize(surf1_pre)
+    result2, surf2_diff = Optimize(surf2_pre)
+    result3, surf3_diff = Optimize(surf3_pre)
     
-    result1 = sp.optimize.minimize(minimize_func, x0=(0.1,8667,1800, 0), args=surf1_pre, method="Powell")
-    result2 = sp.optimize.minimize(minimize_func, x0=(0.1,8667,1800, 0), args=surf2_pre, method="Powell")
+    surf1_min = mask * cz1_result(result1, xx, yy)
+    surf2_min = mask * cz1_result(result2, xx, yy)
+    surf3_min = mask * cz1_result(result3, xx, yy)
+    
     print(str(time.time() - start_time))
-    
-    surf1_min = mask * cb.cz1(result1["x"][0], result1["x"][1], result1["x"][2], xx, yy)
-    surf2_min = mask * cb.cz1(result2["x"][0], result2["x"][1], result2["x"][2], xx, yy)
-    
-    ideal = mask * cb.cz1(0, 8667, 1800, xx, yy)
-    
     ## for plot
     fig3 = plt.figure(figsize=(5,10))
     gs3 = fig3.add_gridspec(2,1)
@@ -157,17 +168,28 @@ if __name__ == '__main__':
     ax_surf1 = scatter2d(fig1, "surf 1", gs1[0,0], surf1_raw)
     ax_surf2 = scatter2d(fig1, "surf axialpad", gs1[1,0], surf2_raw)
     
+    """
     fig2 = plt.figure(figsize = (5,10))
     gs2 = fig2.add_gridspec(2,1)
     ax_fit1 = cb.image_plot(fig2, "surf 1 spline", gs2[0,0], surf1_fit, surf1_fit, cb_micron=False)
     ax_fit2 = cb.image_plot(fig2, "surf axialpad spline", gs2[1,0], surf2_fit, surf2_fit, cb_micron=False)
-    
-    fig4 = plt.figure(figsize=(5, 10))
-    gs4 = fig4.add_gridspec(2,1)
+    """
+    fig4 = plt.figure(figsize=(5, 15))
+    gs4 = fig4.add_gridspec(3,1)
     ax_minimize1 = cb.image_plot(fig4, "fitted", gs4[0,0], surf1_min, surf1_min, cb_micron=False)
     ax_minimize2 = cb.image_plot(fig4, "axialpad fitted", gs4[1,0], surf2_min, surf2_min, cb_micron=False)
+    ax_minimize3 = cb.image_plot(fig4, "fitted 1 and 2", gs4[2,0], surf3_min, surf3_min, cb_micron=False)
     
+    """
     fig5 = plt.figure(figsize=(5, 10))
     gs5 = fig5.add_gridspec(2,1)
     ax_diff1 = cb.image_plot(fig5, "diff", gs5[0,0], surf1_min - ideal, surf1_min - ideal, cb_micron=False)
     ax_diff2 = cb.image_plot(fig5, "diff", gs5[1,0], surf2_min - ideal, surf2_min - ideal, cb_micron=False)
+    """
+    
+    fig6 = plt.figure(figsize=(5,15))
+    gs6 = fig6.add_gridspec(3,1)
+    ax6_1 = scatter2d(fig6, "", gs6[0,0], surf1_diff)
+    ax6_2 = scatter2d(fig6, "", gs6[1,0], surf2_diff)
+    ax6_3 = scatter2d(fig6, "", gs6[2,0], surf3_diff)
+    
