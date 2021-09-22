@@ -1,0 +1,173 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Sep 21 15:34:36 2021
+
+@author: swimc
+"""
+
+import numpy as np
+import math
+import pandas as pd
+import scipy as sp
+import time
+
+import conbined_minimize as cb
+
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.cm as cm
+from matplotlib.colors import Normalize
+import mpl_toolkits.axes_grid1
+
+def read_faro(fname, center):
+    raw = pd.read_table(fname, header=None)
+    ndarray = raw[[2,3,4]].values
+    ndarray = ndarray.T
+    ndarray[0] = ndarray[0] - center[0]
+    ndarray[1] = ndarray[1] - center[1]
+    return ndarray
+
+def faro_interpolate(ndarray):
+    x_old = ndarray[0]
+    y_old = ndarray[1]
+    c_old = ndarray[2]
+    
+    x_arr = y_arr = np.linspace(-m1_radi, m1_radi, px)
+    xx_new, yy_new = np.meshgrid(x_arr, y_arr)
+    
+    xy_old = np.stack([x_old, y_old], axis=1)
+    c_new = sp.interpolate.griddata(xy_old, c_old, (xx_new, yy_new), method="cubic", fill_value=np.nan)
+    return c_new
+   
+def CircleFitting(x,y):
+    """最小二乗法による円フィッティングをする関数
+        input: x,y 円フィッティングする点群
+
+        output  cxe 中心x座標
+                cye 中心y座標
+                re  半径
+
+        参考
+        一般式による最小二乗法（円の最小二乗法）　画像処理ソリューション
+        http://imagingsolution.blog107.fc2.com/blog-entry-16.html
+    """
+
+    sumx  = sum(x)
+    sumy  = sum(y)
+    sumx2 = sum([ix ** 2 for ix in x])
+    sumy2 = sum([iy ** 2 for iy in y])
+    sumxy = sum([ix * iy for (ix,iy) in zip(x,y)])
+
+    F = np.array([[sumx2,sumxy,sumx],
+                  [sumxy,sumy2,sumy],
+                  [sumx,sumy,len(x)]])
+
+    G = np.array([[-sum([ix ** 3 + ix*iy **2 for (ix,iy) in zip(x,y)])],
+                  [-sum([ix ** 2 *iy + iy **3 for (ix,iy) in zip(x,y)])],
+                  [-sum([ix ** 2 + iy **2 for (ix,iy) in zip(x,y)])]])
+
+    T=np.linalg.inv(F).dot(G)
+
+    cxe=float(T[0]/-2)
+    cye=float(T[1]/-2)
+    re=math.sqrt(cxe**2+cye**2-T[2])
+    #print (cxe,cye,re)
+    return (cxe,cye,re) 
+
+def minimize_func(X, Param):
+    o, p, q, z= X
+    surf = Param
+    ideal = cb.cz1(o, p, q, xx, yy)
+    return np.nansum(abs(surf - ideal + z))
+    
+
+def scatter2d(fig, title, position, ndarray):
+    cmap = cm.jet
+    fs = 15
+    
+    x = ndarray[0]
+    y = ndarray[1]
+    c = ndarray[2]
+    
+    ax = fig.add_subplot(position)
+    ax.scatter(x, y, c=c, cmap=cm.jet)
+    ax.set_title(title, fontsize=fs)
+    
+    divider = mpl_toolkits.axes_grid1.make_axes_locatable(ax)
+    cax = divider.append_axes('right', '5%', pad='3%')
+    norm = Normalize(vmin=np.nanmin(c), vmax=np.nanmax(c))
+    cbar_title = "[nm]"
+    
+    mappable = cm.ScalarMappable(norm = norm, cmap = cm.jet)
+    cbar = fig.colorbar(mappable, ax=ax, cax=cax)
+    cbar.set_label(cbar_title, fontsize=fs)
+    
+    return ax
+
+if __name__ == '__main__':
+    px = 512
+    m1_radi = 1850/2
+    ignore_radi = 200
+    valid_radi = m1_radi - ignore_radi # 有効半径
+        
+    xx, yy = np.meshgrid(np.linspace(-m1_radi, m1_radi, px),np.linspace(-m1_radi, m1_radi, px))
+    mask = np.where(xx**2+yy**2<valid_radi**2, 1, np.nan)
+        
+    
+    
+    
+    side_raw1 = read_faro("_PLANETS_faro/鏡側面（円筒）.txt",[0,0])
+    center_fit = CircleFitting(side_raw1[0], side_raw1[1])
+    side_raw2 = read_faro("_PLANETS_faro/鏡側面（円筒）.txt",[center_fit[0],center_fit[1]])
+    
+    surf1_raw = read_faro("_PLANETS_faro/鏡面上1回目.txt", center_fit)
+    surf2_raw = read_faro("_PLANETS_faro/鏡面上（アキシャルパッド上）.txt", center_fit)
+    
+    surf1_fit = faro_interpolate(surf1_raw)
+    surf2_fit = faro_interpolate(surf2_raw)
+    
+    surf1_pre = mask * (surf1_fit - np.nanmin(surf1_fit))
+    surf2_pre = mask * (surf2_fit - np.nanmin(surf2_fit))
+    
+    start_time = time.time()
+    
+    result1 = sp.optimize.minimize(minimize_func, x0=(0.1,8667,1800, 0), args=surf1_pre, method="Powell")
+    result2 = sp.optimize.minimize(minimize_func, x0=(0.1,8667,1800, 0), args=surf2_pre, method="Powell")
+    print(str(time.time() - start_time))
+    
+    surf1_min = mask * cb.cz1(result1["x"][0], result1["x"][1], result1["x"][2], xx, yy)
+    surf2_min = mask * cb.cz1(result2["x"][0], result2["x"][1], result2["x"][2], xx, yy)
+    
+    ideal = mask * cb.cz1(0, 8667, 1800, xx, yy)
+    
+    ## for plot
+    fig3 = plt.figure(figsize=(5,10))
+    gs3 = fig3.add_gridspec(2,1)
+    ax_side1 = scatter2d(fig3, "side", gs3[0,0], side_raw1)
+    ax_side1.scatter([-1000,-1000, 1000, 1000],[1000,-1000, 1000, -1000])
+    theta = np.linspace(0, 2*np.pi, 1000)
+    x_sideplot = center_fit[2] * np.cos(theta)
+    y_sideplot = center_fit[2] * np.sin(theta)
+    ax_side2 = scatter2d(fig3, "side", gs3[1,0], side_raw2)
+    ax_side2.scatter(x_sideplot, y_sideplot, s=1)
+    
+
+    fig1 = plt.figure(figsize = (5,10))
+    gs1 = fig1.add_gridspec(2,1)
+    ax_surf1 = scatter2d(fig1, "surf 1", gs1[0,0], surf1_raw)
+    ax_surf2 = scatter2d(fig1, "surf axialpad", gs1[1,0], surf2_raw)
+    
+    fig2 = plt.figure(figsize = (5,10))
+    gs2 = fig2.add_gridspec(2,1)
+    ax_fit1 = cb.image_plot(fig2, "surf 1 spline", gs2[0,0], surf1_fit, surf1_fit, cb_micron=False)
+    ax_fit2 = cb.image_plot(fig2, "surf axialpad spline", gs2[1,0], surf2_fit, surf2_fit, cb_micron=False)
+    
+    fig4 = plt.figure(figsize=(5, 10))
+    gs4 = fig4.add_gridspec(2,1)
+    ax_minimize1 = cb.image_plot(fig4, "fitted", gs4[0,0], surf1_min, surf1_min, cb_micron=False)
+    ax_minimize2 = cb.image_plot(fig4, "axialpad fitted", gs4[1,0], surf2_min, surf2_min, cb_micron=False)
+    
+    fig5 = plt.figure(figsize=(5, 10))
+    gs5 = fig5.add_gridspec(2,1)
+    ax_diff1 = cb.image_plot(fig5, "diff", gs5[0,0], surf1_min - ideal, surf1_min - ideal, cb_micron=False)
+    ax_diff2 = cb.image_plot(fig5, "diff", gs5[1,0], surf2_min - ideal, surf2_min - ideal, cb_micron=False)
