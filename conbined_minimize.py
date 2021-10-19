@@ -301,8 +301,7 @@ if __name__ == '__main__':
 
         if option_raw == 0:    
             #raw = dat_read("digitFig01.csv") # dat file 読み出し
-            raw = np.loadtxt("mkfolder/stitch2mesh/diff.csv") * 1e-6
-            print(raw.max())
+            raw = np.loadtxt("mkfolder/stitch2mesh/zer03_0923xm130_1007ym830.hei.v2_dense.csv")
             #raw = raw[:,::-1].T #   反時計回りに 0.5*pi 回転
             #raw = raw[::-1, ::-1] # 反時計回りに 1.0*pi 回転
             #raw = raw[::-1, :].T #  反時計回りに 1.5*pi 回転
@@ -517,7 +516,7 @@ if __name__ == '__main__':
         if option_ideal == 1:
             fig.clf()
         
-        
+        """
         fig2 = plt.figure(figsize=(25, 5))
         gs = fig2.add_gridspec(1, 17)
         
@@ -525,4 +524,4 @@ if __name__ == '__main__':
         ax2_rep = image_plot(fig2, title_rep, gs[0, 5:9], reprod, err_m)
         ax2_torque = torque_plot(fig2, title_t, gs[0, 10:], force)
         fig.tight_layout()
-    
+        """
