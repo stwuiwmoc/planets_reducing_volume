@@ -16,6 +16,8 @@ import matplotlib.pyplot as plt
 import conbined_minimize as cb
 import pandas as pd
 
+import conbined_minimize as cb
+
 def mkfolder(suffix = ""):
     import os
     """    
@@ -113,12 +115,13 @@ if __name__ == '__main__':
     fig_dq = plt.figure(figsize=(7,7))
     gsdq = fig_dq.add_gridspec(2, 1)
     axdq_dir = fig_dq.add_subplot(gsdq[0,0])
-    axdq_dir.plot(dq, dir_0)
-    axdq_dir.plot(dq, dir_6)
+    axdq_dir.plot(dq, dir_0, label="dir_0")
+    axdq_dir.plot(dq, dir_6, label="dir_6")
     axdq_dir.grid()
+    axdq_dir.legend()
     
     axdq_diff = fig_dq.add_subplot(gsdq[1,0])
-    axdq_diff.plot(dq, dir_diff)
+    axdq_diff.plot(dq, dir_diff, label="dir_0 - dir_6")
     axdq_diff.grid()
     axdq_diff.vlines(diff_min_dq, dq.min(), dq.max())
     axdq_diff.set_xlabel("dq [mm]")
@@ -137,4 +140,34 @@ if __name__ == '__main__':
     axs_diff.set_xlabel("s [mm]")
     
     
+    ## figure check
+    px = 1023
+    xx, yy = np.meshgrid(np.linspace(-m1_radi, m1_radi, px),np.linspace(-m1_radi, m1_radi, px))
+    outer_mask = np.where(xx**2 + yy**2 >m1_radi**2, np.nan, 1)
+    inner_mask = np.where(xx**2 + yy**2 <(m1_radi-200)**2, np.nan, 1)
     
+    ideal = outer_mask * inner_mask * cb.cz1(o0, p0, q0, xx, yy)
+    displace = outer_mask * inner_mask * cb.cz1(o0, p0, q0+diff_min_dq, xx-diff_min_s, yy)
+    
+    fig = plt.figure(figsize=(7,14))
+    ax1 = cb.image_plot(fig, "ideal", 211, ideal, ideal)
+    ax2 = cb.image_plot(fig, "displace", 212, displace, displace)
+    
+    x_arr = np.linspace(-m1_radi, m1_radi, px)
+    outer_mask_1d = np.where(x_arr**2 > m1_radi**2, np.nan, 1)
+    ideal_1d = outer_mask_1d * cb.cz1(o0, p0, q0, x_arr, 0)
+    displace_1d = outer_mask_1d * cb.cz1(o0, p0, q0+diff_min_dq, x_arr-diff_min_s, 0)
+    fig1d = plt.figure(figsize = (7,7))
+    ax1d1 = fig1d.add_subplot(211)
+    ax1d1.plot(x_arr, ideal_1d, label="ideal")
+    ax1d1.plot(x_arr, displace_1d, label="displace")
+    ax1d1.grid()
+    ax1d1.legend()
+    ax1d1.set_title("x-z plot (y = 0)")
+    
+    ax1d2 = fig1d.add_subplot(212)
+    ax1d2.plot(x_arr, ideal_1d, label="ideal")
+    ax1d2.plot(x_arr, displace_1d, label="displace")
+    ax1d2.set_ylim(40, 48)
+    ax1d2.grid()
+    ax1d2.legend()
