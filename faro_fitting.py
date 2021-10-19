@@ -39,7 +39,7 @@ def faro_interpolate(ndarray):
     c_new = sp.interpolate.griddata(xy_old, c_old, (xx_new, yy_new), method="cubic", fill_value=np.nan)
     return c_new
    
-def CircleFitting(x,y):
+def CircleFitting(x,y, sigma=False):
     """最小二乗法による円フィッティングをする関数
         input: x,y 円フィッティングする点群
 
@@ -48,6 +48,8 @@ def CircleFitting(x,y):
                 re  半径
 
         参考
+        元の関数
+        https://myenigma.hatenablog.com/entry/2015/09/07/214600#Python%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%A0
         一般式による最小二乗法（円の最小二乗法）　画像処理ソリューション
         http://imagingsolution.blog107.fc2.com/blog-entry-16.html
     """
@@ -72,7 +74,37 @@ def CircleFitting(x,y):
     cye=float(T[1]/-2)
     re=math.sqrt(cxe**2+cye**2-T[2])
     #print (cxe,cye,re)
-    return (cxe,cye,re) 
+    if sigma==False:    
+        return (cxe,cye,re)
+    if sigma==True:
+        sigma = sum(( (x - cxe)**2 + (y - cye)**2 - re**2 ) **2 )
+        return (cxe,cye,re, sigma)
+    
+def rotation_func(X, Param):
+    rot1, rot2, rot3 = X
+    edge = Param
+    rot = sp.spatial.transform.Rotation.from_rotvec([rot1, rot2, rot3])
+    surf_rot = rot.apply(edge.T).T
+    x_rot, y_rot, z_rot = surf_rot
+    cxe, cye, re, sigma = CircleFitting(x_rot, y_rot, True)
+    return sigma
+    
+def RotOptimize(edge):
+    result_rot = sp.optimize.minimize(rotation_func, x0=(0,0,0), 
+                                      args=(edge,), method="Powell")
+
+    rot = sp.spatial.transform.Rotation.from_rotvec(result_rot.x)
+    edge_rot = rot.apply(edge.T).T
+    x_rot, y_rot, z_rot = edge_rot
+    cxe, cye, re = CircleFitting(x_rot, y_rot)
+    theta = np.linspace(0, 2*np.pi, 1000)
+    opt_circle = [re * np.cos(theta) + cxe, re * np.sin(theta) + cye]    
+    result_dict = {
+        }
+    return result_rot, edge_rot, (cxe, cye, re), opt_circle
+    
+    
+
 
 def minimize_func(X, Param):
     o, p, q, z= X
@@ -93,6 +125,10 @@ def Optimize(surf):
     
     surf_diff = [x, y, surf[2] - cz1_result(result, x, y)]
     return result, surf_diff
+ 
+    
+    
+    
     
 
 def scatter2d(fig, title, position, ndarray):
@@ -129,12 +165,13 @@ if __name__ == '__main__':
         
     
     side_raw1 = read_faro("_PLANETS_faro/鏡側面（円筒）.txt",[0,0])
-    center_fit = CircleFitting(side_raw1[0], side_raw1[1])
-    side_raw2 = read_faro("_PLANETS_faro/鏡側面（円筒）.txt",[center_fit[0],center_fit[1]])
+    
+    result_rot1, side1_rot, circleparam1, euler1, opt_circle1 = RotOptimize(side_raw1)
     
     surf1_raw = read_faro("_PLANETS_faro/鏡面上1回目.txt", center_fit)
     surf2_raw = read_faro("_PLANETS_faro/鏡面上（アキシャルパッド上）.txt", center_fit)
-     
+    
+    
     surf1_pre = surf1_raw
     surf1_pre[2] = surf1_raw[2] - surf1_raw[2].min()
     surf2_pre = surf2_raw
@@ -162,11 +199,16 @@ if __name__ == '__main__':
     ax_side2 = scatter2d(fig3, "side", gs3[1,0], side_raw2)
     ax_side2.scatter(x_sideplot, y_sideplot, s=1)
     
+    fig7 = plt.figure(figsize = (5,10))
+    gs7 = fig7.add_gridspec(2,1)
+    ax7_side = scatter2d(fig7, "side 1", gs7[0,0], side1_rot)
+    ax7_side.scatter(opt_circle1[0], opt_circle1[1], s=1)
 
     fig1 = plt.figure(figsize = (5,10))
     gs1 = fig1.add_gridspec(2,1)
     ax_surf1 = scatter2d(fig1, "surf 1", gs1[0,0], surf1_raw)
     ax_surf2 = scatter2d(fig1, "surf axialpad", gs1[1,0], surf2_raw)
+    
     
     """
     fig2 = plt.figure(figsize = (5,10))
