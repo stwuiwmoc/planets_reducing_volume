@@ -295,8 +295,14 @@ if __name__ == '__main__':
 
 
         ## 対象データ入力 -----------------------------------------------------------
+        if option_raw == -1:    
+            raw = dat_read("raw_data/diff.csv")
+            raw_0f = raw
+
         if option_raw == 0:    
-            raw = dat_read("digitFig01.csv") # dat file 読み出し
+            #raw = dat_read("digitFig01.csv") # dat file 読み出し
+            raw = np.loadtxt("mkfolder/stitch2mesh/diff.csv") * 1e-6
+            print(raw.max())
             #raw = raw[:,::-1].T #   反時計回りに 0.5*pi 回転
             #raw = raw[::-1, ::-1] # 反時計回りに 1.0*pi 回転
             #raw = raw[::-1, :].T #  反時計回りに 1.5*pi 回転
