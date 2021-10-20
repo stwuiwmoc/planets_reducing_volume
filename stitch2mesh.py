@@ -38,7 +38,7 @@ def interpolate(raw, x_mesh, y_mesh):
     dz_old = raw[:,2]
     
     xy_old = np.stack([x_old, y_old], axis=1)
-    dz_new = sp.interpolate.griddata(xy_old, dz_old, (x_mesh, y_mesh), method="linear", fill_value = 0)
+    dz_new = sp.interpolate.griddata(xy_old, dz_old, (x_mesh, y_mesh), method="cubic", fill_value=np.nan)
     return dz_new
 
 def zer2mesh(zernike_arr, zernike_order, radi, pixel):
@@ -60,23 +60,25 @@ if __name__ == "__main__":
     varid_radi = m1_radi - ignore_radi
     zer_fit_order = 10
     
-    fname = "raw_data/0922xm130_1007ym830.hei.v2_dense.txt"
+    fname = "raw_data/0923xm130_1007ym830.hei.v2_dense.txt"
     shaped = np.loadtxt(fname)[:,1:4]
     
     xx, yy = np.meshgrid(np.linspace(-m1_radi, m1_radi, px),np.linspace(-m1_radi, m1_radi, px))
-    tf = np.where(xx**2+yy**2<varid_radi**2, True, False)
-    mask = np.where(tf==True, 1, np.nan)
     
     z_mesh = interpolate(shaped, xx, yy) * 1e-6 # mm単位に合わせる
+    tf = ~np.isnan(z_mesh)
+    mask = np.where(tf==True, 1, np.nan)
     
-    zer, fit = pr.prop_fit_zernikes(z_mesh*1e-3, #properでの指定は単位 [m]
+    zer, fit = pr.prop_fit_zernikes(tf*z_mesh*1e-3, #properでの指定は単位 [m]
                                     tf, px/2, zer_fit_order, xc=px/2, yc=px/2, FIT=True)
     
-    zer10mesh = zer2mesh(zer, zer_fit_order, varid_radi, px)
-    diff_zer10 = z_mesh - zer10mesh
+    #mask_varid = np.where(xx**2+yy**2<varid_radi**2, True, np.nan)
+    
+    zer10mesh = zer2mesh(zer, zer_fit_order, m1_radi, px)
+    diff_zer10 = ( z_mesh - zer10mesh ) * mask
 
-    zer03mesh = zer2mesh(zer[:3], 3, varid_radi, px)
-    diff_zer03 = z_mesh - zer03mesh
+    zer03mesh = zer2mesh(zer[:3], 3, m1_radi, px)
+    diff_zer03 = ( z_mesh - zer03mesh ) * mask
 
     
     fig = plt.figure(figsize=(10,15))
@@ -90,14 +92,14 @@ if __name__ == "__main__":
                              324, zer10mesh*mask, zer10mesh*mask)
     
     ax_zer03diff = cb.image_plot(fig, "zernike(<="+str(3)+") removed",
-                             325, diff_zer03*mask, diff_zer03*mask)
+                             325, diff_zer03, diff_zer03)
     ax_zer10diff = cb.image_plot(fig, "zernike(<="+str(zer_fit_order)+") removed",
-                             326, diff_zer10*mask, diff_zer10*mask)
+                             326, diff_zer10, diff_zer10)
     fig.tight_layout()
     
     
     np.savetxt(mkfolder() + "zer03_" + fname[9:-4] + ".csv",
-               diff_zer03*mask)
+               diff_zer03)
     np.savetxt(mkfolder() + "zer10_" + fname[9:-4] + ".csv",
-               diff_zer10*mask)
+               diff_zer10)
     
