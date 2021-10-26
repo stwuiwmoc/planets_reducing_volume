@@ -246,6 +246,29 @@ def torque_plot(fig, title, position, force):
     ax.hlines([5, -5], xmin=1, xmax=12, color ="red", linestyle="dashed")
     return ax
 
+def surface_plot(fig, title, position, XX, YY, zz, bottom_percent):
+    fs = 15
+    xx = XX
+    yy = YY
+    
+    zz_pv_micron = pv_micron(zz, 0)
+    bottom = np.nanmin(zz) + zz_pv_micron[1]*1e-3*bottom_percent
+    
+    tf_arr = ~np.isnan(zz)
+    zz_bottom = np.where(tf_arr==True, zz, bottom)
+    
+    ax = fig.add_subplot(position, projection="3d")
+    surf = ax.plot_surface(xx, yy, zz_bottom, cmap=cm.jet, linewidth=0)
+    ax.set_title(title)
+    
+    norm = Normalize(vmin=np.nanmin(zz*1000), vmax=np.nanmax(zz*1000)) # c_scaleがmm表記だと見にくいのでμ表記に変更
+    cbar_title = r"[$\mu$m]"
+
+    mappable = cm.ScalarMappable(norm = norm, cmap = cm.jet)
+    cbar = fig.colorbar(mappable, ax=ax)
+    cbar.set_label(cbar_title, fontsize=fs)
+    return ax
+
 if __name__ == '__main__':
     ## parametar --------------------------------------------------------------
    
@@ -255,7 +278,7 @@ if __name__ == '__main__':
     q0, dq = 1800, 0
     
     # フチを無視する長さ [mm] 半径に対して計算
-    ignore_radi = 50
+    ignore_radi = 75
     
     # 研磨量計算時に下位 %を無視して offset を設定 入力は％ではなく小数
     ignore_offset = 0.02
@@ -300,8 +323,9 @@ if __name__ == '__main__':
             raw_0f = raw
 
         if option_raw == 0:    
-            #raw = dat_read("digitFig01.csv") # dat file 読み出し
-            raw = np.loadtxt("mkfolder/stitch2mesh/zer03_0923xm130_1007ym830.hei.v2_dense.csv")
+            raw = dat_read("digitFig01.csv") # dat file 読み出し
+            #raw = np.loadtxt("mkfolder/stitch2mesh/zer03_0923xm130_1007ym830.hei.v2_dense.csv")
+            
             #raw = raw[:,::-1].T #   反時計回りに 0.5*pi 回転
             #raw = raw[::-1, ::-1] # 反時計回りに 1.0*pi 回転
             #raw = raw[::-1, :].T #  反時計回りに 1.5*pi 回転
@@ -524,4 +548,13 @@ if __name__ == '__main__':
         ax2_rep = image_plot(fig2, title_rep, gs[0, 5:9], reprod, err_m)
         ax2_torque = torque_plot(fig2, title_t, gs[0, 10:], force)
         fig.tight_layout()
+        
         """
+        fig3 = plt.figure(figsize=(10,7))
+        ax_surf_raw = surface_plot(fig3, "", 111, xx, yy, raw_0f, 0.2)
+        fig3.show()
+        
+        fig4 = plt.figure(figsize=(10,7))
+        ax_surf_res = surface_plot(fig4, "", 111, xx, yy, residual, 0.2)
+        fig4.show()
+        
