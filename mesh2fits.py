@@ -9,6 +9,7 @@ import numpy as np
 import astropy.io.fits as fits
 import matplotlib.pyplot as plt
 import PIL
+import datetime
 
 import stitch2mesh as s2m
 
@@ -42,7 +43,7 @@ if __name__ == '__main__':
     fits_radi = 1000 # 1pixel = 2mm で、1001*1001px の fits作成
     rotate_angle = 10.814 + 0.979 # [deg]
     
-    fname_rawdata = "mkfolder/stitch2mesh/zer10_0922xm130_1007ym830.hei.v2_dense.csv"
+    fname_rawdata = "mkfolder/stitch2mesh/zer10_0923xm130_1007ym830.hei.v2_dense.csv"
     rawdata = np.loadtxt(fname_rawdata)
     
     ## 回転 ------------------------------------------------------------------
@@ -71,6 +72,8 @@ if __name__ == '__main__':
     
     hdu.header["file_den"] = fname_txtfile + ".txt"
     hdu.header["vertex_a"] = "{:.04f}".format(rotate_angle)
+    hdu.header["tsmpl1"] = datetime.datetime.now().strftime("%Y%m%d %H%M%S")
+    hdu.header["tmskpl1"] = datetime.datetime.now().strftime("%Y%m%d %H%M%S")
     
     hdu.data = (zz_new * 1e6).astype("float32") # mm -> nm
     hdu.writeto(mkfolder() + fname_txtfile + ".fits", overwrite=True)
