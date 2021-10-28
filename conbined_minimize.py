@@ -250,22 +250,27 @@ def torque_plot(fig, title, position, force):
     ax.hlines([5, -5], xmin=1, xmax=12, color ="red", linestyle="dashed")
     return ax
 
-def surface_plot(fig, title, position, XX, YY, zz, bottom_percent):
+def surface_plot(fig, title, position, XX, YY, zz, zz_cbar, bottom_percent, min_per=0, max_per=1):
+    import matplotlib as mpl
     fs = 15
     xx = XX
     yy = YY
     
-    zz_pv_micron = pv_micron(zz, 0)
-    bottom = np.nanmin(zz) + zz_pv_micron[1]*1e-3*bottom_percent
-    
+    zz_pv = pv_micron(zz, 0)[1] * 1e-3 # mm単位
+    bottom = np.nanmin(zz) + zz_pv * bottom_percent
     tf_arr = ~np.isnan(zz)
     zz_bottom = np.where(tf_arr==True, zz, bottom)
-    
+        
+    cbar_pv = pv_micron(zz_cbar,0)[1] * 1e-3 # mm単位
+    cbar_min = np.nanmin(zz_cbar) + cbar_pv * min_per
+    cbar_max = np.nanmin(zz_cbar) + cbar_pv * max_per
+
     ax = fig.add_subplot(position, projection="3d")
-    surf = ax.plot_surface(xx, yy, zz_bottom, cmap=cm.jet, linewidth=0)
+    ax.plot_surface(xx, yy, zz_bottom, cmap=cm.jet, linewidth=0)
     ax.set_title(title)
+    ax.zaxis.set_major_formatter(mpl.ticker.FuncFormatter(lambda x, pos: x*1e3))
     
-    norm = Normalize(vmin=np.nanmin(zz*1000), vmax=np.nanmax(zz*1000)) # c_scaleがmm表記だと見にくいのでμ表記に変更
+    norm = Normalize(vmin=cbar_min*1e3, vmax=cbar_max*1e3) # c_scaleがmm表記だと見にくいのでμ表記に変更
     cbar_title = r"[$\mu$m]"
 
     mappable = cm.ScalarMappable(norm = norm, cmap = cm.jet)
@@ -552,13 +557,17 @@ if __name__ == '__main__':
         ax2_rep = image_plot(fig2, title_rep, gs[0, 5:9], reprod, err_m)
         ax2_torque = torque_plot(fig2, title_t, gs[0, 10:], force)
         fig.tight_layout()
-        
         """
+        
         fig3 = plt.figure(figsize=(10,7))
-        ax_surf_raw = surface_plot(fig3, "", 111, xx, yy, raw_0f, 0.2)
+        surface_plot(fig3, "", 111, xx, yy, raw*mask, raw_0f, 0.2)
         fig3.show()
         
         fig4 = plt.figure(figsize=(10,7))
-        ax_surf_res = surface_plot(fig4, "", 111, xx, yy, residual, 0.2)
+        surface_plot(fig4, "", 111, xx, yy, err_m, err_m, 0.2)
         fig4.show()
+        
+        fig5 = plt.figure(figsize=(10,7))
+        surface_plot(fig5, "", 111, xx, yy, residual, residual, 0.2)
+        fig5.show()
         
