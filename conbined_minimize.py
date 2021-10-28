@@ -250,7 +250,7 @@ def torque_plot(fig, title, position, force):
     ax.hlines([5, -5], xmin=1, xmax=12, color ="red", linestyle="dashed")
     return ax
 
-def surface_plot(fig, title, position, XX, YY, zz, zz_cbar, bottom_percent, min_per=0, max_per=1):
+def surface_plot(fig, title, position, XX, YY, zz, zz_cbar, bottom_percent, min_per=0, max_per=1, zz_lim=False):
     import matplotlib as mpl
     fs = 15
     xx = XX
@@ -269,6 +269,13 @@ def surface_plot(fig, title, position, XX, YY, zz, zz_cbar, bottom_percent, min_
     ax.plot_surface(xx, yy, zz_bottom, cmap=cm.jet, linewidth=0)
     ax.set_title(title)
     ax.zaxis.set_major_formatter(mpl.ticker.FuncFormatter(lambda x, pos: x*1e3))
+    ax.view_init(elev=30, azim=60)
+    ax.set_xlabel("x [mm]", fontsize=fs)
+    ax.set_ylabel("y [mm]", fontsize=fs)
+    if type(zz_lim) == bool:
+        pass
+    else:
+        ax.set_zlim(np.nanmin(zz_lim), np.nanmax(zz_lim))
     
     norm = Normalize(vmin=cbar_min*1e3, vmax=cbar_max*1e3) # c_scaleがmm表記だと見にくいのでμ表記に変更
     cbar_title = r"[$\mu$m]"
@@ -560,14 +567,14 @@ if __name__ == '__main__':
         """
         
         fig3 = plt.figure(figsize=(10,7))
-        surface_plot(fig3, "", 111, xx, yy, raw*mask, raw_0f, 0.2)
+        surface_plot(fig3, "", 111, xx, yy, raw*mask, raw_0f, ignore_offset)
         fig3.show()
         
         fig4 = plt.figure(figsize=(10,7))
-        surface_plot(fig4, "", 111, xx, yy, err_m, err_m, 0.2)
+        surface_plot(fig4, "", 111, xx, yy, err_m, raw_0f, ignore_offset)
         fig4.show()
         
         fig5 = plt.figure(figsize=(10,7))
-        surface_plot(fig5, "", 111, xx, yy, residual, residual, 0.2)
+        surface_plot(fig5, "", 111, xx, yy, residual, residual, ignore_offset, zz_lim=raw_0f)
         fig5.show()
         
