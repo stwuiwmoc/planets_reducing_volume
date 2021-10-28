@@ -194,22 +194,26 @@ def assess(array, digits):
     return pv_t[0], rms_t[0], v_t[0], v_t[2]
 
 
-def image_plot(fig, title, position, c, c_scale, cb_micron=True):
+def image_plot(fig, title, position, c, c_scale, cb_micron=True, min_per=0, max_per=1):
     cmap = cm.jet
     fs = 15
 
+    cbar_pv = pv_micron(c_scale, 0)[1] * 1e-3 # mm単位で計算
+    cbar_min = np.nanmin(c_scale) + cbar_pv*min_per
+    cbar_max = np.nanmin(c_scale) + cbar_pv*max_per
+
     ax = fig.add_subplot(position)
-    ax.imshow(c, interpolation="nearest", cmap=cmap, vmin=np.nanmin(c_scale), vmax=np.nanmax(c_scale), origin="lower", extent=[-925, 925, -925, 925])
+    ax.imshow(c, interpolation="nearest", cmap=cmap, vmin=cbar_min, vmax=cbar_max, origin="lower", extent=[-925, 925, -925, 925])
     ax.set_title(title, fontsize=fs)
   
     divider = mpl_toolkits.axes_grid1.make_axes_locatable(ax)
     cax = divider.append_axes('right', '5%', pad='3%')
     
     if cb_micron==True:
-        norm = Normalize(vmin=np.nanmin(c_scale*1000), vmax=np.nanmax(c_scale*1000)) # c_scaleがmm表記だと見にくいのでμ表記に変更
+        norm = Normalize(vmin=cbar_min*1e3, vmax=cbar_max*1e3) # c_scaleがmm表記だと見にくいのでμ表記に変更
         cbar_title = r"[$\mu$m]"
     else:
-        norm = Normalize(vmin=np.nanmin(c_scale), vmax=np.nanmax(c_scale))
+        norm = Normalize(vmin=cbar_min, vmax=cbar_max)
         cbar_title = "[mm]"
     mappable = cm.ScalarMappable(norm = norm, cmap = cm.jet)
     cbar = fig.colorbar(mappable, ax=ax, cax=cax)
