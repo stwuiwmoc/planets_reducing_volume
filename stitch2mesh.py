@@ -60,7 +60,7 @@ if __name__ == "__main__":
     varid_radi = m1_radi - ignore_radi
     zer_fit_order = 10
     
-    fname = "raw_data/0923xm130_1007ym830.hei.v2_dense.txt"
+    fname = "raw_data/1101xm130_1102ym830.hei_dense.txt"
     shaped = np.loadtxt(fname)[:,1:4]
     
     xx, yy = np.meshgrid(np.linspace(-m1_radi, m1_radi, px),np.linspace(-m1_radi, m1_radi, px))
@@ -97,6 +97,7 @@ if __name__ == "__main__":
                              326, diff_zer10, diff_zer10)
     fig.tight_layout()
     
+    fig.savefig(mkfolder() + fname[9:-4] + ".png")
     
     np.savetxt(mkfolder() + "zer03_" + fname[9:-4] + ".csv",
                diff_zer03)

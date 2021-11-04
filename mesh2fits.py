@@ -43,7 +43,7 @@ if __name__ == '__main__':
     fits_radi = 1000 # 1pixel = 2mm で、1001*1001px の fits作成
     rotate_angle = 10.814 + 0.979 # [deg]
     
-    fname_rawdata = "mkfolder/stitch2mesh/zer10_0923xm130_1007ym830.hei.v2_dense.csv"
+    fname_rawdata = "mkfolder/stitch2mesh/zer10_1101xm130_1102ym830.hei_dense.csv"
     rawdata = np.loadtxt(fname_rawdata)
     
     ## 回転 ------------------------------------------------------------------
