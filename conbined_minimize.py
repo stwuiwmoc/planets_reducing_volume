@@ -39,7 +39,7 @@ def mkfolder(suffix = ""):
 
 def dat_read(fname):
     # 鏡面異常を表す dat file を読み出して成形
-    data = np.genfromtxt("digitFig01.csv", delimiter = ",", encoding="utf-8_sig")
+    data = np.genfromtxt(fname, delimiter = ",", encoding="utf-8_sig")
     
     pixels = data.reshape((1024,1026))
     
