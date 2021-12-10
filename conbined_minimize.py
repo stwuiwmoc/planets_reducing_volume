@@ -193,7 +193,6 @@ def assess(array, digits):
     v_t = volume(array, digits)
     return pv_t[0], rms_t[0], v_t[0], v_t[2]
 
-
 def image_plot(fig, title, position, c, c_scale, cb_micron=True, min_per=0, max_per=1):
     cmap = cm.jet
     fs = 15
@@ -340,7 +339,7 @@ if __name__ == '__main__':
 
         if option_raw == 0:    
             raw = dat_read("digitFig01.csv") # dat file 読み出し
-            raw = np.loadtxt("mkfolder/stitch2mesh/zer03_1101xm130_1102ym830.hei_dense.csv")
+            #raw = np.loadtxt("mkfolder/stitch2mesh/zer03_1101xm130_1102ym830.hei_dense.csv")
             
             #raw = raw[:,::-1].T #   反時計回りに 0.5*pi 回転
             #raw = raw[::-1, ::-1] # 反時計回りに 1.0*pi 回転
