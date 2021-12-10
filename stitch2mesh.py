@@ -60,7 +60,7 @@ if __name__ == "__main__":
     varid_radi = m1_radi - ignore_radi
     zer_fit_order = 10
     
-    fname = "raw_data/1101xm130i_1102ym830n.hei_dense.txt"
+    fname = "raw_data/1116xm130ym830WTp03.v3.hei_dense.txt"
     shaped = np.loadtxt(fname)[:,1:4]
     
     xx, yy = np.meshgrid(np.linspace(-m1_radi, m1_radi, px),np.linspace(-m1_radi, m1_radi, px))

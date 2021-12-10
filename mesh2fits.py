@@ -41,9 +41,9 @@ if __name__ == '__main__':
     varid_radi = 900
     px_new = 1001
     fits_radi = 1000 # 1pixel = 2mm で、1001*1001px の fits作成
-    rotate_angle = 10.814 + 0.979 # [deg]
+    rotate_angle = 10.814 #+ 0.979 # [deg] 今回の計測はTT座標系基準のデータなので、TT座標系と光軸方向のずれは研磨用fitsに入れる必要は無い
     
-    fname_rawdata = "mkfolder/stitch2mesh/zer10_1109xm130i_1102ym830n.hei_dense.csv"
+    fname_rawdata = "mkfolder/stitch2mesh/zer10_1116xm130ym830WTp03.v3.hei_dense.csv"
     rawdata = np.loadtxt(fname_rawdata)
     
     ## 回転 ------------------------------------------------------------------
