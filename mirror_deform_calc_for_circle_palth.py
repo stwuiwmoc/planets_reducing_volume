@@ -137,7 +137,7 @@ if __name__ == "__main__":
     zernike = ZernikeSurface(constants = consts, 
                              zernike_number_list = [2],
                              zernike_value_array = np.array([2e-6])) 
-    
+    # zernikeの係数を入れて計算を進める方
     reprod = WhReproductedSurface(constants = consts,
                                   target_surface=zernike.surface,
                                   torque_max_value=1e3,
