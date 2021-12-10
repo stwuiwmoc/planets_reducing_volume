@@ -63,11 +63,11 @@ class ZernikeSurface:
         self.zernike_number_list = zernike_number_list
         self.zernike_value_array = zernike_value_array
 
-        self.surface = self.make_masked_zernike_surface()
+        self.surface = self.__make_masked_zernike_surface()
         self.pv = pv_calculation(self.surface)
         self.rms = rms_calculation(self.surface)
     
-    def make_masked_zernike_surface(self):
+    def __make_masked_zernike_surface(self):
         optical_wavelength = 500e-9
         
         wavestruct = pr.prop_begin(beam_diameter = 2*self.__constants.varid_radius,
@@ -90,14 +90,14 @@ class WhReproductedSurface:
         self.ignore_zernike_number_list = ignore_zernike_number_list
      
         self.operation_matrix = np.genfromtxt("raw_data/WT06_zer10_operation_matrix[m].csv", delimiter=",").T
-        self.fitted_zernike_value_array = self.make_fitted_zernike_value_array()
-        self.__remaining_operation_matrix = self.make_remaining_matrix(self.operation_matrix)
-        self.__remaining_fitted_zernike_value_array = self.make_remaining_matrix(self.fitted_zernike_value_array)
-        self.__remaining_zernike_number_list = self.make_remaining_matrix(1+np.arange(self.__constants.zernike_max_degree))
-        self.torque_value_array, self.restructed_torque_value_array = self.make_torque_value_array()
+        self.fitted_zernike_value_array = self.__make_fitted_zernike_value_array()
+        self.remaining_operation_matrix = self.__make_remaining_matrix(self.operation_matrix)
+        self.remaining_fitted_zernike_value_array = self.__make_remaining_matrix(self.fitted_zernike_value_array)
+        self.remaining_zernike_number_list = self.__make_remaining_matrix(1+np.arange(self.__constants.zernike_max_degree))
+        self.torque_value_array, self.restructed_torque_value_array = self.__make_torque_value_array()
         
     
-    def make_fitted_zernike_value_array(self):
+    def __make_fitted_zernike_value_array(self):
         fitted_zernike_value_array = pr.prop_fit_zernikes(wavefront0=self.target_surface,
                                                           pupil0=self.__constants.tf,
                                                           pupilradius0=self.__constants.pixel_number/2,
@@ -106,26 +106,25 @@ class WhReproductedSurface:
                                                           yc=self.__constants.pixel_number/2)
         return fitted_zernike_value_array
     
-    def make_remaining_matrix(self, matrix):
+    def __make_remaining_matrix(self, matrix):
         idx_array = np.array(self.ignore_zernike_number_list) - 1
         remaining_matrix = np.delete(arr=matrix, obj=idx_array, axis=0)
         return remaining_matrix
     
-    def make_torque_value_array(self):
-        inverse_operation_matrix = sp.linalg.pinv2(1e9*self.__remaining_operation_matrix)*1e9
-        print(inverse_operation_matrix)
+    def __make_torque_value_array(self):
+        inverse_operation_matrix = sp.linalg.pinv2(1e9*self.remaining_operation_matrix)*1e9
         
-        #torque_value_array = np.dot(inverse_operation_matrix, self.__remaining_fitted_zernike_value_array)
+        #torque_value_array = np.dot(inverse_operation_matrix, self.remaining_fitted_zernike_value_array)
         torque_value_array = np.dot(inverse_operation_matrix, np.array([-1.01586202e-07, -3.38411547e-07,  3.02566783e-07,  2.10233957e-07,-2.01693302e-07, -6.40135092e-08,  1.15529214e-08,  3.01199936e-07,-1.78044987e-08]))
         
-        print(torque_value_array)
+        
         restructed_torque_value_array = np.where(torque_value_array<self.torque_max_value,
                                                  torque_value_array,
                                                  self.torque_max_value)
         return torque_value_array, restructed_torque_value_array
     
-    def make_reproducted_surface(self):
-        remaining_reproducted_zernike_value_array = np.dot(self.__remaining_operation_matrix, self.torque_value_array)
+    def __make_reproducted_surface(self):
+        remaining_reproducted_zernike_value_array = np.dot(self.remaining_operation_matrix, self.torque_value_array)
         
 
 if __name__ == "__main__":
