@@ -57,7 +57,7 @@ class Constants:
         self.mask = np.where(self.tf==True, 1, np.nan)
         self.zernike_max_degree = zernike_max_degree
 
-class ZernikeSurface:
+class ZernikeToSurface:
     def __init__(self, constants, zernike_number_list, zernike_value_array):
         self.__constants = constants
         self.zernike_number_list = zernike_number_list
@@ -142,9 +142,9 @@ if __name__ == "__main__":
                        pixel_number=256,
                        zernike_max_degree = 10)
     
-    zernike = ZernikeSurface(constants = consts, 
-                             zernike_number_list = [2],
-                             zernike_value_array = np.array([2e-6])) 
+    zernike = ZernikeToSurface(constants = consts, 
+                               zernike_number_list = [2],
+                               zernike_value_array = np.array([2e-6])) 
     # zernikeの係数を入れて計算を進める方
     reprod = WhReproduction(constants = consts,
                             target_zernike_number_list = [2, 3, 5],
@@ -159,6 +159,6 @@ if __name__ == "__main__":
                                               restructed_torque_value=5,
                                               ignore_zernike_number_list=[1])
     
-    reproducted_zernike = ZernikeSurface(constants = consts,
-                                         zernike_number_list = reproduction_same_for_cb.remaining_zernike_number_list,
-                                         zernike_value_array = reproduction_same_for_cb.remaining_reproducted_zernike_value_array)
+    reproducted_zernike = ZernikeToSurface(constants = consts,
+                                           zernike_number_list = reproduction_same_for_cb.remaining_zernike_number_list,
+                                           zernike_value_array = reproduction_same_for_cb.remaining_reproducted_zernike_value_array)
