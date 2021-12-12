@@ -125,7 +125,7 @@ class WhReproductedSurface:
                                                          self.restructed_torque_value)
             
         restructed_torque_value_array = np.where(only_max_restructed_torque_value_array>-self.restructed_torque_value,
-                                                 torque_value_array,
+                                                 only_max_restructed_torque_value_array,
                                                  -self.restructed_torque_value)
         
         return torque_value_array, restructed_torque_value_array
