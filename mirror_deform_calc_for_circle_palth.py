@@ -83,29 +83,20 @@ class ZernikeSurface:
         return masked_wfe
 
 class WhReproductedSurface:
-    def __init__(self, constants, target_surface, torque_max_value, ignore_zernike_number_list):
+    def __init__(self, constants, target_zernike_number_list, target_zernike_value_array, torque_max_value, ignore_zernike_number_list):
         self.__constants = constants
-        self.target_surface = target_surface
+        self.target_zernike_number_list = target_zernike_number_list
+        self.target_zernike_value_array = target_zernike_value_array
         self.torque_max_value = torque_max_value
         self.ignore_zernike_number_list = ignore_zernike_number_list
      
         self.operation_matrix = np.genfromtxt("raw_data/WT06_zer10_operation_matrix[m].csv", delimiter=",").T
-        self.fitted_zernike_value_array = self.__make_fitted_zernike_value_array()
         self.remaining_operation_matrix = self.__make_remaining_matrix(self.operation_matrix)
-        self.remaining_fitted_zernike_value_array = self.__make_remaining_matrix(self.fitted_zernike_value_array)
+        self.remaining_target_zernike_value_array = self.__make_remaining_matrix(self.target_zernike_value_array)
         self.remaining_zernike_number_list = self.__make_remaining_matrix(1+np.arange(self.__constants.zernike_max_degree))
         self.torque_value_array, self.restructed_torque_value_array = self.__make_torque_value_array()
         
-    
-    def __make_fitted_zernike_value_array(self):
-        fitted_zernike_value_array = pr.prop_fit_zernikes(wavefront0=self.target_surface,
-                                                          pupil0=self.__constants.tf,
-                                                          pupilradius0=self.__constants.pixel_number/2,
-                                                          nzer=self.__constants.zernike_max_degree,
-                                                          xc=self.__constants.pixel_number/2,
-                                                          yc=self.__constants.pixel_number/2)
-        return fitted_zernike_value_array
-    
+        
     def __make_remaining_matrix(self, matrix):
         idx_array = np.array(self.ignore_zernike_number_list) - 1
         remaining_matrix = np.delete(arr=matrix, obj=idx_array, axis=0)
@@ -139,7 +130,8 @@ if __name__ == "__main__":
                              zernike_value_array = np.array([2e-6])) 
     # zernikeの係数を入れて計算を進める方
     reprod = WhReproductedSurface(constants = consts,
-                                  target_surface=zernike.surface,
+                                  target_zernike_number_list = [2],
+                                  target_zernike_value_array = np.array([2e-6]),
                                   torque_max_value=1e3,
                                   ignore_zernike_number_list=[1])
    
