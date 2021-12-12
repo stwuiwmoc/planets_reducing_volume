@@ -82,7 +82,7 @@ class ZernikeSurface:
         masked_wfe = self.__constants.mask * wfe
         return masked_wfe
 
-class WhReproductedSurface:
+class WhReproduction:
     def __init__(self, constants, target_zernike_number_list, target_zernike_value_array, restructed_torque_value, ignore_zernike_number_list):
         self.__constants = constants
         self.target_zernike_number_list = target_zernike_number_list
@@ -98,6 +98,7 @@ class WhReproductedSurface:
         self.remaining_zernike_number_list = self.__make_remaining_matrix(1+np.arange(self.__constants.zernike_max_degree))
         
         self.torque_value_array, self.restructed_torque_value_array = self.__make_torque_value_array()
+        self.remaining_reproducted_zernike_value_array = self.__make_reproducted_zernike_value_array()
         
 
     def __make_full_zernike_value_array(self):
@@ -130,12 +131,10 @@ class WhReproductedSurface:
         
         return torque_value_array, restructed_torque_value_array
     
-    def __make_reproducted_surface(self):
-        remaining_reproducted_zernike_value_array = np.dot(self.remaining_operation_matrix, self.torque_value_array)
+    def __make_reproducted_zernike_value_array(self):
+        remaining_reproducted_zernike_value_array = np.dot(self.remaining_operation_matrix, self.restructed_torque_value_array)
         
-        ignore_zernike_idx_array = np.array([x-1 for x in self.ignore_zernike_number_list])
-        #reproducted_zernike_value_array = np.insert(remaining_reprod)
-        return
+        return remaining_reproducted_zernike_value_array
         
 
 if __name__ == "__main__":
@@ -149,11 +148,11 @@ if __name__ == "__main__":
                              zernike_number_list = [2],
                              zernike_value_array = np.array([2e-6])) 
     # zernikeの係数を入れて計算を進める方
-    reprod = WhReproductedSurface(constants = consts,
-                                  target_zernike_number_list = [2, 3, 5],
-                                  target_zernike_value_array = np.array([2e-6, 1e-6, 3e-6]),
-                                  restructed_torque_value=1e3,
-                                  ignore_zernike_number_list=[1])
+    reprod = WhReproduction(constants = consts,
+                            target_zernike_number_list = [2, 3, 5],
+                            target_zernike_value_array = np.array([2e-6, 1e-6, 3e-6]),
+                            restructed_torque_value=1e3,
+                            ignore_zernike_number_list=[1])
     
     
    
