@@ -83,11 +83,11 @@ class ZernikeSurface:
         return masked_wfe
 
 class WhReproductedSurface:
-    def __init__(self, constants, target_zernike_number_list, target_zernike_value_array, torque_max_value, ignore_zernike_number_list):
+    def __init__(self, constants, target_zernike_number_list, target_zernike_value_array, restructed_torque_value, ignore_zernike_number_list):
         self.__constants = constants
         self.target_zernike_number_list = target_zernike_number_list
         self.target_zernike_value_array = target_zernike_value_array
-        self.torque_max_value = torque_max_value
+        self.restructed_torque_value = restructed_torque_value
         self.ignore_zernike_number_list = ignore_zernike_number_list
      
 
@@ -118,12 +118,12 @@ class WhReproductedSurface:
         inverse_operation_matrix = sp.linalg.pinv2(1e9*self.remaining_operation_matrix)*1e9
         
         torque_value_array = np.dot(inverse_operation_matrix, self.remaining_zernike_value_array)
-        #torque_value_array = np.dot(inverse_operation_matrix, np.array([-1.01586202e-07, -3.38411547e-07,  3.02566783e-07,  2.10233957e-07,-2.01693302e-07, -6.40135092e-08,  1.15529214e-08,  3.01199936e-07,-1.78044987e-08]))
         
         
-        restructed_torque_value_array = np.where(torque_value_array<self.torque_max_value,
+        restructed_torque_value_array = np.where(torque_value_array<self.restructed_torque_value,
                                                  torque_value_array,
-                                                 self.torque_max_value)
+                                                 self.restructed_torque_value)
+        
         return torque_value_array, restructed_torque_value_array
     
     def __make_reproducted_surface(self):
@@ -148,7 +148,7 @@ if __name__ == "__main__":
     reprod = WhReproductedSurface(constants = consts,
                                   target_zernike_number_list = [2, 3, 5],
                                   target_zernike_value_array = np.array([2e-6, 1e-6, 3e-6]),
-                                  torque_max_value=1e3,
+                                  restructed_torque_value=1e3,
                                   ignore_zernike_number_list=[1])
     
     
