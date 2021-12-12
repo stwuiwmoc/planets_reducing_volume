@@ -90,7 +90,6 @@ class WhReproduction:
         self.restructed_torque_value = abs(restructed_torque_value)
         self.ignore_zernike_number_list = ignore_zernike_number_list
      
-
         self.operation_matrix = np.genfromtxt("raw_data/WT06_zer10_operation_matrix[m].csv", delimiter=",").T
         self.full_zernike_value_array = self.__make_full_zernike_value_array()
         self.remaining_operation_matrix = self.__make_remaining_matrix(self.operation_matrix)
@@ -133,7 +132,6 @@ class WhReproduction:
     
     def __make_reproducted_zernike_value_array(self):
         remaining_reproducted_zernike_value_array = np.dot(self.remaining_operation_matrix, self.restructed_torque_value_array)
-        
         return remaining_reproducted_zernike_value_array
         
 
@@ -155,4 +153,12 @@ if __name__ == "__main__":
                             ignore_zernike_number_list=[1])
     
     
-   
+    reproduction_same_for_cb = WhReproduction(constants = consts,
+                                              target_zernike_number_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                                              target_zernike_value_array = np.array([ 8.11304455e-08, -1.01586202e-07, -3.38411547e-07,  3.02566783e-07, 2.10233957e-07, -2.01693302e-07, -6.40135092e-08,  1.15529214e-08,3.01199936e-07, -1.78044987e-08]),
+                                              restructed_torque_value=5,
+                                              ignore_zernike_number_list=[1])
+    
+    reproducted_zernike = ZernikeSurface(constants = consts,
+                                         zernike_number_list = reproduction_same_for_cb.remaining_zernike_number_list,
+                                         zernike_value_array = reproduction_same_for_cb.remaining_reproducted_zernike_value_array)
