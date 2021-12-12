@@ -215,20 +215,31 @@ if __name__ == "__main__":
                        zernike_max_degree = 10)
     
     zernike = ZernikeToSurface(constants = consts, 
-                               zernike_number_list = [2],
+                               zernike_number_list = [9],
                                zernike_value_array = np.array([2e-6])) 
     
-    idealized_zernike = ZernikeToSurface(constants = consts, 
-                                         zernike_number_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-                                         zernike_value_array = np.array([ 8.11304455e-08, -1.01586202e-07, -3.38411547e-07,  3.02566783e-07, 2.10233957e-07, -2.01693302e-07, -6.40135092e-08,  1.15529214e-08,3.01199936e-07, -1.78044987e-08]))
-                
-    
-    reproduction_same_for_cb = WhReproduction(constants = consts,
-                                              target_zernike_number_list = idealized_zernike.zernike_number_list,
-                                              target_zernike_value_array = idealized_zernike.zernike_value_array,
-                                              restructed_torque_value=5,
-                                              ignore_zernike_number_list=[1,2,3,4])
+    reproduction = WhReproduction(constants=consts,
+                                  target_zernike_number_list=zernike.zernike_number_list,
+                                  target_zernike_value_array=zernike.zernike_value_array,
+                                  restructed_torque_value=5,
+                                  ignore_zernike_number_list=[1,2,3,4])
     
     reproducted_zernike = ZernikeToSurface(constants = consts,
-                                           zernike_number_list = reproduction_same_for_cb.remaining_zernike_number_list,
-                                           zernike_value_array = reproduction_same_for_cb.remaining_reproducted_zernike_value_array)
+                                           zernike_number_list = reproduction.remaining_zernike_number_list,
+                                           zernike_value_array = reproduction.remaining_reproducted_zernike_value_array)
+
+    """
+    zernike_with_pfit = ZernikeToSurface(constants = consts, 
+                                         zernike_number_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                                         zernike_value_array = np.array([ 8.11304455e-08, -1.01586202e-07, -3.38411547e-07,  3.02566783e-07, 2.10233957e-07, -2.01693302e-07, -6.40135092e-08,  1.15529214e-08,3.01199936e-07, -1.78044987e-08]))
+
+    reproduction_for_pfit = WhReproduction(constants = consts,
+                                           target_zernike_number_list = zernike_with_pfit.zernike_number_list,
+                                           target_zernike_value_array = zernike_with_pfit.zernike_value_array,
+                                           restructed_torque_value=5,
+                                           ignore_zernike_number_list=[1,2,3,4])
+    
+    zernike_with_pfit_WH = ZernikeToSurface(constants = consts,
+                                            zernike_number_list = reproduction_for_pfit,
+                                            zernike_value_array = reproduction_for_pfit)
+    """
