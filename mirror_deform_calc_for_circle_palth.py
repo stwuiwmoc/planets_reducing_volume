@@ -100,7 +100,7 @@ class ZernikeToSurface:
         
         cbar_min = np.nanmin(self.surface) + self.pv * cbar_min_percent/100
         cbar_max = np.nanmin(self.surface) + self.pv * cbar_max_percent/100
-        print(cbar_min, cbar_max)
+        
         extent = [-self.__constants.physical_radius, self.__constants.physical_radius,
                   -self.__constants.physical_radius, self.__constants.physical_radius]
         
@@ -189,18 +189,16 @@ if __name__ == "__main__":
                                zernike_number_list = [2],
                                zernike_value_array = np.array([2e-6])) 
     
-    reprod = WhReproduction(constants = consts,
-                            target_zernike_number_list = [2, 3, 5],
-                            target_zernike_value_array = np.array([2e-6, 1e-6, 3e-6]),
-                            restructed_torque_value=1e3,
-                            ignore_zernike_number_list=[1])
-    
+    idealized_zernike = ZernikeToSurface(constants = consts, 
+                                         zernike_number_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                                         zernike_value_array = np.array([ 8.11304455e-08, -1.01586202e-07, -3.38411547e-07,  3.02566783e-07, 2.10233957e-07, -2.01693302e-07, -6.40135092e-08,  1.15529214e-08,3.01199936e-07, -1.78044987e-08]))
+                
     
     reproduction_same_for_cb = WhReproduction(constants = consts,
-                                              target_zernike_number_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-                                              target_zernike_value_array = np.array([ 8.11304455e-08, -1.01586202e-07, -3.38411547e-07,  3.02566783e-07, 2.10233957e-07, -2.01693302e-07, -6.40135092e-08,  1.15529214e-08,3.01199936e-07, -1.78044987e-08]),
+                                              target_zernike_number_list = idealized_zernike.zernike_number_list,
+                                              target_zernike_value_array = idealized_zernike.zernike_value_array,
                                               restructed_torque_value=5,
-                                              ignore_zernike_number_list=[1])
+                                              ignore_zernike_number_list=[1,2,3,4])
     
     reproducted_zernike = ZernikeToSurface(constants = consts,
                                            zernike_number_list = reproduction_same_for_cb.remaining_zernike_number_list,
