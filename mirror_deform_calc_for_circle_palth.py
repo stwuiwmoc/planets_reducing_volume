@@ -10,6 +10,13 @@ import proper as pr
 import matplotlib.pyplot as plt
 import scipy as sp
 
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.cm as cm
+from matplotlib.colors import Normalize
+import mpl_toolkits.axes_grid1
+
+
 def mkfolder(suffix = ""):
     import os
     """    
@@ -81,6 +88,37 @@ class ZernikeToSurface:
         
         masked_wfe = self.__constants.mask * wfe
         return masked_wfe
+    
+    def make_image_plot(self, fig=False, position=False, color_scale=False, cbar_min_percent=0, cbar_max_percent=100, pv_digits=2, rms_digits=2):
+        figure = plt.figure()
+        position = 111
+        
+        cmap = cm.jet
+        fontsize = 15
+        title = "pv = " + str(round(self.pv*1e6, 2)) + " [um]" + "\n" \
+              + "RMS = " + str(round(self.rms*1e6, 2)) + " [um]"
+        
+        cbar_min = np.nanmin(self.surface) + self.pv * cbar_min_percent/100
+        cbar_max = np.nanmin(self.surface) + self.pv * cbar_max_percent/100
+        print(cbar_min, cbar_max)
+        extent = [-self.__constants.physical_radius, self.__constants.physical_radius,
+                  -self.__constants.physical_radius, self.__constants.physical_radius]
+        
+        ax = figure.add_subplot(position)
+        ax.imshow(self.surface, interpolation="nearest", cmap=cmap, vmin=cbar_min, vmax=cbar_max, origin="lower", extent=extent)
+        ax.set_title(title, fontsize=fontsize)
+        
+        divider = mpl_toolkits.axes_grid1.make_axes_locatable(ax)
+        cax = divider.append_axes("right", "5%", pad="3%")
+        
+        norm = Normalize(vmin=cbar_min, vmax=cbar_max)
+        cbar_title = r"$[\mu$m]"
+        mappable = cm.ScalarMappable(norm=norm, cmap=cmap)
+        
+        cbar = figure.colorbar(mappable, ax=ax, cax=cax)
+        cbar.set_label(cbar_title, fontsize=fontsize)
+        return ax
+        
 
 class WhReproduction:
     def __init__(self, constants, target_zernike_number_list, target_zernike_value_array, restructed_torque_value, ignore_zernike_number_list):
@@ -133,6 +171,11 @@ class WhReproduction:
     def __make_reproducted_zernike_value_array(self):
         remaining_reproducted_zernike_value_array = np.dot(self.remaining_operation_matrix, self.restructed_torque_value_array)
         return remaining_reproducted_zernike_value_array
+    
+    def make_torque_plot(self,fig=False):
+        
+        
+        return
         
 
 if __name__ == "__main__":
@@ -145,7 +188,7 @@ if __name__ == "__main__":
     zernike = ZernikeToSurface(constants = consts, 
                                zernike_number_list = [2],
                                zernike_value_array = np.array([2e-6])) 
-    # zernikeの係数を入れて計算を進める方
+    
     reprod = WhReproduction(constants = consts,
                             target_zernike_number_list = [2, 3, 5],
                             target_zernike_value_array = np.array([2e-6, 1e-6, 3e-6]),
