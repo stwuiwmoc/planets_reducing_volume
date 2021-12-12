@@ -151,10 +151,5 @@ if __name__ == "__main__":
                                   torque_max_value=1e3,
                                   ignore_zernike_number_list=[1])
     
-    reprod1 =WhReproductedSurface(constants = consts,
-                                  target_zernike_number_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-                                  target_zernike_value_array = np.array([2e-6, 1e-6, 3e-6]),
-                                  torque_max_value=1e3,
-                                  ignore_zernike_number_list=[1])
- 
+    
    
