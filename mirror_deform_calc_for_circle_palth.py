@@ -87,7 +87,7 @@ class WhReproductedSurface:
         self.__constants = constants
         self.target_zernike_number_list = target_zernike_number_list
         self.target_zernike_value_array = target_zernike_value_array
-        self.restructed_torque_value = restructed_torque_value
+        self.restructed_torque_value = abs(restructed_torque_value)
         self.ignore_zernike_number_list = ignore_zernike_number_list
      
 
@@ -120,9 +120,13 @@ class WhReproductedSurface:
         torque_value_array = np.dot(inverse_operation_matrix, self.remaining_zernike_value_array)
         
         
-        restructed_torque_value_array = np.where(torque_value_array<self.restructed_torque_value,
+        only_max_restructed_torque_value_array = np.where(torque_value_array<self.restructed_torque_value,
+                                                         torque_value_array,
+                                                         self.restructed_torque_value)
+            
+        restructed_torque_value_array = np.where(only_max_restructed_torque_value_array>-self.restructed_torque_value,
                                                  torque_value_array,
-                                                 self.restructed_torque_value)
+                                                 -self.restructed_torque_value)
         
         return torque_value_array, restructed_torque_value_array
     
