@@ -134,9 +134,10 @@ class ZernikeToTorque:
         self.remaining_zernike_value_array = self.__make_remaining_matrix(self.full_zernike_value_array)
         self.remaining_zernike_number_list = self.__make_remaining_matrix(1+np.arange(self.__constants.zernike_max_degree))
         
-        self.torque_value_array, self.restructed_torque_value_array = self.__make_torque_value_array()
-        self.remaining_reproducted_zernike_value_array = self.__make_reproducted_zernike_value_array(self.torque_value_array)
-        self.remaining_reproducted_restructed_zernike_value_array = self.__make_reproducted_zernike_value_array(self.restructed_torque_value_array)
+        self.torque_value_array = self.__make_torque_value_array()
+        
+        #self.remaining_reproducted_zernike_value_array = self.__make_reproducted_zernike_value_array(self.torque_value_array)
+        #self.remaining_reproducted_restructed_zernike_value_array = self.__make_reproducted_zernike_value_array(self.restructed_torque_value_array)
         
 
     def __make_full_zernike_value_array(self):
@@ -156,18 +157,8 @@ class ZernikeToTorque:
     def __make_torque_value_array(self):
         inverse_operation_matrix = sp.linalg.pinv2(1e9*self.remaining_operation_matrix)*1e9
         
-        torque_value_array = np.dot(inverse_operation_matrix, self.remaining_zernike_value_array)
-        
-        
-        only_max_restructed_torque_value_array = np.where(torque_value_array<self.restructed_torque_value,
-                                                         torque_value_array,
-                                                         self.restructed_torque_value)
-            
-        restructed_torque_value_array = np.where(only_max_restructed_torque_value_array>-self.restructed_torque_value,
-                                                 only_max_restructed_torque_value_array,
-                                                 -self.restructed_torque_value)
-        
-        return torque_value_array, restructed_torque_value_array
+        torque_value_array = np.dot(inverse_operation_matrix, self.remaining_zernike_value_array)    
+        return torque_value_array
     
     def __make_reproducted_zernike_value_array(self, using_torque_value_array):
         remaining_reproducted_zernike_value_array = np.dot(self.remaining_operation_matrix, using_torque_value_array)
@@ -214,7 +205,21 @@ class TorqueToZernike:
         self.restructed_torque_value = abs(restructed_torque_value)
         self.ignore_zernike_number_list = ignore_zernike_number_list
     
-
+        self.operation_matrix = np.genfromtxt("raw_data/WT06_zer10_operation_matrix[m].csv", delimiter=",").T
+        
+    
+    def __make_restructed_torque_value_array(self):
+        only_max_restructed_torque_value_array = np.where(self.torque_value_array<self.restructed_torque_value,
+                                                         self.torque_value_array,
+                                                         self.restructed_torque_value)
+            
+        restructed_torque_value_array = np.where(only_max_restructed_torque_value_array>-self.restructed_torque_value,
+                                                 only_max_restructed_torque_value_array,
+                                                 -self.restructed_torque_value)
+        
+        return restructed_torque_value_array
+    
+    
 if __name__ == "__main__":
     
     consts = Constants(physical_radius=925e-3, 
