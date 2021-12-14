@@ -56,7 +56,15 @@ def make_remaining_matrix(matrix, ignore_zernike_number_list):
     idx_array = np.array(ignore_zernike_number_list) - 1
     remaining_matrix = np.delete(arr=matrix, obj=idx_array, axis=0)
     return remaining_matrix
-    
+
+def make_full_torque_value_array(torque_number_list, torque_value_aray):
+    full_value_array = np.zeros(36)
+    idx_array = np.array(torque_number_list) -1
+    for i in range(len(idx_array)):
+        idx = idx_array[i]
+        full_value_array[idx] = torque_value_aray[i]
+    return full_value_array
+
 
 class Constants:
     def __init__(self, physical_radius, ignore_radius, pixel_number, zernike_max_degree):
@@ -255,12 +263,23 @@ if __name__ == "__main__":
                                                       zernike_value_array=reproducted_zernike.remaining_reproducted_restructed_zernike_value_array)
     
     
-            
+    torque_value_array = make_full_torque_value_array([12,24,36],
+                                                      [5,5,5])
+    
+    wh_deformed_zernike = TorqueToZernike(constants=consts,
+                                          torque_value_array=torque_value_array,
+                                          restructed_torque_value=5,
+                                          ignore_zernike_number_list=[1])
+    
+    wh_deformed_surface = ZernikeToSurface(constants=consts,
+                                           zernike_number_list=wh_deformed_zernike.remaining_zernike_number_list,
+                                           zernike_value_array=wh_deformed_zernike.remaining_reproducted_zernike_value_array)
+    wh_deformed_surface.make_image_plot()
+    """
     sample_surface = ZernikeToSurface(constants=consts,
                                       zernike_number_list=np.arange(10)+1,
                                       zernike_value_array=consts.operation_matrix.T[4])
     sample_surface.make_image_plot()
-    """
     reproducted_zernike = ZernikeToSurface(constants = consts,
                                            zernike_number_list = reproduction.remaining_zernike_number_list,
                                            zernike_value_array = reproduction.remaining_reproducted_zernike_value_array)
