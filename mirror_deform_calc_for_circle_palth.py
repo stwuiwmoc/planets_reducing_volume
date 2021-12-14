@@ -52,6 +52,12 @@ def rms_calculation(array2d):
     rms = np.sqrt( sigma / data_count )
     return rms
 
+def make_remaining_matrix(matrix, ignore_zernike_number_list):
+    idx_array = np.array(ignore_zernike_number_list) - 1
+    remaining_matrix = np.delete(arr=matrix, obj=idx_array, axis=0)
+    return remaining_matrix
+    
+
 class Constants:
     def __init__(self, physical_radius, ignore_radius, pixel_number, zernike_max_degree):
         self.physical_radius = physical_radius
@@ -130,9 +136,9 @@ class ZernikeToTorque:
      
         self.operation_matrix = np.genfromtxt("raw_data/WT06_zer10_operation_matrix[m].csv", delimiter=",").T
         self.full_zernike_value_array = self.__make_full_zernike_value_array()
-        self.remaining_operation_matrix = self.__make_remaining_matrix(self.operation_matrix)
-        self.remaining_zernike_value_array = self.__make_remaining_matrix(self.full_zernike_value_array)
-        self.remaining_zernike_number_list = self.__make_remaining_matrix(1+np.arange(self.__constants.zernike_max_degree))
+        self.remaining_operation_matrix = make_remaining_matrix(self.operation_matrix, self.ignore_zernike_number_list)
+        self.remaining_zernike_value_array = make_remaining_matrix(self.full_zernike_value_array, self.ignore_zernike_number_list)
+        self.remaining_zernike_number_list = make_remaining_matrix(1+np.arange(self.__constants.zernike_max_degree), self.ignore_zernike_number_list)
         
         self.torque_value_array = self.__make_torque_value_array()
         
@@ -149,10 +155,6 @@ class ZernikeToTorque:
             full_zernike_value_array[target_zernike_number_idx] = self.target_zernike_value_array[i]
         return full_zernike_value_array
     
-    def __make_remaining_matrix(self, matrix):
-        idx_array = np.array(self.ignore_zernike_number_list) - 1
-        remaining_matrix = np.delete(arr=matrix, obj=idx_array, axis=0)
-        return remaining_matrix
     
     def __make_torque_value_array(self):
         inverse_operation_matrix = sp.linalg.pinv2(1e9*self.remaining_operation_matrix)*1e9
@@ -206,7 +208,6 @@ class TorqueToZernike:
         self.ignore_zernike_number_list = ignore_zernike_number_list
     
         self.operation_matrix = np.genfromtxt("raw_data/WT06_zer10_operation_matrix[m].csv", delimiter=",").T
-        
     
     def __make_restructed_torque_value_array(self):
         only_max_restructed_torque_value_array = np.where(self.torque_value_array<self.restructed_torque_value,
