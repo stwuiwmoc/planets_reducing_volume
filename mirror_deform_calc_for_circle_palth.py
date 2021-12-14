@@ -10,16 +10,15 @@ import proper as pr
 import matplotlib.pyplot as plt
 import scipy as sp
 
-import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-import matplotlib.cm as cm
+from matplotlib import cm
 from matplotlib.colors import Normalize
 import mpl_toolkits.axes_grid1
 
 
 def mkfolder(suffix = ""):
     import os
-    """    
+    """
     Parameters
     ----------
     suffix : str, optional
@@ -73,7 +72,9 @@ class Constants:
         self.pixel_number = pixel_number
 
         self.varid_radius = physical_radius - ignore_radius
-        self.xx, self.yy = make_meshgrid(-physical_radius, physical_radius, -physical_radius, physical_radius, pixel_number)
+        self.xx, self.yy = make_meshgrid(-physical_radius, physical_radius, 
+                                         -physical_radius, physical_radius, 
+                                         pixel_number)
         self.tf = np.where(self.xx**2+self.yy**2<=self.varid_radius**2, True, False)
         self.mask = np.where(self.tf==True, 1, np.nan)
         self.zernike_max_degree = zernike_max_degree
@@ -86,7 +87,7 @@ class ZernikeToSurface:
         self.zernike_value_array = zernike_value_array
 
         self.surface = self.__make_masked_zernike_surface()
-        self.pv = pv_calculation(self.surface)
+        self.pv=pv_calculation(self.surface)
         self.rms = rms_calculation(self.surface)
     
     def __make_masked_zernike_surface(self):
@@ -110,8 +111,8 @@ class ZernikeToSurface:
         
         cmap = cm.jet
         fontsize = 15
-        title = "pv = " + str(round(self.pv*1e6, 2)) + " [um]" + "\n" \
-              + "RMS = " + str(round(self.rms*1e6, 2)) + " [um]"
+        title = "pv = " + str(round(self.pv*1e6, pv_digits)) + " [um]" + "\n" \
+              + "RMS = " + str(round(self.rms*1e6, rms_digits)) + " [um]"
         
         cbar_min = np.nanmin(self.surface) + self.pv * cbar_min_percent/100
         cbar_max = np.nanmin(self.surface) + self.pv * cbar_max_percent/100
@@ -262,11 +263,11 @@ if __name__ == "__main__":
                                                       zernike_number_list=reproducted_zernike.remaining_zernike_number_list,
                                                       zernike_value_array=reproducted_zernike.remaining_reproducted_restructed_zernike_value_array)
     
-    torque_value_array = make_full_torque_value_array([6,12,18,24,30,36],
-                                                      [5,-5,5,-5,5,-5])
+    original_torque_value_array = make_full_torque_value_array([6,12,18,24,30,36],
+                                                               [5,-5,5,-5,5,-5])
     
     wh_deformed_zernike = TorqueToZernike(constants=consts,
-                                          torque_value_array=torque_value_array,
+                                          torque_value_array=original_torque_value_array,
                                           restructed_torque_value=5,
                                           ignore_zernike_number_list=[1])
     
