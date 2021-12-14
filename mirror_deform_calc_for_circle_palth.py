@@ -234,6 +234,7 @@ if __name__ == "__main__":
 
     
     """
+    #test
     zernike_with_pfit = ZernikeToSurface(constants = consts, 
                                          zernike_number_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
                                          zernike_value_array = np.array([ 8.11304455e-08, -1.01586202e-07, -3.38411547e-07,  3.02566783e-07, 2.10233957e-07, -2.01693302e-07, -6.40135092e-08,  1.15529214e-08,3.01199936e-07, -1.78044987e-08]))
