@@ -80,6 +80,17 @@ class Constants:
         self.zernike_max_degree = zernike_max_degree
         self.operation_matrix = np.genfromtxt("raw_data/WT06_zer10_operation_matrix[m].csv", delimiter=",").T
 
+    def h(self):
+        import inspect
+        attr_list = list(self.__dict__.keys())
+        for attr in attr_list:
+            if attr.startswith("_"): continue
+            print(attr)
+        for method in inspect.getmembers(self, inspect.ismethod):
+            if method[0].startswith("_"): continue
+            print(method[0]+"()")
+
+
 class ZernikeToSurface:
     def __init__(self, constants, zernike_number_list, zernike_value_array):
         self.__constants = constants
@@ -89,6 +100,16 @@ class ZernikeToSurface:
         self.surface = self.__make_masked_zernike_surface()
         self.pv=pv_calculation(self.surface)
         self.rms = rms_calculation(self.surface)
+    
+    def h(self):
+        import inspect
+        attr_list = list(self.__dict__.keys())
+        for attr in attr_list:
+            if attr.startswith("_"): continue
+            print(attr)
+        for method in inspect.getmembers(self, inspect.ismethod):
+            if method[0].startswith("_"): continue
+            print(method[0]+"()")
     
     def __make_masked_zernike_surface(self):
         optical_wavelength = 500e-9
@@ -150,7 +171,15 @@ class ZernikeToTorque:
         
         self.torque_value_array = self.__make_torque_value_array()
         
-        
+    def h(self):
+        import inspect
+        attr_list = list(self.__dict__.keys())
+        for attr in attr_list:
+            if attr.startswith("_"): continue
+            print(attr)
+        for method in inspect.getmembers(self, inspect.ismethod):
+            if method[0].startswith("_"): continue
+            print(method[0]+"()")        
 
     def __make_full_zernike_value_array(self):
         target_zernike_number_idx_array = np.array(self.target_zernike_number_list) - 1
@@ -183,6 +212,16 @@ class TorqueToZernike:
         self.remaining_reproducted_zernike_value_array = self.__make_reproducted_zernike_value_array(self.torque_value_array)
         self.remaining_reproducted_restructed_zernike_value_array = self.__make_reproducted_zernike_value_array(self.restructed_torque_value_array)
         self.remaining_zernike_number_list = make_remaining_matrix(1+np.arange(self.__constants.zernike_max_degree), self.ignore_zernike_number_list)
+
+    def h(self):
+        import inspect
+        attr_list = list(self.__dict__.keys())
+        for attr in attr_list:
+            if attr.startswith("_"): continue
+            print(attr)
+        for method in inspect.getmembers(self, inspect.ismethod):
+            if method[0].startswith("_"): continue
+            print(method[0]+"()")
         
     def __make_restructed_torque_value_array(self):
         only_max_restructed_torque_value_array = np.where(self.torque_value_array<self.restructed_torque_value,
