@@ -162,40 +162,7 @@ class ZernikeToTorque:
         return torque_value_array
     
     
-    def make_torque_plot(self,fig=False, position=False, title=False):
-        figure = plt.figure()
-        position = 111
-        
-        fontsize = 15
-        x = np.arange(1, 13)
-        x_str = []
-        
-        for i in range(12):
-            text = ""
-            for j in range(3):
-                num = str(12*j + i + 1).zfill(2)
-                text = text + "\n" + num
-            x_str.append(text)
-        
-        torque = self.torque_value_array
-        ax = figure.add_subplot(position)
-        ax.plot(x, torque[0:12], color="black", marker="s", linewidth=1)
-        ax.plot(x, torque[12:24], color="green", marker="o", linewidth=1)
-        ax.plot(x, torque[24:36], color="darkviolet", marker="^", linewidth=1)
-        
-        ax.set_title(title, fontsize=fontsize)
-        ax.grid()
-        ax.set_xlabel("Motor Number", fontsize=fontsize)
-        ax.set_xticks(x)
-        ax.set_xticklabels(x_str)
-        ax.set_ylabel("Motor drive amount [mm]", fontsize=fontsize)
-        
-        ax.hlines([self.restructed_torque_value, -self.restructed_torque_value],
-                  xmin=1, xmax=12, color ="red", linestyle="dashed")
-        ax.hlines(0, xmin=1, xmax=12, color ="darkgray")
-        
-        return ax
-
+    
 class TorqueToZernike:
     def __init__(self, constants, torque_value_array, restructed_torque_value, ignore_zernike_number_list):
         self.__constants = constants
@@ -221,6 +188,7 @@ class TorqueToZernike:
     def __make_reproducted_zernike_value_array(self, using_torque_value_array):
         remaining_reproducted_zernike_value_array = np.dot(self.remaining_operation_matrix, using_torque_value_array)
         return remaining_reproducted_zernike_value_array
+    
     
 if __name__ == "__main__":
     
