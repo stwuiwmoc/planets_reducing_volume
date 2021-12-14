@@ -262,9 +262,8 @@ if __name__ == "__main__":
                                                       zernike_number_list=reproducted_zernike.remaining_zernike_number_list,
                                                       zernike_value_array=reproducted_zernike.remaining_reproducted_restructed_zernike_value_array)
     
-    
-    torque_value_array = make_full_torque_value_array([12,24,36],
-                                                      [5,5,5])
+    torque_value_array = make_full_torque_value_array([6,12,18,24,30,36],
+                                                      [5,-5,5,-5,5,-5])
     
     wh_deformed_zernike = TorqueToZernike(constants=consts,
                                           torque_value_array=torque_value_array,
