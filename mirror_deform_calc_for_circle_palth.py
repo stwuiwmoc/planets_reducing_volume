@@ -241,11 +241,11 @@ if __name__ == "__main__":
                                     target_zernike_number_list=target_surface.zernike_number_list,
                                     target_zernike_value_array=target_surface.zernike_value_array,
                                     ignore_zernike_number_list=[1])
-        
+    
     reproducted_zernike = TorqueToZernike(constants=consts,
-                                     torque_value_array=reproducted_torque.torque_value_array,
-                                     restructed_torque_value=5,
-                                     ignore_zernike_number_list=reproducted_torque.ignore_zernike_number_list)
+                                          torque_value_array=reproducted_torque.torque_value_array,
+                                          restructed_torque_value=5,
+                                          ignore_zernike_number_list=reproducted_torque.ignore_zernike_number_list)
     
     reproducted_surface = ZernikeToSurface(constants=consts,
                                            zernike_number_list=reproducted_zernike.remaining_zernike_number_list,
@@ -255,6 +255,10 @@ if __name__ == "__main__":
                                                       zernike_number_list=reproducted_zernike.remaining_zernike_number_list,
                                                       zernike_value_array=reproducted_zernike.remaining_reproducted_restructed_zernike_value_array)
     
+    sample_surface = ZernikeToSurface(constants=consts,
+                                      zernike_number_list=np.arange(10)+1,
+                                      zernike_value_array=reproducted_zernike.operation_matrix.T[5])
+    sample_surface.make_image_plot()
     """
     reproducted_zernike = ZernikeToSurface(constants = consts,
                                            zernike_number_list = reproduction.remaining_zernike_number_list,
