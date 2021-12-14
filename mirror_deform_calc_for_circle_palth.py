@@ -120,7 +120,7 @@ class ZernikeToSurface:
         return ax
         
 
-class WhReproduction:
+class ZernikeToTorque:
     def __init__(self, constants, target_zernike_number_list, target_zernike_value_array, restructed_torque_value, ignore_zernike_number_list):
         self.__constants = constants
         self.target_zernike_number_list = target_zernike_number_list
@@ -206,7 +206,14 @@ class WhReproduction:
         ax.hlines(0, xmin=1, xmax=12, color ="darkgray")
         
         return ax
-        
+
+class TorqueToZernike:
+    def __init__(self, constants, torque_value_array, restructed_torque_value, ignore_zernike_number_list):
+        self.__constants = constants
+        self.torque_value_array = torque_value_array
+        self.restructed_torque_value = abs(restructed_torque_value)
+        self.ignore_zernike_number_list = ignore_zernike_number_list
+    
 
 if __name__ == "__main__":
     
@@ -219,7 +226,7 @@ if __name__ == "__main__":
                                zernike_number_list = [7],
                                zernike_value_array = np.array([2e-7])) 
     
-    reproduction = WhReproduction(constants=consts,
+    reproduction = ZernikeToTorque(constants=consts,
                                   target_zernike_number_list=zernike.zernike_number_list,
                                   target_zernike_value_array=zernike.zernike_value_array,
                                   restructed_torque_value=5,
@@ -238,7 +245,7 @@ if __name__ == "__main__":
                                          zernike_number_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
                                          zernike_value_array = np.array([ 8.11304455e-08, -1.01586202e-07, -3.38411547e-07,  3.02566783e-07, 2.10233957e-07, -2.01693302e-07, -6.40135092e-08,  1.15529214e-08,3.01199936e-07, -1.78044987e-08]))
 
-    reproduction_for_pfit = WhReproduction(constants = consts,
+    reproduction_for_pfit = ZernikeToTorque(constants = consts,
                                            target_zernike_number_list = zernike_with_pfit.zernike_number_list,
                                            target_zernike_value_array = zernike_with_pfit.zernike_value_array,
                                            restructed_torque_value=5,
