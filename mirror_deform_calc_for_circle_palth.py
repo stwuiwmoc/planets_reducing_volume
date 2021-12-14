@@ -135,7 +135,8 @@ class WhReproduction:
         self.remaining_zernike_number_list = self.__make_remaining_matrix(1+np.arange(self.__constants.zernike_max_degree))
         
         self.torque_value_array, self.restructed_torque_value_array = self.__make_torque_value_array()
-        self.remaining_reproducted_zernike_value_array = self.__make_reproducted_zernike_value_array()
+        self.remaining_reproducted_zernike_value_array = self.__make_reproducted_zernike_value_array(self.torque_value_array)
+        self.remaining_reproducted_restructed_zernike_value_array = self.__make_reproducted_zernike_value_array(self.restructed_torque_value_array)
         
 
     def __make_full_zernike_value_array(self):
@@ -168,8 +169,8 @@ class WhReproduction:
         
         return torque_value_array, restructed_torque_value_array
     
-    def __make_reproducted_zernike_value_array(self):
-        remaining_reproducted_zernike_value_array = np.dot(self.remaining_operation_matrix, self.restructed_torque_value_array)
+    def __make_reproducted_zernike_value_array(self, using_torque_value_array):
+        remaining_reproducted_zernike_value_array = np.dot(self.remaining_operation_matrix, using_torque_value_array)
         return remaining_reproducted_zernike_value_array
     
     def make_torque_plot(self,fig=False, position=False, title=False):
@@ -227,6 +228,9 @@ if __name__ == "__main__":
     reproducted_zernike = ZernikeToSurface(constants = consts,
                                            zernike_number_list = reproduction.remaining_zernike_number_list,
                                            zernike_value_array = reproduction.remaining_reproducted_zernike_value_array)
+    reproducted_restructed_zernike = ZernikeToSurface(constants = consts,
+                                                      zernike_number_list = reproduction.remaining_zernike_number_list,
+                                                      zernike_value_array = reproduction.remaining_reproducted_restructed_zernike_value_array)
 
     
     """
