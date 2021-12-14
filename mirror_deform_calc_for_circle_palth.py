@@ -215,19 +215,20 @@ if __name__ == "__main__":
                        zernike_max_degree = 10)
     
     zernike = ZernikeToSurface(constants = consts, 
-                               zernike_number_list = [9],
-                               zernike_value_array = np.array([2e-6])) 
+                               zernike_number_list = [7],
+                               zernike_value_array = np.array([2e-7])) 
     
     reproduction = WhReproduction(constants=consts,
                                   target_zernike_number_list=zernike.zernike_number_list,
                                   target_zernike_value_array=zernike.zernike_value_array,
                                   restructed_torque_value=5,
-                                  ignore_zernike_number_list=[1,2,3,4])
+                                  ignore_zernike_number_list=[1])
     
     reproducted_zernike = ZernikeToSurface(constants = consts,
                                            zernike_number_list = reproduction.remaining_zernike_number_list,
                                            zernike_value_array = reproduction.remaining_reproducted_zernike_value_array)
 
+    
     """
     zernike_with_pfit = ZernikeToSurface(constants = consts, 
                                          zernike_number_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
