@@ -130,9 +130,7 @@ class ZernikeToSurface:
         masked_wfe = self.__c.mask * wfe
         return masked_wfe
     
-    def make_image_plot(self, fig=False, position=False, color_scale=False, cbar_min_percent=0, cbar_max_percent=100, pv_digits=2, rms_digits=2):
-        figure = plt.figure()
-        position = 111
+    def make_image_plot(self, figure=plt.figure(), position=111, color_scale=False, cbar_min_percent=0, cbar_max_percent=100, pv_digits=2, rms_digits=2):
         
         cmap = cm.jet
         fontsize = 15
@@ -160,7 +158,7 @@ class ZernikeToSurface:
         cbar.set_label(cbar_title, fontsize=fontsize)
         return ax
         
-    def make_circle_path_plot(self, fig=False, position=111, radius=0.850, height_magn=1e9, height_unit_str="[nm]"):
+    def make_circle_path_plot(self, figure=plt.figure(), position=111, radius=0.850, height_magn=1e9, height_unit_str="[nm]"):
         varid_radius_pixel_number = int(self.__c.varid_radius/self.__c.physical_radius*self.__c.pixel_number/2)
         measurement_radius_idx = int(radius*1e3)
         
@@ -174,14 +172,15 @@ class ZernikeToSurface:
                                            flags=flags)
         
         circle_path_line = height_magn*linear_polar_image[:, measurement_radius_idx]
+        height_pv = np.nanmax(circle_path_line) - np.nanmin(circle_path_line)
+        height_pv_str = str(round(height_pv, 2))
         
         self.make_image_plot()
-        figure = plt.figure()
+        
         ax = figure.add_subplot(position)
         ax.plot(circle_path_line)
-        
         ax.grid()
-        ax.set_title("circle_path")
+        ax.set_title("circle_path ( pv = " + height_pv_str + " " + height_unit_str + " )")
         ax.set_xlabel("degree")
         ax.set_ylabel("heignt " + height_unit_str + " at R=" + str(measurement_radius_idx))
         return ax
@@ -250,8 +249,7 @@ class TorqueToZernike:
         remaining_reproducted_zernike_value_array = np.dot(self.remaining_operation_matrix, using_torque_value_array)
         return remaining_reproducted_zernike_value_array
     
-    def make_torque_plot(self,fig=False, position=False, title=False):
-        figure = plt.figure()
+    def make_torque_plot(self, figure=plt.figure(), position=111, title=False):
         position = 111
         
         fontsize = 15
@@ -314,7 +312,18 @@ if __name__ == "__main__":
                                                       zernike_number_list=reproducted_zernike.remaining_zernike_number_list,
                                                       zernike_value_array=reproducted_zernike.remaining_reproducted_restructed_zernike_value_array)
     
+    """
+    original_torque_value_array = make_full_torque_value_array([5,12,17,24,29,36],
+                                                               [5,-5,5,-5,5,-5])
     original_torque_value_array = make_full_torque_value_array([6,12,18,24,30,36],
+                                                               [-5,5,-5,5,-5,5])
+    """
+    original_torque_value_array = make_full_torque_value_array([1,7,13,19,25,31, 6,12,18,24,30,36],
+                                                               [5,-5,5,-5,5,-5, -5,5,-5,5,-5,5])
+    
+    original_torque_value_array = make_full_torque_value_array([2,8,14,20,26,32],
+                                                               [5,-5,5,-5,5,-5])
+    original_torque_value_array = make_full_torque_value_array([1,7,13,19,25,31],
                                                                [5,-5,5,-5,5,-5])
     
     wh_deformed_zernike = TorqueToZernike(constants=consts,
@@ -325,6 +334,9 @@ if __name__ == "__main__":
     wh_deformed_surface = ZernikeToSurface(constants=consts,
                                            zernike_number_list=wh_deformed_zernike.remaining_zernike_number_list,
                                            zernike_value_array=wh_deformed_zernike.remaining_reproducted_zernike_value_array)
+    
+    wh_deformed_zernike.make_torque_plot()
+    wh_deformed_surface.make_circle_path_plot()
     
     """
     sample_surface = ZernikeToSurface(constants=consts,
