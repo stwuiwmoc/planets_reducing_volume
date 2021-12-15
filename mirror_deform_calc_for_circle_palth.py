@@ -9,6 +9,7 @@ import numpy as np
 import proper as pr
 import matplotlib.pyplot as plt
 import scipy as sp
+import cv2
 
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
@@ -103,7 +104,7 @@ class ZernikeToSurface:
         self.surface = self.__make_masked_zernike_surface()
         self.pv=pv_calculation(self.surface)
         self.rms = rms_calculation(self.surface)
-    
+        
     def h(self):
         import inspect
         attr_list = list(self.__dict__.keys())
@@ -159,7 +160,7 @@ class ZernikeToSurface:
         cbar.set_label(cbar_title, fontsize=fontsize)
         return ax
         
-
+ 
 class ZernikeToTorque:
     def __init__(self, constants, target_zernike_number_list, target_zernike_value_array, ignore_zernike_number_list):
         self.__constants = constants
@@ -188,7 +189,7 @@ class ZernikeToTorque:
     
     
     def __make_torque_value_array(self):
-        inverse_operation_matrix = sp.linalg.pinv2(1e9*self.remaining_operation_matrix)*1e9
+        inverse_operation_matrix = sp.linalg.pinv(1e9*self.remaining_operation_matrix)*1e9
         
         torque_value_array = np.dot(inverse_operation_matrix, self.remaining_zernike_value_array)    
         return torque_value_array
@@ -302,7 +303,7 @@ if __name__ == "__main__":
     wh_deformed_surface = ZernikeToSurface(constants=consts,
                                            zernike_number_list=wh_deformed_zernike.remaining_zernike_number_list,
                                            zernike_value_array=wh_deformed_zernike.remaining_reproducted_zernike_value_array)
-    wh_deformed_surface.make_image_plot()
+    
     """
     sample_surface = ZernikeToSurface(constants=consts,
                                       zernike_number_list=np.arange(10)+1,
