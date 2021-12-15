@@ -314,15 +314,20 @@ if __name__ == "__main__":
                                                       zernike_number_list=reproducted_zernike.remaining_zernike_number_list,
                                                       zernike_value_array=reproducted_zernike.remaining_reproducted_restructed_zernike_value_array)
     
+    original_torque_value_array = make_full_torque_value_array([1,7,13,19,25,31],
+                                                               [5,-5,5,-5,5,-5])
+    original_torque_value_array = make_full_torque_value_array([2,8,14,20,26,32],
+                                                               [5,-5,5,-5,5,-5])
+    original_torque_value_array = make_full_torque_value_array([3,9,15,21,27,33],
+                                                               [5,-5,5,-5,5,-5])
+    original_torque_value_array = make_full_torque_value_array([4,10,16,22,28,34],
+                                                               [5,-5,5,-5,5,-5])
     original_torque_value_array = make_full_torque_value_array([5,12,17,24,29,36],
                                                                [5,-5,5,-5,5,-5])
     original_torque_value_array = make_full_torque_value_array([6,12,18,24,30,36],
-    original_torque_value_array = make_full_torque_value_array([2,8,14,20,26,32],
                                                                [5,-5,5,-5,5,-5])
-    original_torque_value_array = make_full_torque_value_array([1,7,13,19,25,31],
-                                                               [5,-5,5,-5,5,-5])
-                                                               [-5,5,-5,5,-5,5])
     """
+    
     original_torque_value_array = make_full_torque_value_array([1,7,13,19,25,31, 6,12,18,24,30,36],
                                                                [5,-5,5,-5,5,-5, -5,5,-5,5,-5,5])
     
