@@ -153,14 +153,39 @@ class ZernikeToSurface:
         cax = divider.append_axes("right", "5%", pad="3%")
         
         norm = Normalize(vmin=cbar_min, vmax=cbar_max)
-        cbar_title = r"$[\mu$m]"
+        cbar_title = "[mm]"
         mappable = cm.ScalarMappable(norm=norm, cmap=cmap)
         
         cbar = figure.colorbar(mappable, ax=ax, cax=cax)
         cbar.set_label(cbar_title, fontsize=fontsize)
         return ax
         
- 
+    def make_circle_path_plot(self, fig=False, position=111, radius=0.850, height_magn=1e9, height_unit_str="[nm]"):
+        varid_radius_pixel_number = int(self.__constants.varid_radius/self.__constants.physical_radius*self.__constants.pixel_number/2)
+        measurement_radius_idx = int(radius*1e3)
+        
+        image = np.where(self.__constants.tf==True, self.surface, 0)
+        flags = cv2.INTER_CUBIC + cv2.WARP_FILL_OUTLIERS + cv2.WARP_POLAR_LINEAR
+        
+        linear_polar_image = cv2.warpPolar(src=image,
+                                           dsize=(int(self.__constants.varid_radius*1e3),360), 
+                                           center=(self.__constants.pixel_number/2, self.__constants.pixel_number/2),
+                                           maxRadius=varid_radius_pixel_number, 
+                                           flags=flags)
+        
+        circle_path_line = height_magn*linear_polar_image[:, measurement_radius_idx]
+        
+        self.make_image_plot()
+        figure = plt.figure()
+        ax = figure.add_subplot(position)
+        ax.plot(circle_path_line)
+        
+        ax.grid()
+        ax.set_title("circle_path")
+        ax.set_xlabel("degree")
+        ax.set_ylabel("heignt " + height_unit_str + " at R=" + str(measurement_radius_idx))
+        return ax
+
 class ZernikeToTorque:
     def __init__(self, constants, target_zernike_number_list, target_zernike_value_array, ignore_zernike_number_list):
         self.__constants = constants
@@ -185,16 +210,13 @@ class ZernikeToTorque:
         for i in range(len(self.target_zernike_value_array)):
             target_zernike_number_idx = target_zernike_number_idx_array[i]
             full_zernike_value_array[target_zernike_number_idx] = self.target_zernike_value_array[i]
-        return full_zernike_value_array
-    
+        return full_zernike_value_array    
     
     def __make_torque_value_array(self):
         inverse_operation_matrix = sp.linalg.pinv(1e9*self.remaining_operation_matrix)*1e9
         
         torque_value_array = np.dot(inverse_operation_matrix, self.remaining_zernike_value_array)    
         return torque_value_array
-    
-    
     
 class TorqueToZernike:
     def __init__(self, constants, torque_value_array, restructed_torque_value, ignore_zernike_number_list):
