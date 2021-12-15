@@ -159,6 +159,7 @@ class ZernikeToSurface:
         return ax
         
     def make_circle_path_plot(self, figure=plt.figure(), position=111, radius=0.850, height_magn=1e9, height_unit_str="[nm]"):
+        fontsize = 15
         varid_radius_pixel_number = int(self.__c.varid_radius/self.__c.physical_radius*self.__c.pixel_number/2)
         measurement_radius_idx = int(radius*1e3)
         
@@ -180,9 +181,9 @@ class ZernikeToSurface:
         ax = figure.add_subplot(position)
         ax.plot(circle_path_line)
         ax.grid()
-        ax.set_title("circle_path ( pv = " + height_pv_str + " " + height_unit_str + " )")
-        ax.set_xlabel("degree")
-        ax.set_ylabel("heignt " + height_unit_str + " at R=" + str(measurement_radius_idx))
+        ax.set_title("circle_path ( pv = " + height_pv_str + " " + height_unit_str + " )", fontsize=fontsize)
+        ax.set_xlabel("degree", fontsize=fontsize)
+        ax.set_ylabel("heignt " + height_unit_str + "\nat R=" + str(measurement_radius_idx), fontsize=fontsize)
         return ax
 
 class ZernikeToTorque:
@@ -249,10 +250,10 @@ class TorqueToZernike:
         remaining_reproducted_zernike_value_array = np.dot(self.remaining_operation_matrix, using_torque_value_array)
         return remaining_reproducted_zernike_value_array
     
-    def make_torque_plot(self, figure=plt.figure(), position=111, title=False):
-        position = 111
-        
+    def make_torque_plot(self, figure=plt.figure(), position=111):
         fontsize = 15
+        ax_title = "WH (black : 1-12, green : 13-24, violet : 25-36)"
+        
         x = np.arange(1, 13)
         x_str = []
         
@@ -269,12 +270,12 @@ class TorqueToZernike:
         ax.plot(x, torque[12:24], color="green", marker="o", linewidth=1)
         ax.plot(x, torque[24:36], color="darkviolet", marker="^", linewidth=1)
         
-        ax.set_title(title, fontsize=fontsize)
+        ax.set_title(ax_title, fontsize=fontsize)
         ax.grid()
         ax.set_xlabel("Motor Number", fontsize=fontsize)
         ax.set_xticks(x)
         ax.set_xticklabels(x_str)
-        ax.set_ylabel("Motor drive amount [mm]", fontsize=fontsize)
+        ax.set_ylabel("Motor drive \namount [mm]", fontsize=fontsize)
         
         ax.hlines([self.restructed_torque_value, -self.restructed_torque_value],
                   xmin=1, xmax=12, color ="red", linestyle="dashed")
@@ -290,6 +291,7 @@ if __name__ == "__main__":
                        pixel_number=256,
                        zernike_max_degree = 10)
     
+    """
     target_surface = ZernikeToSurface(constants = consts, 
                                       zernike_number_list = [7],
                                       zernike_value_array = np.array([2e-7])) 
@@ -312,19 +314,18 @@ if __name__ == "__main__":
                                                       zernike_number_list=reproducted_zernike.remaining_zernike_number_list,
                                                       zernike_value_array=reproducted_zernike.remaining_reproducted_restructed_zernike_value_array)
     
-    """
     original_torque_value_array = make_full_torque_value_array([5,12,17,24,29,36],
                                                                [5,-5,5,-5,5,-5])
     original_torque_value_array = make_full_torque_value_array([6,12,18,24,30,36],
+    original_torque_value_array = make_full_torque_value_array([2,8,14,20,26,32],
+                                                               [5,-5,5,-5,5,-5])
+    original_torque_value_array = make_full_torque_value_array([1,7,13,19,25,31],
+                                                               [5,-5,5,-5,5,-5])
                                                                [-5,5,-5,5,-5,5])
     """
     original_torque_value_array = make_full_torque_value_array([1,7,13,19,25,31, 6,12,18,24,30,36],
                                                                [5,-5,5,-5,5,-5, -5,5,-5,5,-5,5])
     
-    original_torque_value_array = make_full_torque_value_array([2,8,14,20,26,32],
-                                                               [5,-5,5,-5,5,-5])
-    original_torque_value_array = make_full_torque_value_array([1,7,13,19,25,31],
-                                                               [5,-5,5,-5,5,-5])
     
     wh_deformed_zernike = TorqueToZernike(constants=consts,
                                           torque_value_array=original_torque_value_array,
@@ -335,8 +336,12 @@ if __name__ == "__main__":
                                            zernike_number_list=wh_deformed_zernike.remaining_zernike_number_list,
                                            zernike_value_array=wh_deformed_zernike.remaining_reproducted_zernike_value_array)
     
-    wh_deformed_zernike.make_torque_plot()
-    wh_deformed_surface.make_circle_path_plot()
+    fig = plt.figure(figsize=(15,7))
+    gs = fig.add_gridspec(2,3)
+    wh_deformed_zernike.make_torque_plot(figure=fig, position=gs[0,2])
+    wh_deformed_surface.make_image_plot(figure=fig, position=gs[0:2,0:2])
+    wh_deformed_surface.make_circle_path_plot(figure=fig, position=gs[1,2])
+    fig.tight_layout()
     
     """
     sample_surface = ZernikeToSurface(constants=consts,
