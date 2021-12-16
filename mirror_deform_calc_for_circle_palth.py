@@ -91,7 +91,7 @@ class Constants:
         self.mask = np.where(self.tf==True, 1, np.nan)
         self.zernike_max_degree = zernike_max_degree
         self.operation_matrix = np.genfromtxt("raw_data/WT06_zer10_operation_matrix[m].csv", delimiter=",").T
-
+        
     def h(self):
         mkhelp(self)
 
@@ -158,7 +158,7 @@ class ZernikeToSurface:
         cbar.set_label(cbar_title, fontsize=fontsize)
         return ax
         
-    def make_circle_path_plot(self, figure=plt.figure(), position=111, radius=0.850, height_magn=1e9, height_unit_str="[nm]"):
+    def make_circle_path_plot(self, figure=plt.figure(), position=111, radius=0.870, height_magn=1e9, height_unit_str="[nm]"):
         fontsize = 15
         varid_radius_pixel_number = int(self.__c.varid_radius/self.__c.physical_radius*self.__c.pixel_number/2)
         measurement_radius_idx = int(radius*1e3)
@@ -313,7 +313,9 @@ if __name__ == "__main__":
     reproducted_restructed_surface = ZernikeToSurface(constants=consts,
                                                       zernike_number_list=reproducted_zernike.remaining_zernike_number_list,
                                                       zernike_value_array=reproducted_zernike.remaining_reproducted_restructed_zernike_value_array)
-    
+    """
+    """
+    # for parameter study
     original_torque_value_array = make_full_torque_value_array([1,7,13,19,25,31],
                                                                [5,-5,5,-5,5,-5])
     original_torque_value_array = make_full_torque_value_array([2,8,14,20,26,32],
@@ -322,15 +324,14 @@ if __name__ == "__main__":
                                                                [5,-5,5,-5,5,-5])
     original_torque_value_array = make_full_torque_value_array([4,10,16,22,28,34],
                                                                [5,-5,5,-5,5,-5])
-    original_torque_value_array = make_full_torque_value_array([5,12,17,24,29,36],
+    original_torque_value_array = make_full_torque_value_array([5,11,17,23,29,35],
                                                                [5,-5,5,-5,5,-5])
+    original_torque_value_array = make_full_torque_value_array([1,7,13,19,25,31, 3,9,15,21,27,33, 4,10,16,22,28,34, 5,11,17,23,29,35, 6,12,18,24,30,36],
+                                                               [-5,5,-5,5,-5,5, -5,5,-5,5,-5,5, -5,5,-5,5,-5,5, -5,5,-5,5,-5,5, 5,-5,5,-5,5,-5])
+    
+    """
     original_torque_value_array = make_full_torque_value_array([6,12,18,24,30,36],
                                                                [5,-5,5,-5,5,-5])
-    """
-    
-    original_torque_value_array = make_full_torque_value_array([1,7,13,19,25,31, 6,12,18,24,30,36],
-                                                               [5,-5,5,-5,5,-5, -5,5,-5,5,-5,5])
-    
     
     wh_deformed_zernike = TorqueToZernike(constants=consts,
                                           torque_value_array=original_torque_value_array,
