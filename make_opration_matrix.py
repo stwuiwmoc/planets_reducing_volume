@@ -173,11 +173,21 @@ if __name__ == '__main__':
     opration_matrix = np.empty((file_num, tf.sum()))
     
     df0 = read("_Fxx/PM3.5_36ptAxWT06_F00.smesh.txt")
+    """
+    act_tuning = np.array([37.,  37.,  20.,  20., -38.,  38.,  
+                           37.,  37.,  20.,  20., -38.,  38.,
+                           37.,  37.,  20.,  20., -38.,  38.,  
+                           37.,  37.,  20.,  20., -38.,  38.,  
+                           37.,  37.,  20.,  20., -38.,  38.,
+                           37.,  37.,  20.,  20., -38.,  38.])
+    """
     
-    act_tuning = np.array([ 37.,  37.,  20.,  20., -38.,  38.,  37.,  37.,  20.,  20., -38.,
-        38.,  37.,  37.,  20.,  20., -38.,  38.,  37.,  37.,  20.,  20.,
-       -38.,  38.,  37.,  37.,  20.,  20., -38.,  38.,  37.,  37.,  20.,
-        20., -38.,  38.])
+    act_tuning = np.array([1, 1, 1, 1, -1, 1,
+                           1, 1, 1, 1, -1, 1,
+                           1, 1, 1, 1, -1, 1,
+                           1, 1, 1, 1, -1, 1,
+                           1, 1, 1, 1, -1, 1,
+                           1, 1, 1, 1, -1, 1])
 
     for i in range(0, file_num):
         
@@ -193,7 +203,6 @@ if __name__ == '__main__':
         """
         diff_drop, loc_drop = nan_drop(diff, mask)
         opration_matrix[i] = diff_drop
-        """
         
         diff = mask * diff * 1000 # [m] -> [mm]
         fit = mask * fit * 1000 # [m] -> [mm]
@@ -212,6 +221,7 @@ if __name__ == '__main__':
         fig.savefig(picname)
         fig.clf()
         
+        """
         print(num)
     
     """
@@ -219,5 +229,5 @@ if __name__ == '__main__':
     np.savetxt(save_fname, opration_matrix, delimiter=",")
     """
     
-    zer_save_fname = "WT06_zer10_opration_matrix[m].csv"
+    zer_save_fname = mkfolder() + "WT06_zer10_opration_matrix_nonmagn[m].csv"
     np.savetxt(zer_save_fname, zer_opration_matrix, delimiter=",")
