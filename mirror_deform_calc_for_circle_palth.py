@@ -65,7 +65,7 @@ def rms_calculation(array2d):
 
 def make_remaining_matrix(matrix, ignore_zernike_number_list):
     idx_array = np.array(ignore_zernike_number_list) - 1
-    remaining_matrix = np.delete(arr=matrix, instance=idx_array, axis=0)
+    remaining_matrix = np.delete(arr=matrix, obj=idx_array, axis=0)
     return remaining_matrix
 
 def make_full_torque_value_array(torque_number_list, torque_value_aray):
