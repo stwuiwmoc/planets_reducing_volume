@@ -35,13 +35,13 @@ def mkfolder(suffix = ""):
     os.makedirs(folder, exist_ok=True)
     return folder
 
-def mkhelp(obj):
+def mkhelp(instance):
     import inspect
-    attr_list = list(obj.__dict__.keys())
+    attr_list = list(instance.__dict__.keys())
     for attr in attr_list:
         if attr.startswith("_"): continue
         print(attr)
-    for method in inspect.getmembers(obj, inspect.ismethod):
+    for method in inspect.getmembers(instance, inspect.ismethod):
         if method[0].startswith("_"): continue
         print(method[0]+"()")
 
@@ -65,7 +65,7 @@ def rms_calculation(array2d):
 
 def make_remaining_matrix(matrix, ignore_zernike_number_list):
     idx_array = np.array(ignore_zernike_number_list) - 1
-    remaining_matrix = np.delete(arr=matrix, obj=idx_array, axis=0)
+    remaining_matrix = np.delete(arr=matrix, instance=idx_array, axis=0)
     return remaining_matrix
 
 def make_full_torque_value_array(torque_number_list, torque_value_aray):
@@ -318,21 +318,23 @@ if __name__ == "__main__":
     # for parameter study
     original_torque_value_array = make_full_torque_value_array([1,7,13,19,25,31],
                                                                [5,-5,5,-5,5,-5])
-    original_torque_value_array = make_full_torque_value_array([2,8,14,20,26,32],
-                                                               [5,-5,5,-5,5,-5])
     original_torque_value_array = make_full_torque_value_array([3,9,15,21,27,33],
                                                                [5,-5,5,-5,5,-5])
     original_torque_value_array = make_full_torque_value_array([4,10,16,22,28,34],
                                                                [5,-5,5,-5,5,-5])
     original_torque_value_array = make_full_torque_value_array([5,11,17,23,29,35],
-                                                               [5,-5,5,-5,5,-5])
-    original_torque_value_array = make_full_torque_value_array([1,7,13,19,25,31, 3,9,15,21,27,33, 4,10,16,22,28,34, 5,11,17,23,29,35, 6,12,18,24,30,36],
-                                                               [-5,5,-5,5,-5,5, -5,5,-5,5,-5,5, -5,5,-5,5,-5,5, -5,5,-5,5,-5,5, 5,-5,5,-5,5,-5])
-    
-    """
+                                                               [5,-5,5,-5,5,-5])    
     original_torque_value_array = make_full_torque_value_array([6,12,18,24,30,36],
                                                                [5,-5,5,-5,5,-5])
     
+    original_torque_value_array = make_full_torque_value_array([1,7,13,19,25,31, 3,9,15,21,27,33, 4,10,16,22,28,34, 5,11,17,23,29,35, 6,12,18,24,30,36],
+                                                               [-5,5,-5,5,-5,5, -5,5,-5,5,-5,5, -5,5,-5,5,-5,5, -5,5,-5,5,-5,5, 5,-5,5,-5,5,-5])
+    """
+
+    original_torque_value_array = make_full_torque_value_array([2,8,14,20,26,32],
+                                                               [5,-5,5,-5,5,-5])
+
+
     wh_deformed_zernike = TorqueToZernike(constants=consts,
                                           torque_value_array=original_torque_value_array,
                                           restructed_torque_value=5,
@@ -348,7 +350,7 @@ if __name__ == "__main__":
     wh_deformed_surface.make_image_plot(figure=fig, position=gs[0:2,0:2])
     wh_deformed_surface.make_circle_path_plot(figure=fig, position=gs[1,2])
     fig.tight_layout()
-    
+        
     """
     sample_surface = ZernikeToSurface(constants=consts,
                                       zernike_number_list=np.arange(10)+1,
