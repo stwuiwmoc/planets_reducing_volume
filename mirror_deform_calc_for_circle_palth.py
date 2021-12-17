@@ -106,14 +106,7 @@ class ZernikeToSurface:
         self.rms = rms_calculation(self.surface)
         
     def h(self):
-        import inspect
-        attr_list = list(self.__dict__.keys())
-        for attr in attr_list:
-            if attr.startswith("_"): continue
-            print(attr)
-        for method in inspect.getmembers(self, inspect.ismethod):
-            if method[0].startswith("_"): continue
-            print(method[0]+"()")
+        mkhelp(self)
     
     def __make_masked_zernike_surface(self):
         optical_wavelength = 500e-9
