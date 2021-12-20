@@ -10,8 +10,8 @@ import proper as pr
 import matplotlib.pyplot as plt
 import scipy as sp
 import cv2
+import PIL
 
-from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 from matplotlib.colors import Normalize
 import mpl_toolkits.axes_grid1
@@ -179,6 +179,84 @@ class ZernikeToSurface:
         ax.set_ylabel("heignt " + height_unit_str + "\nat R=" + str(measurement_radius_idx), fontsize=fontsize)
         return ax
 
+class StitchedCsvToSurface:
+    def __init__(self, constants, original_stitched_csv_fpath, deformed_stitched_csv_fpath):
+        self.__c = constants
+    
+        self.original_masked_surface = self.__read_csv_to_masked_surface(original_stitched_csv_fpath)
+        self.deformed_masked_surface = self.__read_csv_to_masked_surface(deformed_stitched_csv_fpath)
+        self.surface = self.deformed_masked_surface - self.original_masked_surface
+        
+        self.pv=pv_calculation(self.surface)
+        self.rms = rms_calculation(self.surface)
+        
+        
+    def h(self):
+        mkhelp(self)
+        
+    def __read_csv_to_masked_surface(self,filepath):
+        raw = np.loadtxt(filepath)
+        image = PIL.Image.fromarray(raw)
+        img_resize = image.resize(size=(self.__c.pixel_number, self.__c.pixel_number))
+        masked_surface = self.__c.mask * np.array(img_resize)
+        return masked_surface
+        
+    def make_image_plot(self, figure=plt.figure(), position=111, color_scale=False, cbar_min_percent=0, cbar_max_percent=100, pv_digits=2, rms_digits=2):
+        
+        cmap = cm.jet
+        fontsize = 15
+        title = "pv = " + str(round(self.pv*1e6, pv_digits)) + " [um]" + "\n" \
+              + "RMS = " + str(round(self.rms*1e6, rms_digits)) + " [um]"
+        
+        cbar_min = np.nanmin(self.surface) + self.pv * cbar_min_percent/100
+        cbar_max = np.nanmin(self.surface) + self.pv * cbar_max_percent/100
+        
+        extent = [-self.__c.physical_radius, self.__c.physical_radius,
+                  -self.__c.physical_radius, self.__c.physical_radius]
+        
+        ax = figure.add_subplot(position)
+        ax.imshow(self.surface, interpolation="nearest", cmap=cmap, vmin=cbar_min, vmax=cbar_max, origin="lower", extent=extent)
+        ax.set_title(title, fontsize=fontsize)
+        
+        divider = mpl_toolkits.axes_grid1.make_axes_locatable(ax)
+        cax = divider.append_axes("right", "5%", pad="3%")
+        
+        norm = Normalize(vmin=cbar_min, vmax=cbar_max)
+        cbar_title = "[mm]"
+        mappable = cm.ScalarMappable(norm=norm, cmap=cmap)
+        
+        cbar = figure.colorbar(mappable, ax=ax, cax=cax)
+        cbar.set_label(cbar_title, fontsize=fontsize)
+        return ax
+        
+    def make_circle_path_plot(self, figure=plt.figure(), position=111, radius=0.870, height_magn=1e9, height_unit_str="[nm]"):
+        fontsize = 15
+        varid_radius_pixel_number = int(self.__c.varid_radius/self.__c.physical_radius*self.__c.pixel_number/2)
+        measurement_radius_idx = int(radius*1e3)
+        
+        image = np.where(self.__c.tf==True, self.surface, 0)
+        flags = cv2.INTER_CUBIC + cv2.WARP_FILL_OUTLIERS + cv2.WARP_POLAR_LINEAR
+        
+        linear_polar_image = cv2.warpPolar(src=image,
+                                           dsize=(int(self.__c.varid_radius*1e3),360), 
+                                           center=(self.__c.pixel_number/2, self.__c.pixel_number/2),
+                                           maxRadius=varid_radius_pixel_number, 
+                                           flags=flags)
+        
+        circle_path_line = height_magn*linear_polar_image[:, measurement_radius_idx]
+        height_pv = np.nanmax(circle_path_line) - np.nanmin(circle_path_line)
+        height_pv_str = str(round(height_pv, 2))
+        
+        self.make_image_plot()
+        
+        ax = figure.add_subplot(position)
+        ax.plot(circle_path_line)
+        ax.grid()
+        ax.set_title("circle_path ( pv = " + height_pv_str + " " + height_unit_str + " )", fontsize=fontsize)
+        ax.set_xlabel("degree", fontsize=fontsize)
+        ax.set_ylabel("heignt " + height_unit_str + "\nat R=" + str(measurement_radius_idx), fontsize=fontsize)
+        return ax, linear_polar_image
+
 class ZernikeToTorque:
     def __init__(self, constants, target_zernike_number_list, target_zernike_value_array, ignore_zernike_number_list):
         self.__c = constants
@@ -343,7 +421,15 @@ if __name__ == "__main__":
     wh_deformed_surface.make_image_plot(figure=fig, position=gs[0:2,0:2])
     wh_deformed_surface.make_circle_path_plot(figure=fig, position=gs[1,2])
     fig.tight_layout()
-        
+    
+    
+    diff = StitchedCsvToSurface(constants=consts,
+                                original_stitched_csv_fpath="mkfolder/stitch2mesh/zer10_1215xm1301214ym870-510cir.v4.22.hei_dense.csv", 
+                                deformed_stitched_csv_fpath="mkfolder/stitch2mesh/zer10_1215xm1301216ym870-510cir.v4.21.hei_dense.csv")
+    
+    diff.make_image_plot()
+    diff.make_circle_path_plot()
+    
     """
     sample_surface = ZernikeToSurface(constants=consts,
                                       zernike_number_list=np.arange(10)+1,
