@@ -97,7 +97,7 @@ class Constants:
 
 class ZernikeToSurface:
     def __init__(self, constants, zernike_number_list, zernike_value_array):
-        self.__c = constants
+        self.consts = constants
         self.zernike_number_list = zernike_number_list
         self.zernike_value_array = zernike_value_array
 
@@ -111,16 +111,16 @@ class ZernikeToSurface:
     def __make_masked_zernike_surface(self):
         optical_wavelength = 500e-9
         
-        wavestruct = pr.prop_begin(beam_diameter = 2*self.__c.varid_radius,
+        wavestruct = pr.prop_begin(beam_diameter = 2*self.consts.varid_radius,
                                    lamda = optical_wavelength,
-                                   grid_n = self.__c.pixel_number,
+                                   grid_n = self.consts.pixel_number,
                                    beam_diam_fraction=1)
         
         wfe = pr.prop_zernikes(wavestruct, 
                                self.zernike_number_list, 
                                self.zernike_value_array)
         
-        masked_wfe = self.__c.mask * wfe
+        masked_wfe = self.consts.mask * wfe
         return masked_wfe
     
     def make_image_plot(self, figure=plt.figure(), position=111, color_scale=False, cbar_min_percent=0, cbar_max_percent=100, pv_digits=2, rms_digits=2):
@@ -133,8 +133,8 @@ class ZernikeToSurface:
         cbar_min = np.nanmin(self.surface) + self.pv * cbar_min_percent/100
         cbar_max = np.nanmin(self.surface) + self.pv * cbar_max_percent/100
         
-        extent = [-self.__c.physical_radius, self.__c.physical_radius,
-                  -self.__c.physical_radius, self.__c.physical_radius]
+        extent = [-self.consts.physical_radius, self.consts.physical_radius,
+                  -self.consts.physical_radius, self.consts.physical_radius]
         
         ax = figure.add_subplot(position)
         ax.imshow(self.surface, interpolation="nearest", cmap=cmap, vmin=cbar_min, vmax=cbar_max, origin="lower", extent=extent)
@@ -153,15 +153,15 @@ class ZernikeToSurface:
         
     def make_circle_path_plot(self, figure=plt.figure(), position=111, radius=0.870, height_magn=1e9, height_unit_str="[nm]"):
         fontsize = 15
-        varid_radius_pixel_number = int(self.__c.varid_radius/self.__c.physical_radius*self.__c.pixel_number/2)
+        varid_radius_pixel_number = int(self.consts.varid_radius/self.consts.physical_radius*self.consts.pixel_number/2)
         measurement_radius_idx = int(radius*1e3)
         
-        image = np.where(self.__c.tf==True, self.surface, 0)
+        image = np.where(self.consts.tf==True, self.surface, 0)
         flags = cv2.INTER_CUBIC + cv2.WARP_FILL_OUTLIERS + cv2.WARP_POLAR_LINEAR
         
         linear_polar_image = cv2.warpPolar(src=image,
-                                           dsize=(int(self.__c.varid_radius*1e3),360), 
-                                           center=(self.__c.pixel_number/2, self.__c.pixel_number/2),
+                                           dsize=(int(self.consts.varid_radius*1e3),360), 
+                                           center=(self.consts.pixel_number/2, self.consts.pixel_number/2),
                                            maxRadius=varid_radius_pixel_number, 
                                            flags=flags)
         
@@ -178,41 +178,37 @@ class ZernikeToSurface:
         ax.set_xlabel("degree", fontsize=fontsize)
         ax.set_ylabel("heignt " + height_unit_str + "\nat R=" + str(measurement_radius_idx), fontsize=fontsize)
         return ax
-
+    
 class StitchedCsvToSurface(ZernikeToSurface):
     def __init__(self, constants, original_stitched_csv_fpath, deformed_stitched_csv_fpath):
-        self.__c = constants
+        self.consts = constants
     
         self.original_masked_surface = self.__read_csv_to_masked_surface(original_stitched_csv_fpath)
         self.deformed_masked_surface = self.__read_csv_to_masked_surface(deformed_stitched_csv_fpath)
         self.surface = self.deformed_masked_surface - self.original_masked_surface
         
         self.pv=pv_calculation(self.surface)
-        self.rms = rms_calculation(self.surface)
-        
-        
-    def h(self):
-        mkhelp(self)
-        
+        self.rms=rms_calculation(self.surface)
+    
     def __read_csv_to_masked_surface(self,filepath):
         raw = np.loadtxt(filepath)
         raw_zero_fill = np.where(np.isnan(raw), 0, raw)
         image = PIL.Image.fromarray(raw_zero_fill)
-        img_resize = image.resize(size=(self.__c.pixel_number, self.__c.pixel_number))
-        masked_surface = self.__c.mask * np.array(img_resize)
+        img_resize = image.resize(size=(self.consts.pixel_number, self.consts.pixel_number))
+        masked_surface = self.consts.mask * np.array(img_resize)
         return masked_surface
-
+        
 class ZernikeToTorque:
     def __init__(self, constants, target_zernike_number_list, target_zernike_value_array, ignore_zernike_number_list):
-        self.__c = constants
+        self.consts = constants
         self.target_zernike_number_list = target_zernike_number_list
         self.target_zernike_value_array = target_zernike_value_array
         self.ignore_zernike_number_list = ignore_zernike_number_list
      
         self.full_zernike_value_array = self.__make_full_zernike_value_array()
-        self.remaining_operation_matrix = make_remaining_matrix(self.__c.operation_matrix, self.ignore_zernike_number_list)
+        self.remaining_operation_matrix = make_remaining_matrix(self.consts.operation_matrix, self.ignore_zernike_number_list)
         self.remaining_zernike_value_array = make_remaining_matrix(self.full_zernike_value_array, self.ignore_zernike_number_list)
-        self.remaining_zernike_number_list = make_remaining_matrix(1+np.arange(self.__c.zernike_max_degree), self.ignore_zernike_number_list)
+        self.remaining_zernike_number_list = make_remaining_matrix(1+np.arange(self.consts.zernike_max_degree), self.ignore_zernike_number_list)
         
         self.torque_value_array = self.__make_torque_value_array()
         
@@ -222,7 +218,7 @@ class ZernikeToTorque:
     def __make_full_zernike_value_array(self):
         target_zernike_number_idx_array = np.array(self.target_zernike_number_list) - 1
         
-        full_zernike_value_array = np.zeros(self.__c.zernike_max_degree)
+        full_zernike_value_array = np.zeros(self.consts.zernike_max_degree)
         for i in range(len(self.target_zernike_value_array)):
             target_zernike_number_idx = target_zernike_number_idx_array[i]
             full_zernike_value_array[target_zernike_number_idx] = self.target_zernike_value_array[i]
@@ -236,17 +232,17 @@ class ZernikeToTorque:
     
 class TorqueToZernike:
     def __init__(self, constants, torque_value_array, restructed_torque_value, ignore_zernike_number_list):
-        self.__c = constants
+        self.consts = constants
         self.torque_value_array = torque_value_array
         self.restructed_torque_value = abs(restructed_torque_value)
         self.ignore_zernike_number_list = ignore_zernike_number_list
     
-        self.remaining_operation_matrix = make_remaining_matrix(self.__c.operation_matrix, self.ignore_zernike_number_list)
+        self.remaining_operation_matrix = make_remaining_matrix(self.consts.operation_matrix, self.ignore_zernike_number_list)
         self.restructed_torque_value_array = self.__make_restructed_torque_value_array()        
         
         self.remaining_reproducted_zernike_value_array = self.__make_reproducted_zernike_value_array(self.torque_value_array)
         self.remaining_reproducted_restructed_zernike_value_array = self.__make_reproducted_zernike_value_array(self.restructed_torque_value_array)
-        self.remaining_zernike_number_list = make_remaining_matrix(1+np.arange(self.__c.zernike_max_degree), self.ignore_zernike_number_list)
+        self.remaining_zernike_number_list = make_remaining_matrix(1+np.arange(self.consts.zernike_max_degree), self.ignore_zernike_number_list)
 
     def h(self):
         mkhelp(self)
@@ -334,6 +330,8 @@ if __name__ == "__main__":
     # for parameter study
     original_torque_value_array = make_full_torque_value_array([1,7,13,19,25,31],
                                                                [5,-5,5,-5,5,-5])
+    original_torque_value_array = make_full_torque_value_array([2,8,14,20,26,32],
+                                                               [5,-5,5,-5,5,-5])
     original_torque_value_array = make_full_torque_value_array([3,9,15,21,27,33],
                                                                [5,-5,5,-5,5,-5])
     original_torque_value_array = make_full_torque_value_array([4,10,16,22,28,34],
@@ -345,10 +343,7 @@ if __name__ == "__main__":
     
     original_torque_value_array = make_full_torque_value_array([1,7,13,19,25,31, 3,9,15,21,27,33, 4,10,16,22,28,34, 5,11,17,23,29,35, 6,12,18,24,30,36],
                                                                [-5,5,-5,5,-5,5, -5,5,-5,5,-5,5, -5,5,-5,5,-5,5, -5,5,-5,5,-5,5, 5,-5,5,-5,5,-5])
-    """
 
-    original_torque_value_array = make_full_torque_value_array([2,8,14,20,26,32],
-                                                               [5,-5,5,-5,5,-5])
 
 
     wh_deformed_zernike = TorqueToZernike(constants=consts,
@@ -366,6 +361,7 @@ if __name__ == "__main__":
     wh_deformed_surface.make_image_plot(figure=fig, position=gs[0:2,0:2])
     wh_deformed_surface.make_circle_path_plot(figure=fig, position=gs[1,2])
     fig.tight_layout()
+    """
     
     
     diff = StitchedCsvToSurface(constants=consts,
