@@ -196,7 +196,8 @@ class StitchedCsvToSurface:
         
     def __read_csv_to_masked_surface(self,filepath):
         raw = np.loadtxt(filepath)
-        image = PIL.Image.fromarray(raw)
+        raw_zero_fill = np.where(np.isnan(raw), 0, raw)
+        image = PIL.Image.fromarray(raw_zero_fill)
         img_resize = image.resize(size=(self.__c.pixel_number, self.__c.pixel_number))
         masked_surface = self.__c.mask * np.array(img_resize)
         return masked_surface
