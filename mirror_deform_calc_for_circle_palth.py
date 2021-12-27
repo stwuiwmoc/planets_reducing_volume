@@ -304,32 +304,7 @@ if __name__ == "__main__":
                        zernike_max_degree = 10)
     
     """
-    target_surface = ZernikeToSurface(constants = consts, 
-                                      zernike_number_list = [7],
-                                      zernike_value_array = np.array([2e-7])) 
-    
-    reproducted_torque = ZernikeToTorque(constants=consts,
-                                    target_zernike_number_list=target_surface.zernike_number_list,
-                                    target_zernike_value_array=target_surface.zernike_value_array,
-                                    ignore_zernike_number_list=[1])
-     
-    reproducted_zernike = TorqueToZernike(constants=consts,
-                                          torque_value_array=reproducted_torque.torque_value_array,
-                                          restructed_torque_value=5,
-                                          ignore_zernike_number_list=reproducted_torque.ignore_zernike_number_list)
-    
-    reproducted_surface = ZernikeToSurface(constants=consts,
-                                           zernike_number_list=reproducted_zernike.remaining_zernike_number_list,
-                                           zernike_value_array=reproducted_zernike.remaining_reproducted_zernike_value_array)
-
-    reproducted_restructed_surface = ZernikeToSurface(constants=consts,
-                                                      zernike_number_list=reproducted_zernike.remaining_zernike_number_list,
-                                                      zernike_value_array=reproducted_zernike.remaining_reproducted_restructed_zernike_value_array)
-    """
-    """
     # for parameter study
-    original_torque_value_array = make_full_torque_value_array([1,7,13,19,25,31],
-                                                               [5,-5,5,-5,5,-5])
     original_torque_value_array = make_full_torque_value_array([2,8,14,20,26,32],
                                                                [5,-5,5,-5,5,-5])
     original_torque_value_array = make_full_torque_value_array([3,9,15,21,27,33],
@@ -343,13 +318,15 @@ if __name__ == "__main__":
     
     original_torque_value_array = make_full_torque_value_array([1,7,13,19,25,31, 3,9,15,21,27,33, 4,10,16,22,28,34, 5,11,17,23,29,35, 6,12,18,24,30,36],
                                                                [-5,5,-5,5,-5,5, -5,5,-5,5,-5,5, -5,5,-5,5,-5,5, -5,5,-5,5,-5,5, 5,-5,5,-5,5,-5])
+    """
 
-
+    original_torque_value_array = make_full_torque_value_array([1,7,13,19,25,31],
+                                                               [5,-5,5,-5,5,-5])
 
     wh_deformed_zernike = TorqueToZernike(constants=consts,
                                           torque_value_array=original_torque_value_array,
                                           restructed_torque_value=5,
-                                          ignore_zernike_number_list=[1])
+                                          ignore_zernike_number_list=[9])
     
     wh_deformed_surface = ZernikeToSurface(constants=consts,
                                            zernike_number_list=wh_deformed_zernike.remaining_zernike_number_list,
@@ -361,7 +338,6 @@ if __name__ == "__main__":
     wh_deformed_surface.make_image_plot(figure=fig, position=gs[0:2,0:2])
     wh_deformed_surface.make_circle_path_plot(figure=fig, position=gs[1,2])
     fig.tight_layout()
-    """
     
     
     diff = StitchedCsvToSurface(constants=consts,
@@ -370,30 +346,3 @@ if __name__ == "__main__":
     
     diff.make_image_plot()
     diff.make_circle_path_plot()
-    
-    """
-    sample_surface = ZernikeToSurface(constants=consts,
-                                      zernike_number_list=np.arange(10)+1,
-                                      zernike_value_array=consts.operation_matrix.T[4])
-    sample_surface.make_image_plot()
-    reproducted_zernike = ZernikeToSurface(constants = consts,
-                                           zernike_number_list = reproduction.remaining_zernike_number_list,
-                                           zernike_value_array = reproduction.remaining_reproducted_zernike_value_array)
-    reproducted_restructed_zernike = ZernikeToSurface(constants = consts,
-                                                      zernike_number_list = reproduction.remaining_zernike_number_list,
-                                                      zernike_value_array = reproduction.remaining_reproducted_restructed_zernike_value_array)
-
-    zernike_with_pfit = ZernikeToSurface(constants = consts, 
-                                         zernike_number_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-                                         zernike_value_array = np.array([ 8.11304455e-08, -1.01586202e-07, -3.38411547e-07,  3.02566783e-07, 2.10233957e-07, -2.01693302e-07, -6.40135092e-08,  1.15529214e-08,3.01199936e-07, -1.78044987e-08]))
-
-    reproduction_for_pfit = ZernikeToTorque(constants = consts,
-                                           target_zernike_number_list = zernike_with_pfit.zernike_number_list,
-                                           target_zernike_value_array = zernike_with_pfit.zernike_value_array,
-                                           restructed_torque_value=5,
-                                           ignore_zernike_number_list=[1,2,3,4])
-    
-    zernike_with_pfit_WH = ZernikeToSurface(constants = consts,
-                                            zernike_number_list = reproduction_for_pfit,
-                                            zernike_value_array = reproduction_for_pfit)
-    """
