@@ -6,6 +6,7 @@ Created on Tue Dec 28 17:29:18 2021
 """
 
 import planets_optimize_myclass as pom
+import matplotlib.pyplot as plt
 
 if __name__ == "__main__":
     CONSTS = pom.Constants(physical_radius=925e-3, 
@@ -28,7 +29,7 @@ if __name__ == "__main__":
     non_diff_test.make_image_plot()
     
     exelis_read_test = pom.StitchedCsvToSurface(constants=CONSTS, 
-                                                original_stitched_csv_fpath="raw_data/digitFig01.csv", 
+                                                original_stitched_csv_fpath="mkfolder/exelis_rawdata_edit/exelis_reshaped.csv", 
                                                 None_or_deformed_stitched_csv_fpath=None)
     
-    exelis_read_test.make_image_plot()
+    exelis_read_test.make_image_plot(figure=plt.figure())
