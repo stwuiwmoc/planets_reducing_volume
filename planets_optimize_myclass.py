@@ -16,7 +16,6 @@ from matplotlib import cm
 from matplotlib.colors import Normalize
 import mpl_toolkits.axes_grid1
 
-
 def mkfolder(suffix = ""):
     import os
     """
