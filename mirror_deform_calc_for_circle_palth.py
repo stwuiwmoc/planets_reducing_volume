@@ -78,7 +78,29 @@ def make_full_torque_value_array(torque_number_list, torque_value_aray):
 
 
 class Constants:
-    def __init__(self, physical_radius, ignore_radius, pixel_number, zernike_max_degree):
+    
+    
+    def __init__(self, physical_radius, ignore_radius, 
+                 pixel_number, zernike_max_degree):
+        """
+        class : constants
+
+        Parameters
+        ----------
+        physical_radius : float
+            [m] physical radius of the mirror
+        ignore_radius : float
+            [m] outer mask
+        pixel_number : int
+            vertical and horizontal pixel number
+        zernike_max_degree : int
+            max zernike number
+
+        Returns
+        -------
+        None.
+
+        """
         self.physical_radius = physical_radius
         self.ignore_radius = ignore_radius
         self.pixel_number = pixel_number
@@ -96,7 +118,27 @@ class Constants:
         mkhelp(self)
 
 class ZernikeToSurface:
+    
+    
     def __init__(self, constants, zernike_number_list, zernike_value_array):
+        """
+        class : 2d surface from zernike values
+
+        Parameters
+        ----------
+        constants : object
+            instance by class : Constants
+        zernike_number_list : 1d-list of int
+            zernike number which to use (1 means piston)
+        zernike_value_array : 1d-array of float
+            [m] value of zernike coefficient coresponding to zernike_number_list 
+
+        Returns
+        -------
+        None.
+
+        """
+        
         self.consts = constants
         self.zernike_number_list = zernike_number_list
         self.zernike_value_array = zernike_value_array
@@ -123,7 +165,9 @@ class ZernikeToSurface:
         masked_wfe = self.consts.mask * wfe
         return masked_wfe
     
-    def make_image_plot(self, figure=plt.figure(), position=111, color_scale=False, cbar_min_percent=0, cbar_max_percent=100, pv_digits=2, rms_digits=2):
+    def make_image_plot(self, figure=plt.figure(), position=111, 
+                        color_scale=False, cbar_min_percent=0, cbar_max_percent=100, 
+                        pv_digits=2, rms_digits=2):
         
         cmap = cm.jet
         fontsize = 15
@@ -137,7 +181,8 @@ class ZernikeToSurface:
                   -self.consts.physical_radius, self.consts.physical_radius]
         
         ax = figure.add_subplot(position)
-        ax.imshow(self.surface, interpolation="nearest", cmap=cmap, vmin=cbar_min, vmax=cbar_max, origin="lower", extent=extent)
+        ax.imshow(self.surface, interpolation="nearest", cmap=cmap, 
+                  vmin=cbar_min, vmax=cbar_max, origin="lower", extent=extent)
         ax.set_title(title, fontsize=fontsize)
         
         divider = mpl_toolkits.axes_grid1.make_axes_locatable(ax)
@@ -151,7 +196,8 @@ class ZernikeToSurface:
         cbar.set_label(cbar_title, fontsize=fontsize)
         return ax
         
-    def make_circle_path_plot(self, figure=plt.figure(), position=111, radius=0.870, height_magn=1e9, height_unit_str="[nm]"):
+    def make_circle_path_plot(self, figure=plt.figure(), position=111, 
+                              radius=0.870, height_magn=1e9, height_unit_str="[nm]"):
         fontsize = 15
         varid_radius_pixel_number = int(self.consts.varid_radius/self.consts.physical_radius*self.consts.pixel_number/2)
         measurement_radius_idx = int(radius*1e3)
@@ -181,6 +227,23 @@ class ZernikeToSurface:
     
 class StitchedCsvToSurface(ZernikeToSurface):
     def __init__(self, constants, original_stitched_csv_fpath, deformed_stitched_csv_fpath):
+        """
+        class : 2d-surface from measured (stitched) 2d-csv data
+
+        Parameters
+        ----------
+        constants : TYPE
+            instance by class : Constants
+        original_stitched_csv_fpath : str
+            filepath of measured (stitched) and not deformed 2d-csv data 
+        deformed_stitched_csv_fpath : TYPE
+            filepath of measured (stitched) and deformed 2d-csv data
+
+        Returns
+        -------
+        None.
+
+        """
         self.consts = constants
     
         self.original_masked_surface = self.__read_csv_to_masked_surface(original_stitched_csv_fpath)
@@ -200,6 +263,26 @@ class StitchedCsvToSurface(ZernikeToSurface):
         
 class ZernikeToTorque:
     def __init__(self, constants, target_zernike_number_list, target_zernike_value_array, ignore_zernike_number_list):
+        """
+        class : torque values in order to reproduct zernike values
+
+        Parameters
+        ----------
+        constants : TYPE
+            instance by class : Constants
+        target_zernike_number_list : 1d-list of int
+            zernike number which to use (1 means piston)
+        target_zernike_value_array : 1d-array of float
+            [m] value of zernike coefficient coresponding to target_zernike_number_list 
+        ignore_zernike_number_list : 1d-list of int
+            zernike number which is not used in WH reproduction
+
+        Returns
+        -------
+        None.
+
+        """
+        
         self.consts = constants
         self.target_zernike_number_list = target_zernike_number_list
         self.target_zernike_value_array = target_zernike_value_array
@@ -231,18 +314,42 @@ class ZernikeToTorque:
         return torque_value_array
     
 class TorqueToZernike:
+    
     def __init__(self, constants, torque_value_array, restructed_torque_value, ignore_zernike_number_list):
+        """
+        class : calculate zernike values deformed by torque values    
+
+        Parameters
+        ----------
+        constants : object
+            instance by class : Constants
+        torque_value_array : 1d-array of float
+            [mm] torque values (array size is 36)
+        restructed_torque_value : float
+            [mm] mechanical limit of WH
+                attr with prefix "restructed_" is used the restructed_torque_value
+        ignore_zernike_number_list : 1d-list of int
+            zernike number which is ignored in calculating of opreation matrix and inversed matrix
+
+        Returns
+        -------
+        None.
+
+        """
+        
         self.consts = constants
         self.torque_value_array = torque_value_array
         self.restructed_torque_value = abs(restructed_torque_value)
         self.ignore_zernike_number_list = ignore_zernike_number_list
     
-        self.remaining_operation_matrix = make_remaining_matrix(self.consts.operation_matrix, self.ignore_zernike_number_list)
+        self.remaining_operation_matrix = make_remaining_matrix(self.consts.operation_matrix, 
+                                                                self.ignore_zernike_number_list)
         self.restructed_torque_value_array = self.__make_restructed_torque_value_array()        
         
         self.remaining_reproducted_zernike_value_array = self.__make_reproducted_zernike_value_array(self.torque_value_array)
         self.remaining_reproducted_restructed_zernike_value_array = self.__make_reproducted_zernike_value_array(self.restructed_torque_value_array)
-        self.remaining_zernike_number_list = make_remaining_matrix(1+np.arange(self.consts.zernike_max_degree), self.ignore_zernike_number_list)
+        self.remaining_zernike_number_list = make_remaining_matrix(1+np.arange(self.consts.zernike_max_degree), 
+                                                                   self.ignore_zernike_number_list)
 
     def h(self):
         mkhelp(self)
@@ -305,9 +412,9 @@ if __name__ == "__main__":
     
     """
     # for parameter study
-    original_torque_value_array = make_full_torque_value_array([2,8,14,20,26,32],
+    original_torque_value_array = make_full_torque_value_array([1,7,13,19,25,31],
                                                                [5,-5,5,-5,5,-5])
-    original_torque_value_array = make_full_torque_value_array([3,9,15,21,27,33],
+    original_torque_value_array = make_full_torque_value_array([2,8,14,20,26,32],
                                                                [5,-5,5,-5,5,-5])
     original_torque_value_array = make_full_torque_value_array([4,10,16,22,28,34],
                                                                [5,-5,5,-5,5,-5])
@@ -320,13 +427,13 @@ if __name__ == "__main__":
                                                                [-5,5,-5,5,-5,5, -5,5,-5,5,-5,5, -5,5,-5,5,-5,5, -5,5,-5,5,-5,5, 5,-5,5,-5,5,-5])
     """
 
-    original_torque_value_array = make_full_torque_value_array([1,7,13,19,25,31],
-                                                               [5,-5,5,-5,5,-5])
 
+    original_torque_value_array = make_full_torque_value_array([3,9,15,21,27,33],
+                                                               [5,-5,5,-5,5,-5])
     wh_deformed_zernike = TorqueToZernike(constants=consts,
                                           torque_value_array=original_torque_value_array,
                                           restructed_torque_value=5,
-                                          ignore_zernike_number_list=[9])
+                                          ignore_zernike_number_list=[1,2,3,4,5,6])
     
     wh_deformed_surface = ZernikeToSurface(constants=consts,
                                            zernike_number_list=wh_deformed_zernike.remaining_zernike_number_list,
@@ -346,3 +453,4 @@ if __name__ == "__main__":
     
     diff.make_image_plot()
     diff.make_circle_path_plot()
+    np.where()
