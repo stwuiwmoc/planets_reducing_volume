@@ -111,7 +111,6 @@ class Constants:
 
 class ZernikeToSurface:
     
-    
     def __init__(self, constants, zernike_number_list, zernike_value_array):
         """
         class : 2d surface from zernike values
