@@ -405,7 +405,7 @@ class TorqueToZernike:
     
 if __name__ == "__main__":
     
-    consts = Constants(physical_radius=925e-3, 
+    CONSTS = Constants(physical_radius=925e-3, 
                        ignore_radius=25e-3,
                        pixel_number=256,
                        zernike_max_degree = 10)
@@ -430,12 +430,12 @@ if __name__ == "__main__":
 
     original_torque_value_array = make_full_torque_value_array([3,9,15,21,27,33],
                                                                [5,-5,5,-5,5,-5])
-    wh_deformed_zernike = TorqueToZernike(constants=consts,
+    wh_deformed_zernike = TorqueToZernike(constants=CONSTS,
                                           torque_value_array=original_torque_value_array,
                                           restructed_torque_value=5,
                                           ignore_zernike_number_list=[1,2,3,4,5,6])
     
-    wh_deformed_surface = ZernikeToSurface(constants=consts,
+    wh_deformed_surface = ZernikeToSurface(constants=CONSTS,
                                            zernike_number_list=wh_deformed_zernike.remaining_zernike_number_list,
                                            zernike_value_array=wh_deformed_zernike.remaining_reproducted_zernike_value_array)
     
@@ -447,10 +447,9 @@ if __name__ == "__main__":
     fig.tight_layout()
     
     
-    diff = StitchedCsvToSurface(constants=consts,
+    diff = StitchedCsvToSurface(constants=CONSTS,
                                 original_stitched_csv_fpath="mkfolder/stitch2mesh/zer10_1215xm1301214ym870-510cir.v4.22.hei_dense.csv", 
                                 deformed_stitched_csv_fpath="mkfolder/stitch2mesh/zer10_1215xm1301216ym870-510cir.v4.21.hei_dense.csv")
     
     diff.make_image_plot()
     diff.make_circle_path_plot()
-    np.where()
