@@ -12,10 +12,9 @@ def volume_check(radius, pv, ignore_lower_height_percent):
     a = -radius + 2*radius * ignore_lower_height_percent/100
     theta = np.arcsin(a/radius)
     
-    circle = pv*(0.5*radius**2*(-theta - np.sin(2*theta)/2 + np.pi))
     square = pv/(3*radius) * (radius**2 - a**2)**(3/2)
-    bottom = pv*ignore_lower_height_percent/100*2*(0.5*radius**2*(-theta - np.sin(2*theta)/2 + np.pi))
-    return circle + square - bottom
+    circle = pv/2 * a * radius * (np.pi/2 - theta - np.sin(2*theta)/2) 
+    return circle + square
 
 if __name__ == "__main__":
     CONSTS = pom.Constants(physical_radius=0.925, 
@@ -34,7 +33,7 @@ if __name__ == "__main__":
                                      ignore_lower_height_percent=0)
     
     
-    check = volume_check(CONSTS.physical_radius,
+    check = volume_check(CONSTS.varid_radius,
                          zer2per50.pv,
                          zer2per50.ignore_lower_height_percent)
     
