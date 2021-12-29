@@ -16,7 +16,7 @@ if __name__ == "__main__":
     
     diff = pom.StitchedCsvToSurface(constants=CONSTS,
                                     original_stitched_csv_fpath="mkfolder/stitch2mesh/zer10_1215xm1301214ym870-510cir.v4.22.hei_dense.csv", 
-                                    None_or_deformed_stitched_csv_fpath="mkfolder/stitch2mesh/zer10_1215xm1301216ym870-510cir.v4.21.hei_dense.csv")
+                                    deformed_stitched_csv_fpath="mkfolder/stitch2mesh/zer10_1215xm1301216ym870-510cir.v4.21.hei_dense.csv")
     
     diff.make_image_plot()
     diff.make_circle_path_plot()
