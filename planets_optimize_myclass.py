@@ -92,7 +92,7 @@ def oap_calculation(clocking_angle_rad, radius_of_curvature, off_axis_distance, 
 
     cz1 = (4*a*aqx*np.sin(theta) - a*cx*(np.sin(phi - 2*theta) - np.sin(phi + 2*theta)) - a*cy*(np.cos(phi - 2*theta) - np.cos(phi + 2*theta)) - 2*np.sqrt(D) + 2*np.cos(theta))/(4*a*np.sin(theta)**2)
     oap_height = cz1 * 1e-3 # [mm] --> [m] に変換
-    return cz1
+    return oap_height
 
 
 class Constants:
