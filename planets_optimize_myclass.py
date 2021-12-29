@@ -98,7 +98,7 @@ class Constants:
 
 class ZernikeToSurface:
     
-    def __init__(self, constants, zernike_number_list, zernike_value_array, offset_height_percent):
+    def __init__(self, constants, zernike_number_list, zernike_value_array, offset_height_percent=0):
         """
         class : 2d surface from zernike values
 
@@ -244,7 +244,7 @@ class ZernikeToSurface:
         return ax
     
 class StitchedCsvToSurface(ZernikeToSurface):
-    def __init__(self, constants, original_stitched_csv_fpath, None_or_deformed_stitched_csv_fpath, offset_height_percent):
+    def __init__(self, constants, original_stitched_csv_fpath, None_or_deformed_stitched_csv_fpath, offset_height_percent=0):
         """
         class : 2d-surface from measured (stitched) 2d-csv data
 
