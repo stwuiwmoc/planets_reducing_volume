@@ -24,7 +24,26 @@ if __name__ == "__main__":
                                         inputed_surface=exelis.surface, 
                                         removing_zernike_number_list=[4,5])
 
-    removed.make_image_plot()
+    oap = pom.OapSurface(constants=CONSTS, 
+                         radius_of_curvature=8667e-3, 
+                         off_axis_distance=1800e-3, 
+                         clocking_angle_rad=0)
+    
+    roc = pom.OapSurface(constants=CONSTS, 
+                         radius_of_curvature=8668e-3, 
+                         off_axis_distance=1800e-3, 
+                         clocking_angle_rad=0)
+    
+    offaxis = pom.OapSurface(constants=CONSTS, 
+                             radius_of_curvature=8667e-3, 
+                             off_axis_distance=1801e-3, 
+                             clocking_angle_rad=0)
+ 
+    clocking = pom.OapSurface(constants=CONSTS, 
+                              radius_of_curvature=8667e-3, 
+                              off_axis_distance=1800e-3, 
+                              clocking_angle_rad=1e-3)
+ 
     
     target_surface = pom.ZernikeToSurface(constants = CONSTS, 
                                           zernike_number_list = [7],

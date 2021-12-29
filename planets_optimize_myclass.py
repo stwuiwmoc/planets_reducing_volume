@@ -417,6 +417,29 @@ class FilteredSurface(Surface):
         masked_filtered_surface = self.consts.mask * filtered_surface
         return masked_filtered_surface
     
+class OapSurface(Surface):
+    def __init__(self, constants, radius_of_curvature, off_axis_distance, clocking_angle_rad, offset_height_percent=0):
+        self.consts=constants
+        self.radius_of_curvature=radius_of_curvature
+        self.off_axis_distance=off_axis_distance
+        self.clocking_angle_rad=clocking_angle_rad
+        self.offset_height_percent = offset_height_percent
+        
+        oap=oap_calculation(clocking_angle_rad=self.clocking_angle_rad, 
+                            radius_of_curvature=self.radius_of_curvature, 
+                            off_axis_distance=self.off_axis_distance, 
+                            x_mesh=self.consts.xx, 
+                            y_mesh=self.consts.yy)
+        self.surface=self.consts.mask*oap
+        
+        self.pv=super()._pv_calculation()
+        self.rms=super()._rms_calculation()
+        self.volume=super()._volume_calculation()[0]
+        self.offset_height_value=super()._volume_calculation()[1]
+        
+    def h(self):
+        mkhelp()
+    
 class ZernikeToTorque:
     def __init__(self, constants, target_zernike_number_list, target_zernike_value_array, ignore_zernike_number_list):
         """
