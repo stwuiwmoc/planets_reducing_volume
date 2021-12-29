@@ -14,7 +14,6 @@ if __name__ == "__main__":
                            pixel_number=256,
                            zernike_max_degree=10)
     
-    
     diff = pom.StitchedCsvToSurface(constants=CONSTS,
                                     original_stitched_csv_fpath="mkfolder/stitch2mesh/zer10_1215xm1301214ym870-510cir.v4.22.hei_dense.csv", 
                                     None_or_deformed_stitched_csv_fpath="mkfolder/stitch2mesh/zer10_1215xm1301216ym870-510cir.v4.21.hei_dense.csv")
