@@ -5,6 +5,7 @@ Created on Wed Dec 29 12:19:46 2021
 @author: swimc
 """
 import numpy as np
+import matplotlib.pyplot as plt
 
 import planets_optimize_myclass as pom
 
@@ -14,7 +15,7 @@ def volume_check(radius, pv, ignore_lower_height_percent):
     
     square = pv/(3*radius) * (radius**2 - a**2)**(3/2)
     circle = pv/2 * a * radius * (np.pi/2 - theta - np.sin(2*theta)/2) 
-    return circle + square
+    return square - circle
 
 if __name__ == "__main__":
     CONSTS = pom.Constants(physical_radius=0.925, 
@@ -27,19 +28,29 @@ if __name__ == "__main__":
                                     zernike_value_array=[1],
                                     ignore_lower_height_percent=0)
     
-    zer2per50 = pom.ZernikeToSurface(constants=CONSTS, 
-                                     zernike_number_list=[2], 
-                                     zernike_value_array=[1],
-                                     ignore_lower_height_percent=0)
+    class_list = []
+    check_list = []
     
-    
-    check = volume_check(CONSTS.varid_radius,
-                         zer2per50.pv,
-                         zer2per50.ignore_lower_height_percent)
-    
-    print("class ",zer2per50.volume)
-    print("check ",check)
+    for i in range(100):
+        zer2per50 = pom.ZernikeToSurface(constants=CONSTS, 
+                                         zernike_number_list=[3], 
+                                         zernike_value_array=[1],
+                                         ignore_lower_height_percent=i)
+        
+        
+        check = volume_check(CONSTS.varid_radius,
+                             zer2per50.pv,
+                             zer2per50.ignore_lower_height_percent)
+        
+        class_list.append(zer2per50.volume)
+        check_list.append(check)
+        
+        print("class ",zer2per50.volume)
+        print("check ",check)
+        del zer2per50
 
+    plt.plot(class_list)
+    plt.plot(check_list)
     
     exelis = pom.StitchedCsvToSurface(constants=CONSTS, 
                                       original_stitched_csv_fpath="mkfolder/exelis_rawdata_edit/exelis_reshaped.csv", 
