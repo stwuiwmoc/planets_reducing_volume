@@ -28,29 +28,6 @@ if __name__ == "__main__":
                                     zernike_value_array=[1],
                                     ignore_lower_height_percent=0)
     
-    class_list = []
-    check_list = []
-    
-    for i in range(100):
-        zer2per50 = pom.ZernikeToSurface(constants=CONSTS, 
-                                         zernike_number_list=[3], 
-                                         zernike_value_array=[1],
-                                         ignore_lower_height_percent=i)
-        
-        
-        check = volume_check(CONSTS.varid_radius,
-                             zer2per50.pv,
-                             zer2per50.ignore_lower_height_percent)
-        
-        class_list.append(zer2per50.volume)
-        check_list.append(check)
-        
-        print("class ",zer2per50.volume)
-        print("check ",check)
-        del zer2per50
-
-    plt.plot(class_list)
-    plt.plot(check_list)
     
     exelis = pom.StitchedCsvToSurface(constants=CONSTS, 
                                       original_stitched_csv_fpath="mkfolder/exelis_rawdata_edit/exelis_reshaped.csv", 
