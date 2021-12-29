@@ -438,7 +438,7 @@ class OapSurface(Surface):
         self.offset_height_value=super()._volume_calculation()[1]
         
     def h(self):
-        mkhelp()
+        mkhelp(self)
     
 class ZernikeToTorque:
     def __init__(self, constants, target_zernike_number_list, target_zernike_value_array, ignore_zernike_number_list):
