@@ -22,6 +22,6 @@ if __name__ == "__main__":
     
     filtered = pom.FilteredSurface(constants=CONSTS, 
                                    inputed_surface=exelis.surface, 
-                                   filter_parameter=100)
+                                   filter_parameter=0)
     
     filtered.make_image_plot()
