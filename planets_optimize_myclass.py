@@ -55,31 +55,34 @@ def make_remaining_matrix(matrix, ignore_zernike_number_list):
     remaining_matrix = np.delete(arr=matrix, obj=idx_array, axis=0)
     return remaining_matrix
 
-def oap_calculation(clocking_angle_mrad, radius_of_curvature, off_axis_distance, x_mesh, y_mesh):
+def oap_calculation(clocking_angle_rad, radius_of_curvature, off_axis_distance, x_mesh, y_mesh):
     """
     
     Parameters
     ----------
-    clocking_angle_mrad : float [mrad]
+    clocking_angle_rad : float [rad]
         回転角
-    radius_of_curvature : float [mm]
+    radius_of_curvature : float [m]
         曲率半径
-    off_axis_distance : floot [mm]
+    off_axis_distance : floot [m]
         軸外し距離 (off-axis)
-    x_mesh : 2D-mesh-array [mm]
-    y_mesh : 2D-mesh-array [mm]
+    x_mesh : 2D-mesh-array [m]
+        軸外し方向。 off_axis_distanceを増加させる方向をx_meshの正の向きとして定義
+    y_mesh : 2D-mesh-array [m]
 
     Returns
     -------
-    oap_height : 2D-mesh-array [mm]
+    oap_height : 2D-mesh-array [m]
         input された clocking_angle_rad, radius_of_curvature, off_axis_distance での切り取り放物面
     """
+    phi = clocking_angle_rad 
     
-    p = radius_of_curvature
-    aqx = off_axis_distance
-    phi = 1e-3*clocking_angle_mrad # [mrad] -> [rad] へ変換
-    cx = x_mesh
-    cy = y_mesh
+    # [m] --> [mm] に変換
+    p = 1e3 * radius_of_curvature
+    aqx = 1e3 * off_axis_distance
+    cx = 1e3 * x_mesh 
+    cy = 1e3 * y_mesh
+
     
     a = 1/(2*p)
     aqz = a * ( aqx**2 + 0**2 )
@@ -88,6 +91,7 @@ def oap_calculation(clocking_angle_mrad, radius_of_curvature, off_axis_distance,
     D = -4*a**2*cx**2*np.sin(phi)**2*np.sin(theta)**2 - 8*a**2*cx*cy*np.sin(phi)*np.sin(theta)**2*np.cos(phi) + 4*a**2*cy**2*np.sin(phi)**2*np.sin(theta)**2 - 4*a**2*cy**2*np.sin(theta)**2 + 2*a*aqx*np.sin(2*theta) + 4*a*aqz*np.sin(theta)**2 + 4*a*cx*np.sin(theta)*np.cos(phi) - 4*a*cy*np.sin(phi)*np.sin(theta) - np.sin(theta)**2 + 1
 
     cz1 = (4*a*aqx*np.sin(theta) - a*cx*(np.sin(phi - 2*theta) - np.sin(phi + 2*theta)) - a*cy*(np.cos(phi - 2*theta) - np.cos(phi + 2*theta)) - 2*np.sqrt(D) + 2*np.cos(theta))/(4*a*np.sin(theta)**2)
+    oap_height = cz1 * 1e-3 # [mm] --> [m] に変換
     return cz1
 
 
