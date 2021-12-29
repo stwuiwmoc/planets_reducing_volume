@@ -291,7 +291,35 @@ class StitchedCsvToSurface(ZernikeToSurface):
         img_resize = image.resize(size=(self.consts.pixel_number, self.consts.pixel_number))
         masked_surface = self.consts.mask * np.array(img_resize)
         return masked_surface
+
+class FilteredSurface(ZernikeToSurface):
+    def __init__(self, constants, inputed_surface, filter_parameter, offset_height_percent=0):
+        self.consts = constants
+        self.inputed_surface = inputed_surface
+        self.filter_parameter = filter_parameter
+        self.offset_height_percent = offset_height_percent
         
+        self.surface = self.__smoothing_filter()
+        self.pv=super()._pv_calculation()
+        self.rms=super()._rms_calculation()
+        self.volume=super()._volume_calculation()[0]
+        self.offset_height_value=super()._volume_calculation()[1]
+        
+        
+    
+    def h(self):
+        mkhelp(self)
+    
+    def __smoothing_filter(self):
+        surface_without_nan = np.where(self.consts.tf,
+                                       self.inputed_surface,
+                                       0)
+        filtered_surface = sp.ndimage.filters.uniform_filter(surface_without_nan, 
+                                                             size=self.filter_parameter)
+        
+        masked_filtered_surface = self.consts.mask * filtered_surface
+        return masked_filtered_surface
+    
 class ZernikeToTorque:
     def __init__(self, constants, target_zernike_number_list, target_zernike_value_array, ignore_zernike_number_list):
         """
