@@ -96,58 +96,20 @@ class Constants:
     def h(self):
         mkhelp(self)
 
-class ZernikeToSurface:
-    
-    def __init__(self, constants, zernike_number_list, zernike_value_array, offset_height_percent=0):
-        """
-        class : 2d surface from zernike values
-
-        Parameters
-        ----------
-        constants : object
-            instance by class : Constants
-        zernike_number_list : 1d-list of int
-            zernike number which to use (1 means piston)
-        zernike_value_array : 1d-array of float
-            [m] value of zernike coefficient coresponding to zernike_number_list 
-        offset_height_percent : float
-            ignore height in percent. if you set 2, the lower 2% is ignored in self._volume_calculation()
-
-        Returns
-        -------
-        None.
-
-        """
-        
-        self.consts = constants
-        self.zernike_number_list = zernike_number_list
-        self.zernike_value_array = zernike_value_array
+class Surface:
+    def __init__(self, constants, surface, offset_height_percent=0):
+        self.consts=constants
+        self.surface=surface
         self.offset_height_percent = offset_height_percent
 
-        self.surface = self.__make_masked_zernike_surface()
         self.pv=self._pv_calculation()
         self.rms=self._rms_calculation()
         self.volume=self._volume_calculation()[0]
-        self.offset_height_value=self._volume_calculation()[1]
-        
+        self.offset_height_value=self._volume_calculation()[1]  
+
     def h(self):
         mkhelp(self)
-    
-    def __make_masked_zernike_surface(self):
-        optical_wavelength = 500e-9
         
-        wavestruct = pr.prop_begin(beam_diameter = 2*self.consts.varid_radius,
-                                   lamda = optical_wavelength,
-                                   grid_n = self.consts.pixel_number,
-                                   beam_diam_fraction=1)
-        
-        wfe = pr.prop_zernikes(wavestruct, 
-                               self.zernike_number_list, 
-                               self.zernike_value_array)
-        
-        masked_wfe = self.consts.mask * wfe
-        return masked_wfe
-    
     def _pv_calculation(self):
         array2d = self.surface
         peak = np.nanmax(array2d)
@@ -243,7 +205,61 @@ class ZernikeToSurface:
         ax.set_ylabel("heignt " + height_unit_str + "\nat R=" + str(measurement_radius_idx), fontsize=fontsize)
         return ax
     
-class StitchedCsvToSurface(ZernikeToSurface):
+
+class ZernikeToSurface(Surface):
+    
+    def __init__(self, constants, zernike_number_list, zernike_value_array, offset_height_percent=0):
+        """
+        class : 2d surface from zernike values
+
+        Parameters
+        ----------
+        constants : object
+            instance by class : Constants
+        zernike_number_list : 1d-list of int
+            zernike number which to use (1 means piston)
+        zernike_value_array : 1d-array of float
+            [m] value of zernike coefficient coresponding to zernike_number_list 
+        offset_height_percent : float
+            ignore height in percent. if you set 2, the lower 2% is ignored in self._volume_calculation()
+
+        Returns
+        -------
+        None.
+
+        """
+        
+        self.consts = constants
+        self.zernike_number_list = zernike_number_list
+        self.zernike_value_array = zernike_value_array
+        self.offset_height_percent = offset_height_percent
+
+        self.surface = self.__make_masked_zernike_surface()
+        self.pv=super()._pv_calculation()
+        self.rms=super()._rms_calculation()
+        self.volume=super()._volume_calculation()[0]
+        self.offset_height_value=super()._volume_calculation()[1]
+        
+    def h(self):
+        mkhelp(self)
+    
+    def __make_masked_zernike_surface(self):
+        optical_wavelength = 500e-9
+        
+        wavestruct = pr.prop_begin(beam_diameter = 2*self.consts.varid_radius,
+                                   lamda = optical_wavelength,
+                                   grid_n = self.consts.pixel_number,
+                                   beam_diam_fraction=1)
+        
+        wfe = pr.prop_zernikes(wavestruct, 
+                               self.zernike_number_list, 
+                               self.zernike_value_array)
+        
+        masked_wfe = self.consts.mask * wfe
+        return masked_wfe
+    
+    
+class StitchedCsvToSurface(Surface):
     def __init__(self, constants, original_stitched_csv_fpath, None_or_deformed_stitched_csv_fpath, offset_height_percent=0):
         """
         class : 2d-surface from measured (stitched) 2d-csv data
@@ -292,7 +308,7 @@ class StitchedCsvToSurface(ZernikeToSurface):
         masked_surface = self.consts.mask * np.array(img_resize)
         return masked_surface
 
-class FilteredSurface(ZernikeToSurface):
+class FilteredSurface(Surface):
     def __init__(self, constants, inputed_surface, filter_parameter, offset_height_percent=0):
         self.consts = constants
         self.inputed_surface = inputed_surface
