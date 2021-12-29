@@ -216,7 +216,7 @@ class ZernikeToSurface:
         return ax
     
 class StitchedCsvToSurface(ZernikeToSurface):
-    def __init__(self, constants, original_stitched_csv_fpath, deformed_stitched_csv_fpath):
+    def __init__(self, constants, original_stitched_csv_fpath, None_or_deformed_stitched_csv_fpath):
         """
         class : 2d-surface from measured (stitched) 2d-csv data
 
@@ -235,10 +235,16 @@ class StitchedCsvToSurface(ZernikeToSurface):
 
         """
         self.consts = constants
-    
-        self.original_masked_surface = self.__read_csv_to_masked_surface(original_stitched_csv_fpath)
-        self.deformed_masked_surface = self.__read_csv_to_masked_surface(deformed_stitched_csv_fpath)
-        self.surface = self.deformed_masked_surface - self.original_masked_surface
+        
+        if None_or_deformed_stitched_csv_fpath == None:
+            self.original_masked_surface = self.__read_csv_to_masked_surface(original_stitched_csv_fpath)
+            self.deformed_masked_surface = None
+            self.surface = self.original_masked_surface
+        
+        else:
+            self.original_masked_surface = self.__read_csv_to_masked_surface(original_stitched_csv_fpath)
+            self.deformed_masked_surface = self.__read_csv_to_masked_surface(None_or_deformed_stitched_csv_fpath)
+            self.surface = self.deformed_masked_surface - self.original_masked_surface
         
         self.pv=pv_calculation(self.surface)
         self.rms=rms_calculation(self.surface)
