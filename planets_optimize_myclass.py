@@ -50,12 +50,6 @@ def make_meshgrid(x_min, x_max, y_min, y_max, pixel_number):
     y_array = np.linspace(y_min, y_max, pixel_number)
     return np.meshgrid(x_array, y_array)
 
-def rms_calculation(array2d):
-    sigma = np.nansum(array2d**2)
-    data_count = np.sum(~np.isnan(array2d))
-    rms = np.sqrt( sigma / data_count )
-    return rms
-
 def make_remaining_matrix(matrix, ignore_zernike_number_list):
     idx_array = np.array(ignore_zernike_number_list) - 1
     remaining_matrix = np.delete(arr=matrix, obj=idx_array, axis=0)
@@ -128,8 +122,8 @@ class ZernikeToSurface:
         self.zernike_value_array = zernike_value_array
 
         self.surface = self.__make_masked_zernike_surface()
-        self.pv=self._pv_calculation(self.surface)
-        self.rms = rms_calculation(self.surface)
+        self.pv=self._pv_calculation()
+        self.rms=self._rms_calculation()
         
     def h(self):
         mkhelp(self)
@@ -149,11 +143,20 @@ class ZernikeToSurface:
         masked_wfe = self.consts.mask * wfe
         return masked_wfe
     
-    def _pv_calculation(self, array2d):
+    def _pv_calculation(self):
+        array2d = self.surface
         peak = np.nanmax(array2d)
         valley = np.nanmin(array2d)
         pv = peak - valley
         return pv
+    
+    def _rms_calculation(self):
+        array2d = self.surface
+        sigma = np.nansum(array2d**2)
+        data_count = np.sum(~np.isnan(array2d))
+        rms = np.sqrt( sigma / data_count )
+        return rms
+
 
     def make_image_plot(self, figure=plt.figure(), position=111, 
                         color_scale=False, cbar_min_percent=0, cbar_max_percent=100, 
@@ -246,8 +249,8 @@ class StitchedCsvToSurface(ZernikeToSurface):
             self.deformed_masked_surface = self.__read_csv_to_masked_surface(None_or_deformed_stitched_csv_fpath)
             self.surface = self.deformed_masked_surface - self.original_masked_surface
         
-        self.pv=super()._pv_calculation(self.surface)
-        self.rms=rms_calculation(self.surface)
+        self.pv=super()._pv_calculation()
+        self.rms=super()._rms_calculation()
     
     def __read_csv_to_masked_surface(self,filepath):
         raw = np.loadtxt(filepath)
