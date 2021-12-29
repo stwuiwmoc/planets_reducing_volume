@@ -128,7 +128,7 @@ class ZernikeToSurface:
         self.zernike_value_array = zernike_value_array
 
         self.surface = self.__make_masked_zernike_surface()
-        self.pv=self.pv_calculation(self.surface)
+        self.pv=self._pv_calculation(self.surface)
         self.rms = rms_calculation(self.surface)
         
     def h(self):
@@ -149,7 +149,7 @@ class ZernikeToSurface:
         masked_wfe = self.consts.mask * wfe
         return masked_wfe
     
-    def pv_calculation(self, array2d):
+    def _pv_calculation(self, array2d):
         peak = np.nanmax(array2d)
         valley = np.nanmin(array2d)
         pv = peak - valley
@@ -246,7 +246,7 @@ class StitchedCsvToSurface(ZernikeToSurface):
             self.deformed_masked_surface = self.__read_csv_to_masked_surface(None_or_deformed_stitched_csv_fpath)
             self.surface = self.deformed_masked_surface - self.original_masked_surface
         
-        self.pv=super().pv_calculation(self.surface)
+        self.pv=super()._pv_calculation(self.surface)
         self.rms=rms_calculation(self.surface)
     
     def __read_csv_to_masked_surface(self,filepath):
