@@ -205,6 +205,22 @@ class Surface:
         ax.set_ylabel("heignt " + height_unit_str + "\nat R=" + str(measurement_radius_idx), fontsize=fontsize)
         return ax
     
+class ZernikeRemovedSurface(Surface):
+    def __init__(self, constants, inputed_surface, ignore_zernike_number_list, offset_height_percent=0):
+        self.consts=constants
+        self.offset_height_percent = offset_height_percent
+        self.ignore_zernike_number_list = ignore_zernike_number_list
+
+        if self.ignore_zernike_number_list==[]:
+            self.surface=inputed_surface
+            
+        else:
+            self.inputed_surface=inputed_surface
+            self.zernike_value_array=self._zernike_value_array_calculation(self.inputed_surface)
+        
+    def h(self):
+        mkhelp(self)
+
 
 class ZernikeToSurface(Surface):
     

@@ -19,6 +19,11 @@ if __name__ == "__main__":
     exelis = pom.StitchedCsvToSurface(constants=CONSTS, 
                                       original_stitched_csv_fpath="mkfolder/exelis_rawdata_edit/exelis_reshaped.csv",
                                       None_or_deformed_stitched_csv_fpath=None)
+    
+    removed = pom.ZernikeRemovedSurface(constants=CONSTS, 
+                                        inputed_surface=exelis.surface, 
+                                        ignore_zernike_number_list=[])
+ 
     target_surface = pom.ZernikeToSurface(constants = CONSTS, 
                                           zernike_number_list = [7],
                                           zernike_value_array = np.array([2e-7])) 
