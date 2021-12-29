@@ -205,22 +205,64 @@ class Surface:
         ax.set_ylabel("heignt " + height_unit_str + "\nat R=" + str(measurement_radius_idx), fontsize=fontsize)
         return ax
     
-class ZernikeRemovedSurface(Surface):
-    def __init__(self, constants, inputed_surface, ignore_zernike_number_list, offset_height_percent=0):
-        self.consts=constants
-        self.offset_height_percent = offset_height_percent
-        self.ignore_zernike_number_list = ignore_zernike_number_list
+    def _make_masked_zernike_surface(self, zernike_number_list, zernike_value_array):
+        optical_wavelength = 500e-9
+        
+        wavestruct = pr.prop_begin(beam_diameter = 2*self.consts.varid_radius,
+                                   lamda = optical_wavelength,
+                                   grid_n = self.consts.pixel_number,
+                                   beam_diam_fraction=1)
+        
+        wfe = pr.prop_zernikes(wavestruct, 
+                               zernike_number_list, 
+                               zernike_value_array)
+        
+        masked_wfe = self.consts.mask * wfe
+        return masked_wfe
 
-        if self.ignore_zernike_number_list==[]:
-            self.surface=inputed_surface
-            
-        else:
-            self.inputed_surface=inputed_surface
-            self.zernike_value_array=self._zernike_value_array_calculation(self.inputed_surface)
+    
+class ZernikeRemovedSurface(Surface):
+    def __init__(self, constants, inputed_surface, removing_zernike_number_list, offset_height_percent=0):
+        self.consts=constants
+        self.offset_height_percent=offset_height_percent
+        self.removing_zernike_number_list=removing_zernike_number_list
+        
+        full_zernike_number_list = [i+1 for i in range(self.consts.zernike_max_degree)]
+    
+        self.inputed_surface=inputed_surface
+        self.zernike_value_array=self._zernike_value_array_calculation(self.inputed_surface)
+        
+        ignore_zernike_number_list=make_remaining_matrix(full_zernike_number_list, 
+                                                         self.removing_zernike_number_list)
+        self.removing_zernike_value_array=make_remaining_matrix(self.zernike_value_array, 
+                                                                ignore_zernike_number_list)
+        
+        self.removing_surface=super()._make_masked_zernike_surface(self.removing_zernike_number_list,
+                                                                   self.removing_zernike_value_array)
+        self.surface = self.inputed_surface - self.removing_surface
+        
+        self.pv=super()._pv_calculation()
+        self.rms=super()._rms_calculation()
+        self.volume=super()._volume_calculation()[0]
+        self.offset_height_value=super()._volume_calculation()[1]
         
     def h(self):
         mkhelp(self)
 
+    def _zernike_value_array_calculation(self, surface):
+        surface_without_nan = np.where(self.consts.tf,
+                                       surface,
+                                       0)
+        
+        zernike_value_array = pr.prop_fit_zernikes(wavefront0=surface_without_nan,
+                                                   pupil0=self.consts.tf,
+                                                   pupilradius0=self.consts.pixel_number//2,
+                                                   nzer=self.consts.zernike_max_degree,
+                                                   xc=self.consts.pixel_number//2,
+                                                   yc=self.consts.pixel_number//2)
+        return zernike_value_array
+
+    
 
 class ZernikeToSurface(Surface):
     

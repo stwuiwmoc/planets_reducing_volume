@@ -12,7 +12,7 @@ import planets_optimize_myclass as pom
 
 if __name__ == "__main__":
     CONSTS = pom.Constants(physical_radius=925e-3, 
-                           ignore_radius=75e-3,
+                           ignore_radius=25e-3,
                            pixel_number=1024,
                            zernike_max_degree=10)
     
@@ -22,8 +22,10 @@ if __name__ == "__main__":
     
     removed = pom.ZernikeRemovedSurface(constants=CONSTS, 
                                         inputed_surface=exelis.surface, 
-                                        ignore_zernike_number_list=[])
- 
+                                        removing_zernike_number_list=[4,5])
+
+    removed.make_image_plot()
+    
     target_surface = pom.ZernikeToSurface(constants = CONSTS, 
                                           zernike_number_list = [7],
                                           zernike_value_array = np.array([2e-7])) 
