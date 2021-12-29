@@ -98,7 +98,7 @@ class Constants:
 
 class ZernikeToSurface:
     
-    def __init__(self, constants, zernike_number_list, zernike_value_array, ignore_lower_height_percent):
+    def __init__(self, constants, zernike_number_list, zernike_value_array, offset_height_percent):
         """
         class : 2d surface from zernike values
 
@@ -110,7 +110,7 @@ class ZernikeToSurface:
             zernike number which to use (1 means piston)
         zernike_value_array : 1d-array of float
             [m] value of zernike coefficient coresponding to zernike_number_list 
-        ignore_lower_height_percent : float
+        offset_height_percent : float
             ignore height in percent. if you set 2, the lower 2% is ignored in self._volume_calculation()
 
         Returns
@@ -122,12 +122,13 @@ class ZernikeToSurface:
         self.consts = constants
         self.zernike_number_list = zernike_number_list
         self.zernike_value_array = zernike_value_array
-        self.ignore_lower_height_percent = ignore_lower_height_percent
+        self.offset_height_percent = offset_height_percent
 
         self.surface = self.__make_masked_zernike_surface()
         self.pv=self._pv_calculation()
         self.rms=self._rms_calculation()
-        self.volume=self._volume_calculation()
+        self.volume=self._volume_calculation()[0]
+        self.offset_height_value=self._volume_calculation()[1]
         
     def h(self):
         mkhelp(self)
@@ -165,11 +166,11 @@ class ZernikeToSurface:
         # 下位○%は体積計算で無視するために、下位○%の閾値を計算
         sorted_surface = np.sort(self.surface.flatten()) # np.nanは最大値の後に並ぶ
         value_count = np.sum(~np.isnan(self.surface))
-        ignore_height_idx = int(value_count * self.ignore_lower_height_percent/100)
-        ignore_height_value = sorted_surface[ignore_height_idx]
+        offset_height_idx = int(value_count * self.offset_height_percent/100)
+        offset_height_value = sorted_surface[offset_height_idx]
         
-        lower_ignored_surface = np.where(self.surface>=ignore_height_value,
-                                         self.surface - ignore_height_value,
+        lower_ignored_surface = np.where(self.surface>=offset_height_value,
+                                         self.surface - offset_height_value,
                                          0)
         
         # 1pixelあたりの単位面積を計算
@@ -179,8 +180,7 @@ class ZernikeToSurface:
         # 1 pixelあたりの体積を計算        
         unit_pixel_volume = unit_pixel_area * lower_ignored_surface
         volume_in_m3 = unit_pixel_volume.sum()
-        volume_in_mm3 = volume_in_m3 * 1e9
-        return volume_in_m3
+        return (volume_in_m3, offset_height_value)
 
 
     def make_image_plot(self, figure=plt.figure(), position=111, 
@@ -244,7 +244,7 @@ class ZernikeToSurface:
         return ax
     
 class StitchedCsvToSurface(ZernikeToSurface):
-    def __init__(self, constants, original_stitched_csv_fpath, None_or_deformed_stitched_csv_fpath):
+    def __init__(self, constants, original_stitched_csv_fpath, None_or_deformed_stitched_csv_fpath, offset_height_percent):
         """
         class : 2d-surface from measured (stitched) 2d-csv data
 
@@ -256,6 +256,8 @@ class StitchedCsvToSurface(ZernikeToSurface):
             filepath of measured (stitched) and not deformed 2d-csv data 
         deformed_stitched_csv_fpath : TYPE
             filepath of measured (stitched) and deformed 2d-csv data
+        offset_height_percent : float
+            ignore height in percent. if you set 2, the lower 2% is ignored in self._volume_calculation()
 
         Returns
         -------
@@ -274,9 +276,14 @@ class StitchedCsvToSurface(ZernikeToSurface):
             self.deformed_masked_surface = self.__read_csv_to_masked_surface(None_or_deformed_stitched_csv_fpath)
             self.surface = self.deformed_masked_surface - self.original_masked_surface
         
+        self.offset_height_percent = offset_height_percent
+        
         self.pv=super()._pv_calculation()
         self.rms=super()._rms_calculation()
-    
+        self.volume=super()._volume_calculation()[0]
+        self.offset_height_value=super()._volume_calculation()[1]
+        
+        
     def __read_csv_to_masked_surface(self,filepath):
         raw = np.loadtxt(filepath)
         raw_zero_fill = np.where(np.isnan(raw), 0, raw)

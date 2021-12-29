@@ -19,17 +19,21 @@ def volume_check(radius, pv, ignore_lower_height_percent):
 
 if __name__ == "__main__":
     CONSTS = pom.Constants(physical_radius=0.925, 
-                           ignore_radius=0.025, 
+                           ignore_radius=0, 
                            pixel_number=1024, 
                            zernike_max_degree=10)
     
-    zer2per0 = pom.ZernikeToSurface(constants=CONSTS, 
-                                    zernike_number_list=[2], 
-                                    zernike_value_array=[1],
-                                    ignore_lower_height_percent=0)
-    
+    zer2 = pom.ZernikeToSurface(constants=CONSTS, 
+                                zernike_number_list=[2], 
+                                zernike_value_array=[1.0020721132673347e-6],
+                                offset_height_percent=0)
+    fig1=plt.figure()
+    zer2.make_image_plot(figure=fig1)
+    print(zer2.volume)
     
     exelis = pom.StitchedCsvToSurface(constants=CONSTS, 
                                       original_stitched_csv_fpath="mkfolder/exelis_rawdata_edit/exelis_reshaped.csv", 
-                                      None_or_deformed_stitched_csv_fpath=None)
-    
+                                      None_or_deformed_stitched_csv_fpath=None,
+                                      offset_height_percent=2)
+    fig2=plt.figure()
+    exelis.make_image_plot(fig2)
