@@ -96,6 +96,116 @@ class Constants:
     def h(self):
         mkhelp(self)
 
+class Surface:
+    def __init__(self, constants, surface, offset_height_percent=0):
+        self.consts=constants
+        self.surface=surface
+        self.offset_height_percent = offset_height_percent
+
+        self.pv=self._pv_calculation()
+        self.rms=self._rms_calculation()
+        self.volume=self._volume_calculation()[0]
+        self.offset_height_value=self._volume_calculation()[1]  
+
+    def h(self):
+        mkhelp(self)
+        
+    def _pv_calculation(self):
+        array2d = self.surface
+        peak = np.nanmax(array2d)
+        valley = np.nanmin(array2d)
+        pv = peak - valley
+        return pv
+    
+    def _rms_calculation(self):
+        array2d = self.surface
+        sigma = np.nansum(array2d**2)
+        data_count = np.sum(~np.isnan(array2d))
+        rms = np.sqrt( sigma / data_count )
+        return rms
+    
+    def _volume_calculation(self):
+        # 下位○%は体積計算で無視するために、下位○%の閾値を計算
+        sorted_surface = np.sort(self.surface.flatten()) # np.nanは最大値の後に並ぶ
+        value_count = np.sum(~np.isnan(self.surface))
+        offset_height_idx = int(value_count * self.offset_height_percent/100)
+        offset_height_value = sorted_surface[offset_height_idx]
+        
+        lower_ignored_surface = np.where(self.surface>=offset_height_value,
+                                         self.surface - offset_height_value,
+                                         0)
+        
+        # 1pixelあたりの単位面積を計算
+        physical_diameter = 2 * self.consts.physical_radius
+        unit_pixel_area = (physical_diameter / self.consts.pixel_number)**2
+
+        # 1 pixelあたりの体積を計算        
+        unit_pixel_volume = unit_pixel_area * lower_ignored_surface
+        volume_in_m3 = unit_pixel_volume.sum()
+        return (volume_in_m3, offset_height_value)
+
+
+    def make_image_plot(self, figure=plt.figure(), position=111, 
+                        color_scale=False, cbar_min_percent=0, cbar_max_percent=100, 
+                        pv_digits=2, rms_digits=2):
+        
+        cmap = cm.jet
+        fontsize = 15
+        title = "pv = " + str(round(self.pv*1e6, pv_digits)) + " [um]" + "\n" \
+              + "RMS = " + str(round(self.rms*1e6, rms_digits)) + " [um]"
+        
+        cbar_min = np.nanmin(self.surface) + self.pv * cbar_min_percent/100
+        cbar_max = np.nanmin(self.surface) + self.pv * cbar_max_percent/100
+        
+        extent = [-self.consts.physical_radius, self.consts.physical_radius,
+                  -self.consts.physical_radius, self.consts.physical_radius]
+        
+        ax = figure.add_subplot(position)
+        ax.imshow(self.surface, interpolation="nearest", cmap=cmap, 
+                  vmin=cbar_min, vmax=cbar_max, origin="lower", extent=extent)
+        ax.set_title(title, fontsize=fontsize)
+        
+        divider = mpl_toolkits.axes_grid1.make_axes_locatable(ax)
+        cax = divider.append_axes("right", "5%", pad="3%")
+        
+        norm = Normalize(vmin=cbar_min, vmax=cbar_max)
+        cbar_title = "[m]"
+        mappable = cm.ScalarMappable(norm=norm, cmap=cmap)
+        
+        cbar = figure.colorbar(mappable, ax=ax, cax=cax)
+        cbar.set_label(cbar_title, fontsize=fontsize)
+        return ax
+        
+    def make_circle_path_plot(self, figure=plt.figure(), position=111, 
+                              radius=0.870, height_magn=1e9, height_unit_str="[nm]"):
+        fontsize = 15
+        varid_radius_pixel_number = int(self.consts.varid_radius/self.consts.physical_radius*self.consts.pixel_number/2)
+        measurement_radius_idx = int(radius*1e3)
+        
+        image = np.where(self.consts.tf==True, self.surface, 0)
+        flags = cv2.INTER_CUBIC + cv2.WARP_FILL_OUTLIERS + cv2.WARP_POLAR_LINEAR
+        
+        linear_polar_image = cv2.warpPolar(src=image,
+                                           dsize=(int(self.consts.varid_radius*1e3),360), 
+                                           center=(self.consts.pixel_number/2, self.consts.pixel_number/2),
+                                           maxRadius=varid_radius_pixel_number, 
+                                           flags=flags)
+        
+        circle_path_line = height_magn*linear_polar_image[:, measurement_radius_idx]
+        height_pv = np.nanmax(circle_path_line) - np.nanmin(circle_path_line)
+        height_pv_str = str(round(height_pv, 2))
+        
+        self.make_image_plot()
+        
+        ax = figure.add_subplot(position)
+        ax.plot(circle_path_line)
+        ax.grid()
+        ax.set_title("circle_path ( pv = " + height_pv_str + " " + height_unit_str + " )", fontsize=fontsize)
+        ax.set_xlabel("degree", fontsize=fontsize)
+        ax.set_ylabel("heignt " + height_unit_str + "\nat R=" + str(measurement_radius_idx), fontsize=fontsize)
+        return ax
+    
+
 class ZernikeToSurface:
     
     def __init__(self, constants, zernike_number_list, zernike_value_array, offset_height_percent=0):
