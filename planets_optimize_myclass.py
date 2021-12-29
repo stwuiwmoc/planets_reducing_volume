@@ -207,7 +207,7 @@ class ZernikeToSurface:
         cax = divider.append_axes("right", "5%", pad="3%")
         
         norm = Normalize(vmin=cbar_min, vmax=cbar_max)
-        cbar_title = "[mm]"
+        cbar_title = "[m]"
         mappable = cm.ScalarMappable(norm=norm, cmap=cmap)
         
         cbar = figure.colorbar(mappable, ax=ax, cax=cax)
