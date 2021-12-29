@@ -292,7 +292,8 @@ class ZernikeToSurface(Surface):
         self.zernike_value_array = zernike_value_array
         self.offset_height_percent = offset_height_percent
 
-        self.surface = self.__make_masked_zernike_surface()
+        self.surface = super()._make_masked_zernike_surface(self.zernike_number_list,
+                                                            self.zernike_value_array)
         self.pv=super()._pv_calculation()
         self.rms=super()._rms_calculation()
         self.volume=super()._volume_calculation()[0]
@@ -300,22 +301,7 @@ class ZernikeToSurface(Surface):
         
     def h(self):
         mkhelp(self)
-    
-    def __make_masked_zernike_surface(self):
-        optical_wavelength = 500e-9
         
-        wavestruct = pr.prop_begin(beam_diameter = 2*self.consts.varid_radius,
-                                   lamda = optical_wavelength,
-                                   grid_n = self.consts.pixel_number,
-                                   beam_diam_fraction=1)
-        
-        wfe = pr.prop_zernikes(wavestruct, 
-                               self.zernike_number_list, 
-                               self.zernike_value_array)
-        
-        masked_wfe = self.consts.mask * wfe
-        return masked_wfe
-    
     
 class StitchedCsvToSurface(Surface):
     def __init__(self, constants, original_stitched_csv_fpath, None_or_deformed_stitched_csv_fpath, offset_height_percent=0):
