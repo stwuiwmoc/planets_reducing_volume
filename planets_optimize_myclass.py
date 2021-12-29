@@ -50,12 +50,6 @@ def make_meshgrid(x_min, x_max, y_min, y_max, pixel_number):
     y_array = np.linspace(y_min, y_max, pixel_number)
     return np.meshgrid(x_array, y_array)
 
-def pv_calculation(array2d):
-    peak = np.nanmax(array2d)
-    valley = np.nanmin(array2d)
-    pv = peak - valley
-    return pv
-
 def rms_calculation(array2d):
     sigma = np.nansum(array2d**2)
     data_count = np.sum(~np.isnan(array2d))
@@ -134,7 +128,7 @@ class ZernikeToSurface:
         self.zernike_value_array = zernike_value_array
 
         self.surface = self.__make_masked_zernike_surface()
-        self.pv=pv_calculation(self.surface)
+        self.pv=self.pv_calculation(self.surface)
         self.rms = rms_calculation(self.surface)
         
     def h(self):
@@ -155,6 +149,12 @@ class ZernikeToSurface:
         masked_wfe = self.consts.mask * wfe
         return masked_wfe
     
+    def pv_calculation(self, array2d):
+        peak = np.nanmax(array2d)
+        valley = np.nanmin(array2d)
+        pv = peak - valley
+        return pv
+
     def make_image_plot(self, figure=plt.figure(), position=111, 
                         color_scale=False, cbar_min_percent=0, cbar_max_percent=100, 
                         pv_digits=2, rms_digits=2):
@@ -246,7 +246,7 @@ class StitchedCsvToSurface(ZernikeToSurface):
             self.deformed_masked_surface = self.__read_csv_to_masked_surface(None_or_deformed_stitched_csv_fpath)
             self.surface = self.deformed_masked_surface - self.original_masked_surface
         
-        self.pv=pv_calculation(self.surface)
+        self.pv=super().pv_calculation(self.surface)
         self.rms=rms_calculation(self.surface)
     
     def __read_csv_to_masked_surface(self,filepath):
