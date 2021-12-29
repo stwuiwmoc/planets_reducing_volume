@@ -304,7 +304,7 @@ class ZernikeToSurface(Surface):
         
     
 class StitchedCsvToSurface(Surface):
-    def __init__(self, constants, original_stitched_csv_fpath, None_or_deformed_stitched_csv_fpath, offset_height_percent=0):
+    def __init__(self, constants, original_stitched_csv_fpath, deformed_stitched_csv_fpath, offset_height_percent=0):
         """
         class : 2d-surface from measured (stitched) 2d-csv data
 
@@ -326,14 +326,12 @@ class StitchedCsvToSurface(Surface):
         """
         self.consts = constants
         
-        if None_or_deformed_stitched_csv_fpath == None:
-            self.original_masked_surface = self.__read_csv_to_masked_surface(original_stitched_csv_fpath)
-            self.deformed_masked_surface = None
-            self.surface = self.original_masked_surface
+        if deformed_stitched_csv_fpath == "":
+            self.surface = self.__read_csv_to_masked_surface(original_stitched_csv_fpath)
         
         else:
             self.original_masked_surface = self.__read_csv_to_masked_surface(original_stitched_csv_fpath)
-            self.deformed_masked_surface = self.__read_csv_to_masked_surface(None_or_deformed_stitched_csv_fpath)
+            self.deformed_masked_surface = self.__read_csv_to_masked_surface(deformed_stitched_csv_fpath)
             self.surface = self.deformed_masked_surface - self.original_masked_surface
         
         self.offset_height_percent = offset_height_percent
