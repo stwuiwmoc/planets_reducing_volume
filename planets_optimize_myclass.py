@@ -580,3 +580,12 @@ class TorqueToZernike:
         ax.hlines(0, xmin=1, xmax=12, color ="darkgray")
         
         return ax
+    
+class OapMinimize:
+    def __init__(self, constants, inputed_surface):
+        self.consts=constants
+        self.inputed_surface=inputed_surface
+        return
+    
+    def h(self):
+        mkhelp(self)
