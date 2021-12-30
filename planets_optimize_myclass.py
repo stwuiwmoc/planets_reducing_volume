@@ -55,17 +55,18 @@ def make_remaining_matrix(matrix, ignore_zernike_number_list):
     remaining_matrix = np.delete(arr=matrix, obj=idx_array, axis=0)
     return remaining_matrix
 
-def oap_calculation(clocking_angle_rad, radius_of_curvature, off_axis_distance, x_mesh, y_mesh):
+def oap_calculation(radius_of_curvature, off_axis_distance, clocking_angle_rad, x_mesh, y_mesh):
     """
     
     Parameters
     ----------
-    clocking_angle_rad : float [rad]
-        回転角
     radius_of_curvature : float [m]
         曲率半径
     off_axis_distance : floot [m]
         軸外し距離 (off-axis)
+    clocking_angle_rad : float [rad]
+        回転角
+    
     x_mesh : 2D-mesh-array [m]
         軸外し方向。 off_axis_distanceを増加させる方向をx_meshの正の向きとして定義
     y_mesh : 2D-mesh-array [m]
