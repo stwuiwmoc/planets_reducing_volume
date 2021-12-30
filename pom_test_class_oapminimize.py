@@ -17,6 +17,13 @@ if __name__ == "__main__":
                            pixel_number=1024,
                            zernike_max_degree=10)
     
+    OAP = pom.OapConstants(ideal_radius_of_curvature=8667, 
+                           ideal_off_axis_distance=1800, 
+                           ideal_clocking_angle_rad=0, 
+                           delta_radius_of_curvature=0, 
+                           delta_off_axis_distance=0, 
+                           delta_clocking_angle_rad=0)
+  
     exelis = pom.StitchedCsvToSurface(constants=CONSTS, 
                                       original_stitched_csv_fpath="mkfolder/exelis_rawdata_edit/exelis_reshaped.csv",
                                       deformed_stitched_csv_fpath="")

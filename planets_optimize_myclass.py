@@ -581,12 +581,39 @@ class TorqueToZernike:
         ax.hlines(0, xmin=1, xmax=12, color ="darkgray")
         
         return ax
+
+class OapConstants:
+    def __init__(self, 
+                 ideal_radius_of_curvature, ideal_off_axis_distance, ideal_clocking_angle_rad, 
+                 delta_radius_of_curvature, delta_off_axis_distance, delta_clocking_angle_rad):
     
+        self.ideal_radius_of_curvature=ideal_radius_of_curvature
+        self.ideal_off_axis_distance=ideal_off_axis_distance
+        self.ideal_clocking_angle_rad=ideal_clocking_angle_rad
+    
+        self.delta_radius_of_curvature=delta_radius_of_curvature
+        self.delta_off_axis_distance=delta_off_axis_distance
+        self.delta_clocking_angle_rad=delta_clocking_angle_rad
+        
+        self.minimize_init_list=self.__make_minimize_init_list()
+        
+    def h(self):
+        mkhelp(self)
+    
+    def __make_minimize_init_list(self):
+        minimize_init_list=[self.ideal_radius_of_curvature + self.delta_radius_of_curvature,
+                            self.ideal_off_axis_distance + self.delta_off_axis_distance,
+                            self.ideal_clocking_angle_rad + self.delta_clocking_angle_rad]
+        
+        return minimize_init_list
+
+
 class OapMinimize:
     def __init__(self, constants, inputed_surface):
         self.consts=constants
         self.inputed_surface=inputed_surface
         return
+    
     
     def h(self):
         mkhelp(self)
