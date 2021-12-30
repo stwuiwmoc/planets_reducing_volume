@@ -55,6 +55,45 @@ def make_remaining_matrix(matrix, ignore_zernike_number_list):
     remaining_matrix = np.delete(arr=matrix, obj=idx_array, axis=0)
     return remaining_matrix
 
+def oap_calculation(clocking_angle_rad, radius_of_curvature, off_axis_distance, x_mesh, y_mesh):
+    """
+    
+    Parameters
+    ----------
+    clocking_angle_rad : float [rad]
+        回転角
+    radius_of_curvature : float [m]
+        曲率半径
+    off_axis_distance : floot [m]
+        軸外し距離 (off-axis)
+    x_mesh : 2D-mesh-array [m]
+        軸外し方向。 off_axis_distanceを増加させる方向をx_meshの正の向きとして定義
+    y_mesh : 2D-mesh-array [m]
+
+    Returns
+    -------
+    oap_height : 2D-mesh-array [m]
+        input された clocking_angle_rad, radius_of_curvature, off_axis_distance での切り取り放物面
+    """
+    phi = clocking_angle_rad 
+    
+    # [m] --> [mm] に変換
+    p = 1e3 * radius_of_curvature
+    aqx = 1e3 * off_axis_distance
+    cx = 1e3 * x_mesh 
+    cy = 1e3 * y_mesh
+
+    
+    a = 1/(2*p)
+    aqz = a * ( aqx**2 + 0**2 )
+    theta = np.arctan(2*a*aqx)
+    
+    D = -4*a**2*cx**2*np.sin(phi)**2*np.sin(theta)**2 - 8*a**2*cx*cy*np.sin(phi)*np.sin(theta)**2*np.cos(phi) + 4*a**2*cy**2*np.sin(phi)**2*np.sin(theta)**2 - 4*a**2*cy**2*np.sin(theta)**2 + 2*a*aqx*np.sin(2*theta) + 4*a*aqz*np.sin(theta)**2 + 4*a*cx*np.sin(theta)*np.cos(phi) - 4*a*cy*np.sin(phi)*np.sin(theta) - np.sin(theta)**2 + 1
+
+    cz1 = (4*a*aqx*np.sin(theta) - a*cx*(np.sin(phi - 2*theta) - np.sin(phi + 2*theta)) - a*cy*(np.cos(phi - 2*theta) - np.cos(phi + 2*theta)) - 2*np.sqrt(D) + 2*np.cos(theta))/(4*a*np.sin(theta)**2)
+    oap_height = cz1 * 1e-3 # [mm] --> [m] に変換
+    return oap_height
+
 
 class Constants:
     
@@ -377,6 +416,29 @@ class FilteredSurface(Surface):
         
         masked_filtered_surface = self.consts.mask * filtered_surface
         return masked_filtered_surface
+    
+class OapSurface(Surface):
+    def __init__(self, constants, radius_of_curvature, off_axis_distance, clocking_angle_rad, offset_height_percent=0):
+        self.consts=constants
+        self.radius_of_curvature=radius_of_curvature
+        self.off_axis_distance=off_axis_distance
+        self.clocking_angle_rad=clocking_angle_rad
+        self.offset_height_percent = offset_height_percent
+        
+        oap=oap_calculation(clocking_angle_rad=self.clocking_angle_rad, 
+                            radius_of_curvature=self.radius_of_curvature, 
+                            off_axis_distance=self.off_axis_distance, 
+                            x_mesh=self.consts.xx, 
+                            y_mesh=self.consts.yy)
+        self.surface=self.consts.mask*oap
+        
+        self.pv=super()._pv_calculation()
+        self.rms=super()._rms_calculation()
+        self.volume=super()._volume_calculation()[0]
+        self.offset_height_value=super()._volume_calculation()[1]
+        
+    def h(self):
+        mkhelp(self)
     
 class ZernikeToTorque:
     def __init__(self, constants, target_zernike_number_list, target_zernike_value_array, ignore_zernike_number_list):
