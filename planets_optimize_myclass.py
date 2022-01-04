@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import scipy as sp
 import cv2
 import PIL
+import time
 
 from matplotlib import cm
 from matplotlib.colors import Normalize
@@ -609,11 +610,82 @@ class OapConstants:
 
 
 class OapMinimize:
-    def __init__(self, constants, inputed_surface):
+    def __init__(self, constants, oap_constants, inputed_surface, offset_height_percent):
         self.consts=constants
+        self.oap_consts=oap_constants
         self.inputed_surface=inputed_surface
+        self.offset_height_percent=offset_height_percent
+                
+        ideal_oap=OapSurface(constants=self.consts, 
+                             radius_of_curvature=self.oap_consts.ideal_radius_of_curvature, 
+                             off_axis_distance=self.oap_consts.ideal_off_axis_distance, 
+                             clocking_angle_rad=self.oap_consts.ideal_clocking_angle_rad,
+                             offset_height_percent=self.offset_height_percent)
+        
+        self.__ideal_oap_surface=ideal_oap.surface
+   
+        self.minimize_args_list=self.__make_minimize_args_list()
+        
+        print("OapMinimize start")
+        start_time = time.time()
+
+        minimize_result=sp.optimize.minimize(fun=self.__minimize_input_function,
+                                             x0=self.oap_consts.minimize_init_list,
+                                             args=(self.minimize_args_list),
+                                             method="Powell")
+
+        print("OapMinimize finished")
+        end_time = time.time()
+
+        self.result_all=minimize_result
+
+        self.result_time=end_time-start_time
+        self.result_parameters=minimize_result["x"]
         return
     
     
     def h(self):
         mkhelp(self)
+    
+    def __make_minimize_args_list(self):
+        args_list = [self.consts,
+                     self.oap_consts,
+                     self.inputed_surface,
+                     self.__ideal_oap_surface,
+                     self.offset_height_percent]
+        
+        return args_list
+    
+    def __minimize_input_function(self, X, args_list):
+        test_radius_of_curvature = X[0]
+        test_off_axis_distance = X[1]
+        test_clocking_angle_rad = X[2]
+        
+        arg_consts = args_list[0]
+        arg_oap_consts = args_list[1]
+        arg_inputed_surface = args_list[2]
+        arg_ideal_oap_surface = args_list[3]
+        arg_offset_height_percent = args_list[4]
+        
+        inputed_surface_physical_height = arg_inputed_surface + arg_ideal_oap_surface
+        
+        test_oap_obj = OapSurface(constants=arg_consts, 
+                                  radius_of_curvature=test_radius_of_curvature, 
+                                  off_axis_distance=test_off_axis_distance, 
+                                  clocking_angle_rad=test_clocking_angle_rad,
+                                  offset_height_percent=arg_offset_height_percent)
+            
+        test_oap_surface_physical_height = test_oap_obj.surface
+        
+        difference_of_surface = inputed_surface_physical_height - test_oap_surface_physical_height
+        
+        difference_surface_obj = Surface(constants=arg_consts, 
+                                         surface=difference_of_surface,
+                                         offset_height_percent=arg_offset_height_percent)
+        
+        volume = difference_surface_obj.volume
+        
+        del test_oap_obj
+        del difference_surface_obj
+        return volume
+        
