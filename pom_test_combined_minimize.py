@@ -10,6 +10,24 @@ import matplotlib.pyplot as plt
 
 import planets_optimize_myclass as pom
 
+def mkfolder(suffix = ""):
+    import os
+    """    
+    Parameters
+    ----------
+    suffix : str, optional
+        The default is "".
+
+    Returns
+    -------
+    str ( script name + suffix )
+    """ 
+    filename = os.path.basename(__file__)
+    filename = filename.replace(".py", "") + suffix
+    folder = "mkfolder/" + filename + "/"
+    os.makedirs(folder, exist_ok=True)
+    return folder
+
 if __name__ == "__main__":
     CONSTS = pom.Constants(physical_radius=925e-3, 
                            ignore_radius=25e-3,
@@ -72,3 +90,15 @@ if __name__ == "__main__":
     
     wh_optimized_exelis = pom.Surface(constants=CONSTS, 
                                       surface=zernike_removed.inputed_surface-wh_optimized_surface.surface)
+    
+    fig = plt.figure(figsize=(10,22))
+    gs = fig.add_gridspec(4,2)
+    
+    exelis.make_image_plot(figure=fig, position=gs[0,0])
+    filtered_exelis.make_image_plot(figure=fig, position=gs[0,1])
+    oap_optimized_exelis.make_image_plot(figure=fig, position=gs[1,1])
+    wh_optimized_surface.make_image_plot(figure=fig, position=gs[2,0])
+    wh_optimized_exelis.make_image_plot(figure=fig, position=gs[2,1])
+    wh_optimized_zernike.make_torque_plot(figure=fig, position=gs[3,:])
+    
+    fig.savefig(mkfolder()+"test.png")
