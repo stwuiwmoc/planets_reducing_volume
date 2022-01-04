@@ -584,6 +584,29 @@ class OapConstants:
     def __init__(self, 
                  ideal_radius_of_curvature, ideal_off_axis_distance, ideal_clocking_angle_rad, 
                  delta_radius_of_curvature, delta_off_axis_distance, delta_clocking_angle_rad):
+        """
+        
+
+        Parameters
+        ----------
+        ideal_radius_of_curvature : float
+            ideal
+        ideal_off_axis_distance : float
+            ideal
+        ideal_clocking_angle_rad : float
+            ideal
+        delta_radius_of_curvature : float
+            ideal+delta = init parameter for x0 in sp.optimize.minimize()
+        delta_off_axis_distance : float
+            ideal+delta = init parameter for x0 in sp.optimize.minimize()
+        delta_clocking_angle_rad : float
+            ideal+delta = init parameter for x0 in sp.optimize.minimize()
+
+        Returns
+        -------
+        None.
+
+        """
     
         self.ideal_radius_of_curvature=ideal_radius_of_curvature
         self.ideal_off_axis_distance=ideal_off_axis_distance
