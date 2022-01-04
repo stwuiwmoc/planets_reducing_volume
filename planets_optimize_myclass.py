@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import scipy as sp
 import cv2
 import PIL
+import time
 
 from matplotlib import cm
 from matplotlib.colors import Normalize
@@ -55,17 +56,18 @@ def make_remaining_matrix(matrix, ignore_zernike_number_list):
     remaining_matrix = np.delete(arr=matrix, obj=idx_array, axis=0)
     return remaining_matrix
 
-def oap_calculation(clocking_angle_rad, radius_of_curvature, off_axis_distance, x_mesh, y_mesh):
+def oap_calculation(radius_of_curvature, off_axis_distance, clocking_angle_rad, x_mesh, y_mesh):
     """
     
     Parameters
     ----------
-    clocking_angle_rad : float [rad]
-        回転角
     radius_of_curvature : float [m]
         曲率半径
     off_axis_distance : floot [m]
         軸外し距離 (off-axis)
+    clocking_angle_rad : float [rad]
+        回転角
+    
     x_mesh : 2D-mesh-array [m]
         軸外し方向。 off_axis_distanceを増加させる方向をx_meshの正の向きとして定義
     y_mesh : 2D-mesh-array [m]
@@ -580,3 +582,110 @@ class TorqueToZernike:
         ax.hlines(0, xmin=1, xmax=12, color ="darkgray")
         
         return ax
+
+class OapConstants:
+    def __init__(self, 
+                 ideal_radius_of_curvature, ideal_off_axis_distance, ideal_clocking_angle_rad, 
+                 delta_radius_of_curvature, delta_off_axis_distance, delta_clocking_angle_rad):
+    
+        self.ideal_radius_of_curvature=ideal_radius_of_curvature
+        self.ideal_off_axis_distance=ideal_off_axis_distance
+        self.ideal_clocking_angle_rad=ideal_clocking_angle_rad
+    
+        self.delta_radius_of_curvature=delta_radius_of_curvature
+        self.delta_off_axis_distance=delta_off_axis_distance
+        self.delta_clocking_angle_rad=delta_clocking_angle_rad
+        
+        self.minimize_init_list=self.__make_minimize_init_list()
+        
+    def h(self):
+        mkhelp(self)
+    
+    def __make_minimize_init_list(self):
+        minimize_init_list=[self.ideal_radius_of_curvature + self.delta_radius_of_curvature,
+                            self.ideal_off_axis_distance + self.delta_off_axis_distance,
+                            self.ideal_clocking_angle_rad + self.delta_clocking_angle_rad]
+        
+        return minimize_init_list
+
+
+class OapMinimize:
+    def __init__(self, constants, oap_constants, inputed_surface, offset_height_percent):
+        self.consts=constants
+        self.oap_consts=oap_constants
+        self.inputed_surface=inputed_surface
+        self.offset_height_percent=offset_height_percent
+                
+        ideal_oap=OapSurface(constants=self.consts, 
+                             radius_of_curvature=self.oap_consts.ideal_radius_of_curvature, 
+                             off_axis_distance=self.oap_consts.ideal_off_axis_distance, 
+                             clocking_angle_rad=self.oap_consts.ideal_clocking_angle_rad,
+                             offset_height_percent=self.offset_height_percent)
+        
+        self.__ideal_oap_surface=ideal_oap.surface
+   
+        self.minimize_args_list=self.__make_minimize_args_list()
+        
+        print("OapMinimize start")
+        start_time = time.time()
+
+        minimize_result=sp.optimize.minimize(fun=self.__minimize_input_function,
+                                             x0=self.oap_consts.minimize_init_list,
+                                             args=(self.minimize_args_list),
+                                             method="Powell")
+
+        print("OapMinimize finished")
+        end_time = time.time()
+
+        self.result_all=minimize_result
+
+        self.result_time=end_time-start_time
+        self.result_parameters=minimize_result["x"]
+        return
+    
+    
+    def h(self):
+        mkhelp(self)
+    
+    def __make_minimize_args_list(self):
+        args_list = [self.consts,
+                     self.oap_consts,
+                     self.inputed_surface,
+                     self.__ideal_oap_surface,
+                     self.offset_height_percent]
+        
+        return args_list
+    
+    def __minimize_input_function(self, X, args_list):
+        test_radius_of_curvature = X[0]
+        test_off_axis_distance = X[1]
+        test_clocking_angle_rad = X[2]
+        
+        arg_consts = args_list[0]
+        arg_oap_consts = args_list[1]
+        arg_inputed_surface = args_list[2]
+        arg_ideal_oap_surface = args_list[3]
+        arg_offset_height_percent = args_list[4]
+        
+        inputed_surface_physical_height = arg_inputed_surface + arg_ideal_oap_surface
+        
+        test_oap_obj = OapSurface(constants=arg_consts, 
+                                  radius_of_curvature=test_radius_of_curvature, 
+                                  off_axis_distance=test_off_axis_distance, 
+                                  clocking_angle_rad=test_clocking_angle_rad,
+                                  offset_height_percent=arg_offset_height_percent)
+            
+        test_oap_surface_physical_height = test_oap_obj.surface
+        
+        difference_of_surface = inputed_surface_physical_height - test_oap_surface_physical_height
+        
+        difference_surface_obj = Surface(constants=arg_consts, 
+                                         surface=difference_of_surface,
+                                         offset_height_percent=arg_offset_height_percent)
+        
+        volume = difference_surface_obj.volume
+        
+        del test_oap_obj
+        del difference_surface_obj
+        return volume
+        
