@@ -101,7 +101,7 @@ class Constants:
     
     
     def __init__(self, physical_radius, ignore_radius, 
-                 pixel_number, zernike_max_degree):
+                 pixel_number, zernike_max_degree, offset_height_percent):
         """
         class : constants
 
@@ -115,6 +115,8 @@ class Constants:
             vertical and horizontal pixel number
         zernike_max_degree : int
             max zernike number
+        offset_height_percent : float
+            ignore height in percent. if you set 2, the lower 2% is ignored in volume calculation
 
         Returns
         -------
@@ -124,6 +126,7 @@ class Constants:
         self.physical_radius = physical_radius
         self.ignore_radius = ignore_radius
         self.pixel_number = pixel_number
+        self.offset_height_percent=offset_height_percent
 
         self.varid_radius = physical_radius - ignore_radius
         self.xx, self.yy = make_meshgrid(-physical_radius, physical_radius, 
@@ -138,10 +141,9 @@ class Constants:
         mkhelp(self)
 
 class Surface:
-    def __init__(self, constants, surface, offset_height_percent=0):
+    def __init__(self, constants, surface):
         self.consts=constants
         self.surface=surface
-        self.offset_height_percent = offset_height_percent
 
         self.pv=self._pv_calculation()
         self.rms=self._rms_calculation()
@@ -169,7 +171,7 @@ class Surface:
         # 下位○%は体積計算で無視するために、下位○%の閾値を計算
         sorted_surface = np.sort(self.surface.flatten()) # np.nanは最大値の後に並ぶ
         value_count = np.sum(~np.isnan(self.surface))
-        offset_height_idx = int(value_count * self.offset_height_percent/100)
+        offset_height_idx = int(value_count * self.consts.offset_height_percent/100)
         offset_height_value = sorted_surface[offset_height_idx]
         
         lower_ignored_surface = np.where(self.surface>=offset_height_value,
@@ -263,9 +265,8 @@ class Surface:
 
     
 class ZernikeRemovedSurface(Surface):
-    def __init__(self, constants, inputed_surface, removing_zernike_number_list, offset_height_percent=0):
+    def __init__(self, constants, inputed_surface, removing_zernike_number_list):
         self.consts=constants
-        self.offset_height_percent=offset_height_percent
         self.removing_zernike_number_list=removing_zernike_number_list
         
         full_zernike_number_list = [i+1 for i in range(self.consts.zernike_max_degree)]
@@ -307,7 +308,7 @@ class ZernikeRemovedSurface(Surface):
 
 class ZernikeToSurface(Surface):
     
-    def __init__(self, constants, zernike_number_list, zernike_value_array, offset_height_percent=0):
+    def __init__(self, constants, zernike_number_list, zernike_value_array):
         """
         class : 2d surface from zernike values
 
@@ -331,8 +332,7 @@ class ZernikeToSurface(Surface):
         self.consts = constants
         self.zernike_number_list = zernike_number_list
         self.zernike_value_array = zernike_value_array
-        self.offset_height_percent = offset_height_percent
-
+        
         self.surface = super()._make_masked_zernike_surface(self.zernike_number_list,
                                                             self.zernike_value_array)
         self.pv=super()._pv_calculation()
@@ -345,7 +345,7 @@ class ZernikeToSurface(Surface):
         
     
 class StitchedCsvToSurface(Surface):
-    def __init__(self, constants, original_stitched_csv_fpath, deformed_stitched_csv_fpath, offset_height_percent=0):
+    def __init__(self, constants, original_stitched_csv_fpath, deformed_stitched_csv_fpath):
         """
         class : 2d-surface from measured (stitched) 2d-csv data
 
@@ -375,7 +375,6 @@ class StitchedCsvToSurface(Surface):
             self.deformed_masked_surface = self.__read_csv_to_masked_surface(deformed_stitched_csv_fpath)
             self.surface = self.deformed_masked_surface - self.original_masked_surface
         
-        self.offset_height_percent = offset_height_percent
         
         self.pv=super()._pv_calculation()
         self.rms=super()._rms_calculation()
@@ -392,11 +391,10 @@ class StitchedCsvToSurface(Surface):
         return masked_surface
 
 class FilteredSurface(Surface):
-    def __init__(self, constants, inputed_surface, filter_parameter, offset_height_percent=0):
+    def __init__(self, constants, inputed_surface, filter_parameter):
         self.consts = constants
         self.inputed_surface = inputed_surface
         self.filter_parameter = filter_parameter
-        self.offset_height_percent = offset_height_percent
         
         self.surface = self.__smoothing_filter()
         self.pv=super()._pv_calculation()
@@ -420,12 +418,11 @@ class FilteredSurface(Surface):
         return masked_filtered_surface
     
 class OapSurface(Surface):
-    def __init__(self, constants, radius_of_curvature, off_axis_distance, clocking_angle_rad, offset_height_percent=0):
+    def __init__(self, constants, radius_of_curvature, off_axis_distance, clocking_angle_rad):
         self.consts=constants
         self.radius_of_curvature=radius_of_curvature
         self.off_axis_distance=off_axis_distance
         self.clocking_angle_rad=clocking_angle_rad
-        self.offset_height_percent = offset_height_percent
         
         oap=oap_calculation(clocking_angle_rad=self.clocking_angle_rad, 
                             radius_of_curvature=self.radius_of_curvature, 
@@ -587,6 +584,29 @@ class OapConstants:
     def __init__(self, 
                  ideal_radius_of_curvature, ideal_off_axis_distance, ideal_clocking_angle_rad, 
                  delta_radius_of_curvature, delta_off_axis_distance, delta_clocking_angle_rad):
+        """
+        
+
+        Parameters
+        ----------
+        ideal_radius_of_curvature : float
+            ideal
+        ideal_off_axis_distance : float
+            ideal
+        ideal_clocking_angle_rad : float
+            ideal
+        delta_radius_of_curvature : float
+            ideal+delta = init parameter for x0 in sp.optimize.minimize()
+        delta_off_axis_distance : float
+            ideal+delta = init parameter for x0 in sp.optimize.minimize()
+        delta_clocking_angle_rad : float
+            ideal+delta = init parameter for x0 in sp.optimize.minimize()
+
+        Returns
+        -------
+        None.
+
+        """
     
         self.ideal_radius_of_curvature=ideal_radius_of_curvature
         self.ideal_off_axis_distance=ideal_off_axis_distance
@@ -610,17 +630,15 @@ class OapConstants:
 
 
 class OapMinimize:
-    def __init__(self, constants, oap_constants, inputed_surface, offset_height_percent):
+    def __init__(self, constants, oap_constants, inputed_surface):
         self.consts=constants
         self.oap_consts=oap_constants
         self.inputed_surface=inputed_surface
-        self.offset_height_percent=offset_height_percent
                 
         ideal_oap=OapSurface(constants=self.consts, 
                              radius_of_curvature=self.oap_consts.ideal_radius_of_curvature, 
                              off_axis_distance=self.oap_consts.ideal_off_axis_distance, 
-                             clocking_angle_rad=self.oap_consts.ideal_clocking_angle_rad,
-                             offset_height_percent=self.offset_height_percent)
+                             clocking_angle_rad=self.oap_consts.ideal_clocking_angle_rad)
         
         self.__ideal_oap_surface=ideal_oap.surface
    
@@ -651,8 +669,7 @@ class OapMinimize:
         args_list = [self.consts,
                      self.oap_consts,
                      self.inputed_surface,
-                     self.__ideal_oap_surface,
-                     self.offset_height_percent]
+                     self.__ideal_oap_surface]
         
         return args_list
     
@@ -665,23 +682,20 @@ class OapMinimize:
         arg_oap_consts = args_list[1]
         arg_inputed_surface = args_list[2]
         arg_ideal_oap_surface = args_list[3]
-        arg_offset_height_percent = args_list[4]
         
         inputed_surface_physical_height = arg_inputed_surface + arg_ideal_oap_surface
         
         test_oap_obj = OapSurface(constants=arg_consts, 
                                   radius_of_curvature=test_radius_of_curvature, 
                                   off_axis_distance=test_off_axis_distance, 
-                                  clocking_angle_rad=test_clocking_angle_rad,
-                                  offset_height_percent=arg_offset_height_percent)
+                                  clocking_angle_rad=test_clocking_angle_rad)
             
         test_oap_surface_physical_height = test_oap_obj.surface
         
         difference_of_surface = inputed_surface_physical_height - test_oap_surface_physical_height
         
         difference_surface_obj = Surface(constants=arg_consts, 
-                                         surface=difference_of_surface,
-                                         offset_height_percent=arg_offset_height_percent)
+                                         surface=difference_of_surface)
         
         volume = difference_surface_obj.volume
         
