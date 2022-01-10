@@ -23,7 +23,8 @@ if __name__ == "__main__":
     CONSTS = pom.Constants(physical_radius=925e-3, 
                            ignore_radius=25e-3,
                            pixel_number=256,
-                           zernike_max_degree = 10)
+                           zernike_max_degree = 10,
+                           offset_height_percent=0)
     """
     # for parameter study
     original_torque_value_array = make_full_torque_value_array([1,7,13,19,25,31],
@@ -52,7 +53,7 @@ if __name__ == "__main__":
     wh_deformed_surface = pom.ZernikeToSurface(constants=CONSTS,
                                                zernike_number_list=wh_deformed_zernike.remaining_zernike_number_list,
                                                zernike_value_array=wh_deformed_zernike.remaining_reproducted_zernike_value_array)
-    
+        
     fig = plt.figure(figsize=(15,7))
     gs = fig.add_gridspec(2,3)
     wh_deformed_zernike.make_torque_plot(figure=fig, position=gs[0,2])
