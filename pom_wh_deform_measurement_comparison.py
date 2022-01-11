@@ -4,7 +4,7 @@ Created on Tue Dec 28 17:29:18 2021
 
 @author: swimc
 """
-
+# %%
 import planets_optimize_myclass as pom
 import matplotlib.pyplot as plt
 

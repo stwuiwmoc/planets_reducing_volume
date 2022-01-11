@@ -4,7 +4,7 @@ Created on Tue Feb  2 21:54:36 2021
 
 @author: swimc
 """
-
+# %%
 import numpy as np
 import pandas as pd
 from scipy.optimize import minimize

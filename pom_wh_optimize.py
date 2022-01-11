@@ -4,6 +4,8 @@ Created on Tue Dec 28 17:38:50 2021
 
 @author: swimc
 """
+# %%
+
 import numpy as np
 
 import planets_optimize_myclass as pom

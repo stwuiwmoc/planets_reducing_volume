@@ -4,6 +4,7 @@ Created on Thu Dec 30 21:32:06 2021
 
 @author: swimc
 """
+# %%
 
 
 import numpy as np

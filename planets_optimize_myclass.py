@@ -4,6 +4,7 @@ Created on Thu Dec  9 14:59:35 2021
 
 @author: swimc
 """
+# %%
 
 import numpy as np
 import proper as pr
