@@ -7,8 +7,10 @@ Created on Tue Dec 28 17:29:18 2021
 # %%
 import planets_optimize_myclass as pom
 import matplotlib.pyplot as plt
+import importlib
 
 if __name__ == "__main__":
+    importlib.reload(pom)
     CONSTS = pom.Constants(physical_radius=925e-3, 
                            ignore_radius=25e-3,
                            pixel_number=1024,

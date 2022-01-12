@@ -189,7 +189,7 @@ class Surface:
         return (volume_in_m3, offset_height_value)
 
 
-    def make_image_plot(self, figure=plt.figure(), position=111, 
+    def make_image_plot(self, figure, position=111, 
                         color_scale=False, cbar_min_percent=0, cbar_max_percent=100, 
                         pv_digits=2, rms_digits=2):
         
@@ -220,7 +220,7 @@ class Surface:
         cbar.set_label(cbar_title, fontsize=fontsize)
         return ax
         
-    def make_circle_path_plot(self, figure=plt.figure(), position=111, 
+    def make_circle_path_plot(self, figure, position=111, 
                               radius=0.870, height_magn=1e9, height_unit_str="[nm]"):
         fontsize = 15
         varid_radius_pixel_number = int(self.consts.varid_radius/self.consts.physical_radius*self.consts.pixel_number/2)
@@ -238,8 +238,6 @@ class Surface:
         circle_path_line = height_magn*linear_polar_image[:, measurement_radius_idx]
         height_pv = np.nanmax(circle_path_line) - np.nanmin(circle_path_line)
         height_pv_str = str(round(height_pv, 2))
-        
-        self.make_image_plot()
         
         ax = figure.add_subplot(position)
         ax.plot(circle_path_line)

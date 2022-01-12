@@ -8,6 +8,7 @@ Created on Tue Dec 28 17:01:34 2021
 
 import numpy as np
 import matplotlib.pyplot as plt
+import importlib
 
 import planets_optimize_myclass as pom
 
@@ -21,6 +22,8 @@ def make_full_torque_value_array(torque_number_list, torque_value_aray):
 
 
 if __name__ == "__main__":
+    importlib.reload(pom)
+    
     CONSTS = pom.Constants(physical_radius=925e-3, 
                            ignore_radius=25e-3,
                            pixel_number=256,
