@@ -35,6 +35,4 @@ if __name__ == "__main__":
     zernike_removed.make_image_plot(figure=fig2, position=gs2[0:2, 0])
     zernike_removed.make_circle_path_plot(figure=fig2, position=gs2[2,0])
     fig2.tight_layout()
-    
-    plt.plot()
-    
+    fig2.show()
