@@ -144,11 +144,10 @@ class Constants:
         self.xx, self.yy = make_meshgrid(-physical_radius, physical_radius,
                                          -physical_radius, physical_radius,
                                          pixel_number)
-        self.tf = np.where(
-            self.xx**2 +
-            self.yy**2 <= self.varid_radius**2,
-            True,
-            False)
+
+        self.tf = np.where(self.xx**2 + self.yy**2 <= self.varid_radius**2,
+                           True,
+                           False)
         self.mask = np.where(self.tf, 1, np.nan)
         self.zernike_max_degree = zernike_max_degree
         self.operation_matrix = np.genfromtxt(
@@ -208,15 +207,14 @@ class Surface:
         volume_in_m3 = unit_pixel_volume.sum()
         return (volume_in_m3, offset_height_value)
 
-    def make_image_plot(
-            self,
-            figure,
-            position=111,
-            color_scale=False,
-            cbar_min_percent=0,
-            cbar_max_percent=100,
-            pv_digits=2,
-            rms_digits=2):
+    def make_image_plot(self,
+                        figure,
+                        position=111,
+                        color_scale=False,
+                        cbar_min_percent=0,
+                        cbar_max_percent=100,
+                        pv_digits=2,
+                        rms_digits=2):
 
         cmap = cm.jet
         fontsize = 15
@@ -246,27 +244,24 @@ class Surface:
         cbar.set_label(cbar_title, fontsize=fontsize)
         return ax
 
-    def make_circle_path_plot(
-            self,
-            figure,
-            position=111,
-            radius=0.870,
-            height_magn=1e9,
-            height_unit_str="[nm]"):
+    def make_circle_path_plot(self,
+                              figure,
+                              position=111,
+                              radius=0.870,
+                              height_magn=1e9,
+                              height_unit_str="[nm]"):
         fontsize = 15
-        varid_radius_pixel_number = int(
-            self.consts.varid_radius /
-            self.consts.physical_radius *
-            self.consts.pixel_number /
-            2)
+        varid_radius_pixel_number = int(self.consts.varid_radius /
+                                        self.consts.physical_radius *
+                                        self.consts.pixel_number /
+                                        2)
         measurement_radius_idx = int(radius * 1e3)
 
         image = np.where(self.consts.tf, self.surface, 0)
         flags = cv2.INTER_CUBIC + cv2.WARP_FILL_OUTLIERS + cv2.WARP_POLAR_LINEAR
 
         linear_polar_image = cv2.warpPolar(src=image,
-                                           dsize=(int(self.consts.varid_radius * 1e3),
-                                                  360),
+                                           dsize=(int(self.consts.varid_radius * 1e3), 360),
                                            center=(self.consts.pixel_number / 2,
                                                    self.consts.pixel_number / 2),
                                            maxRadius=varid_radius_pixel_number,
@@ -325,9 +320,7 @@ class ZernikeRemovedSurface(Surface):
         self.removing_zernike_number_list = removing_zernike_number_list
 
         full_zernike_number_list = [
-            i +
-            1 for i in range(
-                self.consts.zernike_max_degree)]
+            i + 1 for i in range(self.consts.zernike_max_degree)]
 
         self.inputed_surface = inputed_surface
         self.zernike_value_array = self._zernike_value_array_calculation(
@@ -491,6 +484,7 @@ class OapSurface(Surface):
             radius_of_curvature,
             off_axis_distance,
             clocking_angle_rad):
+
         self.consts = constants
         self.radius_of_curvature = radius_of_curvature
         self.off_axis_distance = off_axis_distance
@@ -757,8 +751,7 @@ class OapMinimize:
         minimize_result = sp.optimize.minimize(
             fun=self.__minimize_input_function,
             x0=self.oap_consts.minimize_init_list,
-            args=(
-                self.minimize_args_list),
+            args=(self.minimize_args_list),
             method="Powell")
 
         print("OapMinimize finished")
