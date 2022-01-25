@@ -63,12 +63,7 @@ def make_remaining_matrix(matrix, ignore_zernike_number_list):
     return remaining_matrix
 
 
-def oap_calculation(
-        radius_of_curvature,
-        off_axis_distance,
-        clocking_angle_rad,
-        x_mesh,
-        y_mesh):
+def oap_calculation(radius_of_curvature, off_axis_distance, clocking_angle_rad, x_mesh, y_mesh):
     """
 
     Parameters
@@ -98,14 +93,12 @@ def oap_calculation(
     cy = 1e3 * y_mesh
 
     a = 1 / (2 * p)
-    aqz = a * (aqx**2 + 0**2)
+    aqz = a * (aqx ** 2 + 0 ** 2)
     theta = np.arctan(2 * a * aqx)
 
-    D = -4 * a**2 * cx**2 * np.sin(phi)**2 * np.sin(theta)**2 - 8 * a**2 * cx * cy * np.sin(phi) * np.sin(theta)**2 * np.cos(phi) + 4 * a**2 * cy**2 * np.sin(phi)**2 * np.sin(theta)**2 - 4 * a**2 * cy**2 * np.sin(
-        theta)**2 + 2 * a * aqx * np.sin(2 * theta) + 4 * a * aqz * np.sin(theta)**2 + 4 * a * cx * np.sin(theta) * np.cos(phi) - 4 * a * cy * np.sin(phi) * np.sin(theta) - np.sin(theta)**2 + 1
+    D = -4 * a**2 * cx**2 * np.sin(phi)**2 * np.sin(theta)**2 - 8 * a**2 * cx * cy * np.sin(phi) * np.sin(theta)**2 * np.cos(phi) + 4 * a**2 * cy**2 * np.sin(phi)**2 * np.sin(theta)**2 - 4 * a**2 * cy**2 * np.sin(theta)**2 + 2 * a * aqx * np.sin(2 * theta) + 4 * a * aqz * np.sin(theta)**2 + 4 * a * cx * np.sin(theta) * np.cos(phi) - 4 * a * cy * np.sin(phi) * np.sin(theta) - np.sin(theta)**2 + 1
 
-    cz1 = (4 * a * aqx * np.sin(theta) - a * cx * (np.sin(phi - 2 * theta) - np.sin(phi + 2 * theta)) - a * cy *
-           (np.cos(phi - 2 * theta) - np.cos(phi + 2 * theta)) - 2 * np.sqrt(D) + 2 * np.cos(theta)) / (4 * a * np.sin(theta)**2)
+    cz1 = (4 * a * aqx * np.sin(theta) - a * cx * (np.sin(phi - 2 * theta) - np.sin(phi + 2 * theta)) - a * cy * (np.cos(phi - 2 * theta) - np.cos(phi + 2 * theta)) - 2 * np.sqrt(D) + 2 * np.cos(theta)) / (4 * a * np.sin(theta)**2)
     oap_height = cz1 * 1e-3  # [mm] --> [m] に変換
     return oap_height
 
@@ -144,14 +137,10 @@ class Constants:
         self.xx, self.yy = make_meshgrid(-physical_radius, physical_radius,
                                          -physical_radius, physical_radius,
                                          pixel_number)
-
-        self.tf = np.where(self.xx**2 + self.yy**2 <= self.varid_radius**2,
-                           True,
-                           False)
+        self.tf = np.where(self.xx ** 2 + self.yy ** 2 <= self.varid_radius**2, True, False)
         self.mask = np.where(self.tf, 1, np.nan)
         self.zernike_max_degree = zernike_max_degree
-        self.operation_matrix = np.genfromtxt(
-            "raw_data/WT06_zer10_operation_matrix[m].csv", delimiter=",").T
+        self.operation_matrix = np.genfromtxt("raw_data/WT06_zer10_operation_matrix[m].csv", delimiter=",").T
 
     def h(self):
         mkhelp(self)
@@ -207,20 +196,14 @@ class Surface:
         volume_in_m3 = unit_pixel_volume.sum()
         return (volume_in_m3, offset_height_value)
 
-    def make_image_plot(self,
-                        figure,
-                        position=111,
-                        color_scale=False,
-                        cbar_min_percent=0,
-                        cbar_max_percent=100,
-                        pv_digits=2,
-                        rms_digits=2):
+    def make_image_plot(self, figure, position=111,
+                        color_scale=False, cbar_min_percent=0, cbar_max_percent=100,
+                        pv_digits=2, rms_digits=2):
 
         cmap = cm.jet
         fontsize = 15
-        title = "pv = " + str(round(self.pv * 1e6,
-                                    pv_digits)) + " [um]" + "\n" + "RMS = " + str(round(self.rms * 1e6,
-                                                                                        rms_digits)) + " [um]"
+        title = "pv = " + str(round(self.pv * 1e6, pv_digits)) + " [um]" + "\n"
+        + "RMS = " + str(round(self.rms * 1e6, rms_digits)) + " [um]"
 
         cbar_min = np.nanmin(self.surface) + self.pv * cbar_min_percent / 100
         cbar_max = np.nanmin(self.surface) + self.pv * cbar_max_percent / 100
@@ -244,17 +227,10 @@ class Surface:
         cbar.set_label(cbar_title, fontsize=fontsize)
         return ax
 
-    def make_circle_path_plot(self,
-                              figure,
-                              position=111,
-                              radius=0.870,
-                              height_magn=1e9,
-                              height_unit_str="[nm]"):
+    def make_circle_path_plot(self, figure, position=111,
+                              radius=0.870, height_magn=1e9, height_unit_str="[nm]"):
         fontsize = 15
-        varid_radius_pixel_number = int(self.consts.varid_radius /
-                                        self.consts.physical_radius *
-                                        self.consts.pixel_number /
-                                        2)
+        varid_radius_pixel_number = int(self.consts.varid_radius / self.consts.physical_radius * self.consts.pixel_number / 2)
         measurement_radius_idx = int(radius * 1e3)
 
         image = np.where(self.consts.tf, self.surface, 0)
@@ -262,13 +238,11 @@ class Surface:
 
         linear_polar_image = cv2.warpPolar(src=image,
                                            dsize=(int(self.consts.varid_radius * 1e3), 360),
-                                           center=(self.consts.pixel_number / 2,
-                                                   self.consts.pixel_number / 2),
+                                           center=(self.consts.pixel_number / 2, self.consts.pixel_number / 2),
                                            maxRadius=varid_radius_pixel_number,
                                            flags=flags)
 
-        circle_path_line = height_magn * \
-            linear_polar_image[:, measurement_radius_idx]
+        circle_path_line = height_magn * linear_polar_image[:, measurement_radius_idx]
         height_pv = np.nanmax(circle_path_line) - np.nanmin(circle_path_line)
         height_pv_str = str(round(height_pv, 2))
 
@@ -291,10 +265,7 @@ class Surface:
             fontsize=fontsize)
         return ax
 
-    def _make_masked_zernike_surface(
-            self,
-            zernike_number_list,
-            zernike_value_array):
+    def _make_masked_zernike_surface(self, zernike_number_list, zernike_value_array):
         optical_wavelength = 500e-9
 
         wavestruct = pr.prop_begin(beam_diameter=2 * self.consts.varid_radius,
@@ -311,28 +282,22 @@ class Surface:
 
 
 class ZernikeRemovedSurface(Surface):
-    def __init__(
-            self,
-            constants,
-            inputed_surface,
-            removing_zernike_number_list):
+    def __init__(self, constants, inputed_surface, removing_zernike_number_list):
         self.consts = constants
         self.removing_zernike_number_list = removing_zernike_number_list
 
-        full_zernike_number_list = [
-            i + 1 for i in range(self.consts.zernike_max_degree)]
+        full_zernike_number_list = [i + 1 for i in range(self.consts.zernike_max_degree)]
 
         self.inputed_surface = inputed_surface
-        self.zernike_value_array = self._zernike_value_array_calculation(
-            self.inputed_surface)
+        self.zernike_value_array = self._zernike_value_array_calculation(self.inputed_surface)
 
-        ignore_zernike_number_list = make_remaining_matrix(
-            full_zernike_number_list, self.removing_zernike_number_list)
-        self.removing_zernike_value_array = make_remaining_matrix(
-            self.zernike_value_array, ignore_zernike_number_list)
+        ignore_zernike_number_list = make_remaining_matrix(full_zernike_number_list,
+                                                           self.removing_zernike_number_list)
+        self.removing_zernike_value_array = make_remaining_matrix(self.zernike_value_array,
+                                                                  ignore_zernike_number_list)
 
-        self.removing_surface = super()._make_masked_zernike_surface(
-            self.removing_zernike_number_list, self.removing_zernike_value_array)
+        self.removing_surface = super()._make_masked_zernike_surface(self.removing_zernike_number_list,
+                                                                     self.removing_zernike_value_array)
         self.surface = self.inputed_surface - self.removing_surface
 
         self.pv = super()._pv_calculation()
@@ -348,13 +313,12 @@ class ZernikeRemovedSurface(Surface):
                                        surface,
                                        0)
 
-        zernike_value_array = pr.prop_fit_zernikes(
-            wavefront0=surface_without_nan,
-            pupil0=self.consts.tf,
-            pupilradius0=self.consts.pixel_number // 2,
-            nzer=self.consts.zernike_max_degree,
-            xc=self.consts.pixel_number // 2,
-            yc=self.consts.pixel_number // 2)
+        zernike_value_array = pr.prop_fit_zernikes(wavefront0=surface_without_nan,
+                                                   pupil0=self.consts.tf,
+                                                   pupilradius0=self.consts.pixel_number // 2,
+                                                   nzer=self.consts.zernike_max_degree,
+                                                   xc=self.consts.pixel_number // 2,
+                                                   yc=self.consts.pixel_number // 2)
         return zernike_value_array
 
 
@@ -385,8 +349,8 @@ class ZernikeToSurface(Surface):
         self.zernike_number_list = zernike_number_list
         self.zernike_value_array = zernike_value_array
 
-        self.surface = super()._make_masked_zernike_surface(
-            self.zernike_number_list, self.zernike_value_array)
+        self.surface = super()._make_masked_zernike_surface(self.zernike_number_list,
+                                                            self.zernike_value_array)
         self.pv = super()._pv_calculation()
         self.rms = super()._rms_calculation()
         self.volume = super()._volume_calculation()[0]
@@ -424,8 +388,7 @@ class StitchedCsvToSurface(Surface):
         self.consts = constants
 
         if deformed_stitched_csv_fpath == "":
-            self.surface = self.__read_csv_to_masked_surface(
-                original_stitched_csv_fpath)
+            self.surface = self.__read_csv_to_masked_surface(original_stitched_csv_fpath)
 
         else:
             self.original_masked_surface = self.__read_csv_to_masked_surface(
@@ -470,21 +433,15 @@ class FilteredSurface(Surface):
         surface_without_nan = np.where(self.consts.tf,
                                        self.inputed_surface,
                                        0)
-        filtered_surface = sp.ndimage.filters.uniform_filter(
-            surface_without_nan, size=self.filter_parameter)
+        filtered_surface = sp.ndimage.filters.uniform_filter(surface_without_nan,
+                                                             size=self.filter_parameter)
 
         masked_filtered_surface = self.consts.mask * filtered_surface
         return masked_filtered_surface
 
 
 class OapSurface(Surface):
-    def __init__(
-            self,
-            constants,
-            radius_of_curvature,
-            off_axis_distance,
-            clocking_angle_rad):
-
+    def __init__(self, constants, radius_of_curvature, off_axis_distance, clocking_angle_rad):
         self.consts = constants
         self.radius_of_curvature = radius_of_curvature
         self.off_axis_distance = off_axis_distance
@@ -539,12 +496,9 @@ class ZernikeToTorque:
         self.ignore_zernike_number_list = ignore_zernike_number_list
 
         self.full_zernike_value_array = self.__make_full_zernike_value_array()
-        self.remaining_operation_matrix = make_remaining_matrix(
-            self.consts.operation_matrix, self.ignore_zernike_number_list)
-        self.remaining_zernike_value_array = make_remaining_matrix(
-            self.full_zernike_value_array, self.ignore_zernike_number_list)
-        self.remaining_zernike_number_list = make_remaining_matrix(
-            1 + np.arange(self.consts.zernike_max_degree), self.ignore_zernike_number_list)
+        self.remaining_operation_matrix = make_remaining_matrix(self.consts.operation_matrix, self.ignore_zernike_number_list)
+        self.remaining_zernike_value_array = make_remaining_matrix(self.full_zernike_value_array, self.ignore_zernike_number_list)
+        self.remaining_zernike_number_list = make_remaining_matrix(1 + np.arange(self.consts.zernike_max_degree), self.ignore_zernike_number_list)
 
         self.torque_value_array = self.__make_torque_value_array()
 
@@ -552,8 +506,7 @@ class ZernikeToTorque:
         mkhelp(self)
 
     def __make_full_zernike_value_array(self):
-        target_zernike_number_idx_array = np.array(
-            self.target_zernike_number_list) - 1
+        target_zernike_number_idx_array = np.array(self.target_zernike_number_list) - 1
 
         full_zernike_value_array = np.zeros(self.consts.zernike_max_degree)
         for i in range(len(self.target_zernike_value_array)):
@@ -562,23 +515,15 @@ class ZernikeToTorque:
         return full_zernike_value_array
 
     def __make_torque_value_array(self):
-        inverse_operation_matrix = sp.linalg.pinv(
-            1e9 * self.remaining_operation_matrix) * 1e9
+        inverse_operation_matrix = sp.linalg.pinv(1e9 * self.remaining_operation_matrix) * 1e9
 
-        torque_value_array = np.dot(
-            inverse_operation_matrix,
-            self.remaining_zernike_value_array)
+        torque_value_array = np.dot(inverse_operation_matrix, self.remaining_zernike_value_array)
         return torque_value_array
 
 
 class TorqueToZernike:
 
-    def __init__(
-            self,
-            constants,
-            torque_value_array,
-            restructed_torque_value,
-            ignore_zernike_number_list):
+    def __init__(self, constants, torque_value_array, restructed_torque_value, ignore_zernike_number_list):
         """
         class : calculate zernike values deformed by torque values
 
@@ -605,30 +550,26 @@ class TorqueToZernike:
         self.restructed_torque_value = abs(restructed_torque_value)
         self.ignore_zernike_number_list = ignore_zernike_number_list
 
-        self.remaining_operation_matrix = make_remaining_matrix(
-            self.consts.operation_matrix, self.ignore_zernike_number_list)
+        self.remaining_operation_matrix = make_remaining_matrix(self.consts.operation_matrix,
+                                                                self.ignore_zernike_number_list)
         self.restructed_torque_value_array = self.__make_restructed_torque_value_array()
 
-        self.remaining_reproducted_zernike_value_array = self.__make_reproducted_zernike_value_array(
-            self.torque_value_array)
-        self.remaining_reproducted_restructed_zernike_value_array = self.__make_reproducted_zernike_value_array(
-            self.restructed_torque_value_array)
-        self.remaining_zernike_number_list = make_remaining_matrix(
-            1 + np.arange(self.consts.zernike_max_degree), self.ignore_zernike_number_list)
+        self.remaining_reproducted_zernike_value_array = self.__make_reproducted_zernike_value_array(self.torque_value_array)
+        self.remaining_reproducted_restructed_zernike_value_array = self.__make_reproducted_zernike_value_array(self.restructed_torque_value_array)
+        self.remaining_zernike_number_list = make_remaining_matrix(1 + np.arange(self.consts.zernike_max_degree),
+                                                                   self.ignore_zernike_number_list)
 
     def h(self):
         mkhelp(self)
 
     def __make_restructed_torque_value_array(self):
-        only_max_restructed_torque_value_array = np.where(
-            self.torque_value_array < self.restructed_torque_value,
-            self.torque_value_array,
-            self.restructed_torque_value)
+        only_max_restructed_torque_value_array = np.where(self.torque_value_array < self.restructed_torque_value,
+                                                          self.torque_value_array,
+                                                          self.restructed_torque_value)
 
-        restructed_torque_value_array = np.where(
-            only_max_restructed_torque_value_array > -self.restructed_torque_value,
-            only_max_restructed_torque_value_array,
-            -self.restructed_torque_value)
+        restructed_torque_value_array = np.where(only_max_restructed_torque_value_array > -self.restructed_torque_value,
+                                                 only_max_restructed_torque_value_array,
+                                                 -self.restructed_torque_value)
 
         return restructed_torque_value_array
 
@@ -672,14 +613,9 @@ class TorqueToZernike:
 
 
 class OapConstants:
-    def __init__(
-            self,
-            ideal_radius_of_curvature,
-            ideal_off_axis_distance,
-            ideal_clocking_angle_rad,
-            delta_radius_of_curvature,
-            delta_off_axis_distance,
-            delta_clocking_angle_rad):
+    def __init__(self,
+                 ideal_radius_of_curvature, ideal_off_axis_distance, ideal_clocking_angle_rad,
+                 delta_radius_of_curvature, delta_off_axis_distance, delta_clocking_angle_rad):
         """
 
 
@@ -718,13 +654,9 @@ class OapConstants:
         mkhelp(self)
 
     def __make_minimize_init_list(self):
-        minimize_init_list = [
-            self.ideal_radius_of_curvature +
-            self.delta_radius_of_curvature,
-            self.ideal_off_axis_distance +
-            self.delta_off_axis_distance,
-            self.ideal_clocking_angle_rad +
-            self.delta_clocking_angle_rad]
+        minimize_init_list = [self.ideal_radius_of_curvature + self.delta_radius_of_curvature,
+                              self.ideal_off_axis_distance + self.delta_off_axis_distance,
+                              self.ideal_clocking_angle_rad + self.delta_clocking_angle_rad]
 
         return minimize_init_list
 
@@ -735,11 +667,10 @@ class OapMinimize:
         self.oap_consts = oap_constants
         self.inputed_surface = inputed_surface
 
-        ideal_oap = OapSurface(
-            constants=self.consts,
-            radius_of_curvature=self.oap_consts.ideal_radius_of_curvature,
-            off_axis_distance=self.oap_consts.ideal_off_axis_distance,
-            clocking_angle_rad=self.oap_consts.ideal_clocking_angle_rad)
+        ideal_oap = OapSurface(constants=self.consts,
+                               radius_of_curvature=self.oap_consts.ideal_radius_of_curvature,
+                               off_axis_distance=self.oap_consts.ideal_off_axis_distance,
+                               clocking_angle_rad=self.oap_consts.ideal_clocking_angle_rad)
 
         self.__ideal_oap_surface = ideal_oap.surface
 
@@ -748,11 +679,10 @@ class OapMinimize:
         print("OapMinimize start")
         start_time = time.time()
 
-        minimize_result = sp.optimize.minimize(
-            fun=self.__minimize_input_function,
-            x0=self.oap_consts.minimize_init_list,
-            args=(self.minimize_args_list),
-            method="Powell")
+        minimize_result = sp.optimize.minimize(fun=self.__minimize_input_function,
+                                               x0=self.oap_consts.minimize_init_list,
+                                               args=(self.minimize_args_list),
+                                               method="Powell")
 
         print("OapMinimize finished")
         end_time = time.time()
@@ -793,8 +723,7 @@ class OapMinimize:
 
         test_oap_surface_physical_height = test_oap_obj.surface
 
-        difference_of_surface = inputed_surface_physical_height - \
-            test_oap_surface_physical_height
+        difference_of_surface = inputed_surface_physical_height - test_oap_surface_physical_height
 
         difference_surface_obj = Surface(constants=arg_consts,
                                          surface=difference_of_surface)
