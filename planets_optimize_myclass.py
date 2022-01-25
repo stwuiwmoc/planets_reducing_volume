@@ -697,7 +697,6 @@ class OapMinimize:
 
     def __make_minimize_args_list(self):
         args_list = [self.consts,
-                     self.oap_consts,
                      self.inputed_surface,
                      self.__ideal_oap_surface]
 
@@ -709,9 +708,8 @@ class OapMinimize:
         test_clocking_angle_rad = X[2]
 
         arg_consts = args_list[0]
-        arg_oap_consts = args_list[1]
-        arg_inputed_surface = args_list[2]
-        arg_ideal_oap_surface = args_list[3]
+        arg_inputed_surface = args_list[1]
+        arg_ideal_oap_surface = args_list[2]
 
         inputed_surface_physical_height = arg_inputed_surface + arg_ideal_oap_surface
 
