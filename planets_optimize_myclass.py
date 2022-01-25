@@ -202,8 +202,7 @@ class Surface:
 
         cmap = cm.jet
         fontsize = 15
-        title = "pv = " + str(round(self.pv * 1e6, pv_digits)) + " [um]" + "\n"
-        + "RMS = " + str(round(self.rms * 1e6, rms_digits)) + " [um]"
+        title = "pv = " + str(round(self.pv * 1e6, pv_digits)) + " [um]" + "\n" + "RMS = " + str(round(self.rms * 1e6, rms_digits)) + " [um]"
 
         cbar_min = np.nanmin(self.surface) + self.pv * cbar_min_percent / 100
         cbar_max = np.nanmin(self.surface) + self.pv * cbar_max_percent / 100
