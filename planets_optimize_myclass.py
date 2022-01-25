@@ -13,6 +13,7 @@ import scipy as sp
 import cv2
 import PIL
 import time
+import pandas as pd
 
 from matplotlib import cm
 from matplotlib.colors import Normalize
@@ -730,3 +731,19 @@ class OapMinimize:
         del test_oap_obj
         del difference_surface_obj
         return volume
+
+
+class CirclePathMeasurementReading:
+    def __init__(self,
+                 original_csv_fpath: str,
+                 deformed_csv_fpath: str) -> None:
+
+        self.df_raw_original = pd.read_csv(original_csv_fpath)
+        self.df_raw_deformed = pd.read_csv(deformed_csv_fpath)
+        height_diff = self.df_raw_deformed["height"].values - self.df_raw_original["height"].values
+
+        self.df_diff = pd.DataFrame({"angle": self.df_raw_original["angle"].values,
+                                     "height": height_diff})
+
+    def h(self):
+        mkhelp(self)
