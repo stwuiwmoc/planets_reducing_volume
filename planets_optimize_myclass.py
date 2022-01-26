@@ -735,9 +735,11 @@ class OapMinimize:
 
 class CirclePathMeasurementReading:
     def __init__(self,
+                 Constants,
                  original_csv_fpath: str,
                  deformed_csv_fpath: str) -> None:
 
+        self.consts = Constants
         self.df_raw_original = pd.read_csv(original_csv_fpath)
         self.df_raw_deformed = pd.read_csv(deformed_csv_fpath)
         height_diff = self.df_raw_deformed["height"].values - self.df_raw_original["height"].values
