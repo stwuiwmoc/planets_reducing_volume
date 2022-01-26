@@ -5,7 +5,7 @@ Created on Thu Dec  9 14:59:35 2021
 @author: swimc
 """
 # %%
-
+from typing import Callable
 import numpy as np
 import proper as pr
 import matplotlib.pyplot as plt
@@ -746,6 +746,30 @@ class CirclePathMeasurementReading:
 
         self.df_diff = pd.DataFrame({"angle": self.df_raw_original["angle"].values,
                                      "height": height_diff})
+        self.zernike_polynomial_function = self.__make_zernike_polynomial()
 
     def h(self):
         mkhelp(self)
+
+    def __make_zernike_polynomial(self) -> Callable[[list[float], tuple[np.ndarray, np.ndarray]], np.ndarray]:
+
+        def make_zernike_polynomial_inner(coef: list[float],
+                                          params_: tuple[np.ndarray, np.ndarray]) -> Callable[[list[float], tuple[np.ndarray, np.ndarray]], np.ndarray]:
+            radius, theta = params_
+
+            zernike1 = coef[0] * 1
+            zernike2 = coef[1] * 2 * (radius) * np.cos(theta)
+            zernike3 = coef[2] * 2 * (radius) * np.sin(theta)
+            zernike4 = coef[3] * np.sqrt(3) * (2.0 * radius ** 2 - 1.0)
+            zernike5 = coef[4] * np.sqrt(6) * (radius ** 2) * np.sin(2 * theta)
+            zernike6 = coef[5] * np.sqrt(6) * (radius ** 2) * np.cos(2 * theta)
+            zernike7 = coef[6] * np.sqrt(8) * (3.0 * radius ** 3 - 2.0 * radius) * np.sin(theta)
+            zernike8 = coef[7] * np.sqrt(8) * (3.0 * radius ** 3 - 2.0 * radius) * np.cos(theta)
+            zernike9 = coef[8] * np.sqrt(8) * (radius ** 3) * np.sin(3 * theta)
+            zernike10 = coef[9] * np.sqrt(8) * (radius ** 3) * np.cos(3 * theta)
+            zernike11 = coef[10] * np.sqrt(5) * (6.0 * radius ** 4 - 6.0 * radius ** 2 + 1.0)
+
+            zernike_polynomial = zernike1 + zernike2 + zernike3 + zernike4 + zernike5 + zernike6 + zernike7 + zernike8 + zernike9 + zernike10 + zernike11
+            return zernike_polynomial
+
+        return make_zernike_polynomial_inner
