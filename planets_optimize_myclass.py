@@ -108,6 +108,23 @@ def oap_calculation(radius_of_curvature, off_axis_distance, clocking_angle_rad, 
 def zernike_term_calculation(term_number: int,
                              radius: ndarray,
                              theta: ndarray) -> ndarray:
+    """zernike_term_calculation
+    zernikeの各項を計算する（係数は入ってない）
+
+    Parameters
+    ----------
+    term_number : int
+        計算したいzernikeの項の番号（1~11）
+    radius : ndarray
+        半径 [m]
+    theta : ndarray
+        角度 [rad]
+
+    Returns
+    -------
+    ndarray
+        zernikeのどれか一つの項の計算結果（係数は入ってない）
+    """
     if term_number == 1:
         return 1
     if term_number == 2:
@@ -138,6 +155,23 @@ def zernike_term_calculation(term_number: int,
 def zernike_polynomial_calculation(coef: list[float],
                                    radius: ndarray,
                                    theta: ndarray) -> ndarray:
+    """
+    zernike多項式のarrayを計算する（係数込み）
+
+    Parameters
+    ----------
+    coef : list[float]
+        zernike係数ベクトル
+    radius : ndarray
+        半径 [m]
+    theta : ndarray
+        角度 [rad]
+
+    Returns
+    -------
+    ndarray
+        zernike多項式のarray
+    """
 
     zernike1 = coef[0] * zernike_term_calculation(1, radius, theta)
     zernike2 = coef[1] * zernike_term_calculation(2, radius, theta)
@@ -811,6 +845,20 @@ class CirclePathZernikeFitting:
                  df_diff: pd.DataFrame,
                  ignore_zernike_number_list: list[int]
                  ) -> None:
+        """CirclePathZernikeFitting
+        zernike多項式を除去
+
+        Parameters
+        ----------
+        Constants : class
+
+        circle_path_radius : float
+            円環パスの半径 [m]
+        df_diff : pd.DataFrame
+            CirclePathMeasurementReading の df_diff
+        ignore_zernike_number_list : list[int]
+            zernikeでfittingした後に除去する項（中身は1~11まで）
+        """
 
         self.consts = Constants
         self.circle_path_radius = circle_path_radius
@@ -833,6 +881,25 @@ class CirclePathZernikeFitting:
         def zernike_r_const_polynomial_calculation(coef_r_const: list[float],
                                                    radius: float,
                                                    theta: ndarray) -> ndarray:
+            """zernike_r_const_polynomial_calculation
+            radiusが固定値（＝円環パス）の場合のzernike 多項式の計算
+            そのままのzernikeでフィッティングすると、
+            thetaによる計算結果の部分が全く同じ値になる項（1, 4, 11など）が出て各係数が独立ではなくなってしまう
+
+            Parameters
+            ----------
+            coef_r_const : list[float]
+                radius固定値の時のzernike係数ベクトル
+            radius : float
+                円環パスの半径（固定値なのでarrayではない）
+            theta : ndarray
+                角度 [rad]
+
+            Returns
+            -------
+            ndarray
+                zernike 多項式の計算結果
+            """
 
             zernike1_ = zernike_term_calculation(1, radius, theta)
             zernike2_ = zernike_term_calculation(2, radius, theta)
@@ -867,7 +934,21 @@ class CirclePathZernikeFitting:
             residual = height_array_ - zernike_array_
             return residual
 
-        def make_zernike_polynomial_from_r_const_zernike(zernike_r_const_polynomial_list: list[float]) -> ndarray:
+        def make_zernike_polynomial_from_r_const_zernike(zernike_r_const_polynomial_list: list[float]
+                                                         ) -> ndarray:
+            """make_zernike_polynomial_from_r_const_zernike
+            radius固定の場合のzernike係数ベクトルを通常のzernike係数ベクトルとして並べ直す
+
+            Parameters
+            ----------
+            zernike_r_const_polynomial_list : list[float]
+                radius固定の場合のzernike係数
+
+            Returns
+            -------
+            ndarray
+                通常のzernike係数ベクトル len(ndarray) = 11
+            """
 
             zernike_polynomial_array_ = np.empty(11)
             zernike_polynomial_array_[0] = zernike_r_const_polynomial_list[0]
@@ -902,8 +983,22 @@ class CirclePathZernikeFitting:
         return result_dict
 
     def __zernike_removing(self,
-                           zernike_polynomial_array: ndarray) -> ndarray:
+                           zernike_polynomial_array: ndarray
+                           ) -> dict:
+        """__zernike_removing
+        zernike係数ベクトルを用いてzernike成分を除去
 
+        Parameters
+        ----------
+        zernike_polynomial_array : ndarray
+            通常のzernike係数ベクトル
+
+        Returns
+        -------
+        dict
+            removing_zernike: 除去するzernike成分の計算結果のarray
+            residual: height - removing_zernike
+        """
         def make_remaining_array(ignore_list: list[int],
                                  polynomial_array: ndarray) -> ndarray:
             tf_array = np.zeros(11)
