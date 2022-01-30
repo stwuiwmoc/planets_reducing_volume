@@ -789,10 +789,12 @@ class CirclePathMeasurementReading:
                  Constants,
                  circle_path_radius: float,
                  original_csv_fpath: str,
-                 deformed_csv_fpath: str) -> None:
+                 deformed_csv_fpath: str,
+                 ignore_zernike_number_list: list[int]) -> None:
 
         self.consts = Constants
         self.circle_path_radius = circle_path_radius
+        self.ignore_zernike_number_list = ignore_zernike_number_list
         self.df_raw_original = pd.read_csv(original_csv_fpath)
         self.df_raw_deformed = pd.read_csv(deformed_csv_fpath)
         height_diff = self.df_raw_deformed["height"].values - self.df_raw_original["height"].values
@@ -804,6 +806,10 @@ class CirclePathMeasurementReading:
         zernike_fitting_result = self.__zernike_fitting()
         self.optimize_result = zernike_fitting_result["optimize_result"]
         self.zernike_polynomial_array = zernike_fitting_result["zernike_polynomial_array"]
+
+        zernike_removing_result = self.__zernike_removing(zernike_polynomial_array=self.zernike_polynomial_array)
+        self.removing_zernike = zernike_removing_result["removing_zernike"]
+        self.height_removed = zernike_removing_result["residual"]
 
     def h(self):
         mkhelp(self)
@@ -878,5 +884,34 @@ class CirclePathMeasurementReading:
 
         result_dict = {"optimize_result": optimize_result_sq,
                        "zernike_polynomial_array": zernike_polynomial_array}
+
+        return result_dict
+
+    def __zernike_removing(self,
+                           zernike_polynomial_array: ndarray) -> ndarray:
+
+        def make_remaining_array(ignore_list: list[int],
+                                 polynomial_array: ndarray) -> ndarray:
+            tf_array = np.zeros(11)
+            for num in ignore_list:
+                tf_array[num - 1] = 1
+            remaining_polynomial_array = tf_array * polynomial_array
+            return remaining_polynomial_array
+
+        radian_array = self.df_diff["radian"].values
+        height_array = self.df_diff["height"].values
+        ignore_zernike_number_list = self.ignore_zernike_number_list
+
+        remaining_zernike_polynomial_array = make_remaining_array(ignore_list=ignore_zernike_number_list,
+                                                                  polynomial_array=zernike_polynomial_array)
+
+        removing_zernike_array = zernike_polynomial_calculation(coef=remaining_zernike_polynomial_array,
+                                                                radius=self.circle_path_radius,
+                                                                theta=radian_array)
+
+        residual_height_array = height_array - removing_zernike_array
+
+        result_dict = {"removing_zernike": removing_zernike_array,
+                       "residual": residual_height_array}
 
         return result_dict
