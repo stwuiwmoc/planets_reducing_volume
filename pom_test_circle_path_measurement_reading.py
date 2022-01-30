@@ -16,5 +16,6 @@ if __name__ == "__main__":
     input_filename3 = "../sag_integration_code/" + "mkfolder/psm_test_kagi_data_integration/0117h_height.csv"
 
     mes03 = pom.CirclePathMeasurementReading(Constants=CONSTS,
+                                             circle_path_radius=870e-3,
                                              original_csv_fpath=input_filename0,
                                              deformed_csv_fpath=input_filename3)

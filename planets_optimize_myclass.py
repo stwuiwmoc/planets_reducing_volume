@@ -5,11 +5,12 @@ Created on Thu Dec  9 14:59:35 2021
 @author: swimc
 """
 # %%
-from typing import Callable
+from numpy import ndarray
 import numpy as np
 import proper as pr
 import matplotlib.pyplot as plt
 import scipy as sp
+from scipy import optimize
 import cv2
 import PIL
 import time
@@ -102,6 +103,55 @@ def oap_calculation(radius_of_curvature, off_axis_distance, clocking_angle_rad, 
     cz1 = (4 * a * aqx * np.sin(theta) - a * cx * (np.sin(phi - 2 * theta) - np.sin(phi + 2 * theta)) - a * cy * (np.cos(phi - 2 * theta) - np.cos(phi + 2 * theta)) - 2 * np.sqrt(D) + 2 * np.cos(theta)) / (4 * a * np.sin(theta)**2)
     oap_height = cz1 * 1e-3  # [mm] --> [m] に変換
     return oap_height
+
+
+def zernike_polynomial_calculation(coef: list[float],
+                                   radius: ndarray,
+                                   theta: ndarray) -> ndarray:
+
+    zernike1 = coef[0] * 1
+    zernike2 = coef[1] * 2 * (radius) * np.cos(theta)
+    zernike3 = coef[2] * 2 * (radius) * np.sin(theta)
+    zernike4 = coef[3] * np.sqrt(3) * (2.0 * radius ** 2 - 1.0)
+    zernike5 = coef[4] * np.sqrt(6) * (radius ** 2) * np.sin(2 * theta)
+    zernike6 = coef[5] * np.sqrt(6) * (radius ** 2) * np.cos(2 * theta)
+    zernike7 = coef[6] * np.sqrt(8) * (3.0 * radius ** 3 - 2.0 * radius) * np.sin(theta)
+    zernike8 = coef[7] * np.sqrt(8) * (3.0 * radius ** 3 - 2.0 * radius) * np.cos(theta)
+    zernike9 = coef[8] * np.sqrt(8) * (radius ** 3) * np.sin(3 * theta)
+    zernike10 = coef[9] * np.sqrt(8) * (radius ** 3) * np.cos(3 * theta)
+    zernike11 = coef[10] * np.sqrt(5) * (6.0 * radius ** 4 - 6.0 * radius ** 2 + 1.0)
+
+    zernike_polynomial = zernike1 + zernike2 + zernike3 + zernike4 + zernike5 + zernike6 + zernike7 + zernike8 + zernike9 + zernike10 + zernike11
+    return zernike_polynomial
+
+
+def zernike_r_const_polynomial_calculation(coef_r_const: list[float],
+                                           radius: float,
+                                           theta: ndarray) -> ndarray:
+
+    zernike1_ = 1
+    zernike2_ = 2 * (radius) * np.cos(theta)
+    zernike3_ = 2 * (radius) * np.sin(theta)
+    zernike4_ = np.sqrt(3) * (2.0 * radius ** 2 - 1.0)
+    zernike5_ = np.sqrt(6) * (radius ** 2) * np.sin(2 * theta)
+    zernike6_ = np.sqrt(6) * (radius ** 2) * np.cos(2 * theta)
+    zernike7_ = np.sqrt(8) * (3.0 * radius ** 3 - 2.0 * radius) * np.sin(theta)
+    zernike8_ = np.sqrt(8) * (3.0 * radius ** 3 - 2.0 * radius) * np.cos(theta)
+    zernike9_ = np.sqrt(8) * (radius ** 3) * np.sin(3 * theta)
+    zernike10_ = np.sqrt(8) * (radius ** 3) * np.cos(3 * theta)
+    zernike11_ = np.sqrt(5) * (6.0 * radius ** 4 - 6.0 * radius ** 2 + 1.0)
+
+    zernike1_4_11 = coef_r_const[0] * (zernike1_ + zernike4_ + zernike11_)
+    zernike2_8 = coef_r_const[1] * (zernike2_ + zernike8_)
+    zernike3_7 = coef_r_const[2] * (zernike3_ + zernike7_)
+    zernike5 = coef_r_const[3] * zernike5_
+    zernike6 = coef_r_const[4] * zernike6_
+    zernike9 = coef_r_const[5] * zernike9_
+    zernike10 = coef_r_const[6] * zernike10_
+
+    zernike_r_const_polynomial = zernike1_4_11 + zernike2_8 + zernike3_7 + zernike5 + zernike6 + zernike9 + zernike10
+
+    return zernike_r_const_polynomial
 
 
 class Constants:
@@ -736,40 +786,48 @@ class OapMinimize:
 class CirclePathMeasurementReading:
     def __init__(self,
                  Constants,
+                 circle_path_radius: float,
                  original_csv_fpath: str,
                  deformed_csv_fpath: str) -> None:
 
         self.consts = Constants
+        self.circle_path_radius = circle_path_radius
         self.df_raw_original = pd.read_csv(original_csv_fpath)
         self.df_raw_deformed = pd.read_csv(deformed_csv_fpath)
         height_diff = self.df_raw_deformed["height"].values - self.df_raw_original["height"].values
 
-        self.df_diff = pd.DataFrame({"angle": self.df_raw_original["angle"].values,
+        self.df_diff = pd.DataFrame({"degree": self.df_raw_original["angle"].values,
+                                     "radian": np.deg2rad(self.df_raw_original["angle"].values),
                                      "height": height_diff})
-        self.zernike_polynomial_function = self.__make_zernike_polynomial()
+
+        self.res = self.__zernike_fitting()
+
+        self.res_zer = zernike_r_const_polynomial_calculation(self.res["x"],
+                                                              self.circle_path_radius,
+                                                              self.df_diff["radian"])
 
     def h(self):
         mkhelp(self)
 
-    def __make_zernike_polynomial(self) -> Callable[[list[float], tuple[np.ndarray, np.ndarray]], np.ndarray]:
+    def __zernike_fitting(self):
 
-        def make_zernike_polynomial_inner(coef: list[float],
-                                          params_: tuple[np.ndarray, np.ndarray]) -> Callable[[list[float], tuple[np.ndarray, np.ndarray]], np.ndarray]:
-            radius, theta = params_
+        def minimize_funciton_sq(x, params_):
+            radius_, theta_array_, height_array_ = params_
+            zernike_array_ = zernike_r_const_polynomial_calculation(coef_r_const=x,
+                                                                    radius=radius_,
+                                                                    theta=theta_array_)
 
-            zernike1 = coef[0] * 1
-            zernike2 = coef[1] * 2 * (radius) * np.cos(theta)
-            zernike3 = coef[2] * 2 * (radius) * np.sin(theta)
-            zernike4 = coef[3] * np.sqrt(3) * (2.0 * radius ** 2 - 1.0)
-            zernike5 = coef[4] * np.sqrt(6) * (radius ** 2) * np.sin(2 * theta)
-            zernike6 = coef[5] * np.sqrt(6) * (radius ** 2) * np.cos(2 * theta)
-            zernike7 = coef[6] * np.sqrt(8) * (3.0 * radius ** 3 - 2.0 * radius) * np.sin(theta)
-            zernike8 = coef[7] * np.sqrt(8) * (3.0 * radius ** 3 - 2.0 * radius) * np.cos(theta)
-            zernike9 = coef[8] * np.sqrt(8) * (radius ** 3) * np.sin(3 * theta)
-            zernike10 = coef[9] * np.sqrt(8) * (radius ** 3) * np.cos(3 * theta)
-            zernike11 = coef[10] * np.sqrt(5) * (6.0 * radius ** 4 - 6.0 * radius ** 2 + 1.0)
+            residual = height_array_ - zernike_array_
+            return residual
 
-            zernike_polynomial = zernike1 + zernike2 + zernike3 + zernike4 + zernike5 + zernike6 + zernike7 + zernike8 + zernike9 + zernike10 + zernike11
-            return zernike_polynomial
+        radius = self.circle_path_radius
+        theta_array = self.df_diff["radian"].values
+        height_array = self.df_diff["height"].values
 
-        return make_zernike_polynomial_inner
+        params = [radius, theta_array, height_array]
+
+        optimize_result_sq = optimize.least_squares(fun=minimize_funciton_sq,
+                                                    x0=(np.ones(7) * 1e-9),
+                                                    args=(params, ))
+
+        return optimize_result_sq
