@@ -806,42 +806,41 @@ class CirclePathMeasurementReading:
     def h(self):
         mkhelp(self)
 
-    def zernike_r_const_polynomial_calculation(self,
-                                               coef_r_const: list[float],
-                                               radius: float,
-                                               theta: ndarray) -> ndarray:
-
-        zernike1_ = zernike_term_calculation(1, radius, theta)
-        zernike2_ = zernike_term_calculation(2, radius, theta)
-        zernike3_ = zernike_term_calculation(3, radius, theta)
-        zernike4_ = zernike_term_calculation(4, radius, theta)
-        zernike5_ = zernike_term_calculation(5, radius, theta)
-        zernike6_ = zernike_term_calculation(6, radius, theta)
-        zernike7_ = zernike_term_calculation(7, radius, theta)
-        zernike8_ = zernike_term_calculation(8, radius, theta)
-        zernike9_ = zernike_term_calculation(9, radius, theta)
-        zernike10_ = zernike_term_calculation(10, radius, theta)
-        zernike11_ = zernike_term_calculation(11, radius, theta)
-
-        zernike1_4_11 = coef_r_const[0] * (zernike1_ + zernike4_ + zernike11_)
-        zernike2_8 = coef_r_const[1] * (zernike2_ + zernike8_)
-        zernike3_7 = coef_r_const[2] * (zernike3_ + zernike7_)
-        zernike5 = coef_r_const[3] * zernike5_
-        zernike6 = coef_r_const[4] * zernike6_
-        zernike9 = coef_r_const[5] * zernike9_
-        zernike10 = coef_r_const[6] * zernike10_
-
-        zernike_r_const_polynomial = zernike1_4_11 + zernike2_8 + zernike3_7 + zernike5 + zernike6 + zernike9 + zernike10
-
-        return zernike_r_const_polynomial
-
     def __zernike_fitting(self):
+
+        def zernike_r_const_polynomial_calculation(coef_r_const: list[float],
+                                                   radius: float,
+                                                   theta: ndarray) -> ndarray:
+
+            zernike1_ = zernike_term_calculation(1, radius, theta)
+            zernike2_ = zernike_term_calculation(2, radius, theta)
+            zernike3_ = zernike_term_calculation(3, radius, theta)
+            zernike4_ = zernike_term_calculation(4, radius, theta)
+            zernike5_ = zernike_term_calculation(5, radius, theta)
+            zernike6_ = zernike_term_calculation(6, radius, theta)
+            zernike7_ = zernike_term_calculation(7, radius, theta)
+            zernike8_ = zernike_term_calculation(8, radius, theta)
+            zernike9_ = zernike_term_calculation(9, radius, theta)
+            zernike10_ = zernike_term_calculation(10, radius, theta)
+            zernike11_ = zernike_term_calculation(11, radius, theta)
+
+            zernike1_4_11 = coef_r_const[0] * (zernike1_ + zernike4_ + zernike11_)
+            zernike2_8 = coef_r_const[1] * (zernike2_ + zernike8_)
+            zernike3_7 = coef_r_const[2] * (zernike3_ + zernike7_)
+            zernike5 = coef_r_const[3] * zernike5_
+            zernike6 = coef_r_const[4] * zernike6_
+            zernike9 = coef_r_const[5] * zernike9_
+            zernike10 = coef_r_const[6] * zernike10_
+
+            zernike_r_const_polynomial = zernike1_4_11 + zernike2_8 + zernike3_7 + zernike5 + zernike6 + zernike9 + zernike10
+
+            return zernike_r_const_polynomial
 
         def minimize_funciton_sq(x, params_):
             radius_, theta_array_, height_array_ = params_
-            zernike_array_ = self.zernike_r_const_polynomial_calculation(coef_r_const=x,
-                                                                         radius=radius_,
-                                                                         theta=theta_array_)
+            zernike_array_ = zernike_r_const_polynomial_calculation(coef_r_const=x,
+                                                                    radius=radius_,
+                                                                    theta=theta_array_)
 
             residual = height_array_ - zernike_array_
             return residual
