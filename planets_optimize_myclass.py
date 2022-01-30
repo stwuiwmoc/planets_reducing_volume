@@ -125,6 +125,35 @@ def zernike_polynomial_calculation(coef: list[float],
     return zernike_polynomial
 
 
+def zernike_r_const_polynomial_calculation(coef_r_const: list[float],
+                                           radius: float,
+                                           theta: ndarray) -> ndarray:
+
+    zernike1_ = 1
+    zernike2_ = 2 * (radius) * np.cos(theta)
+    zernike3_ = 2 * (radius) * np.sin(theta)
+    zernike4_ = np.sqrt(3) * (2.0 * radius ** 2 - 1.0)
+    zernike5_ = np.sqrt(6) * (radius ** 2) * np.sin(2 * theta)
+    zernike6_ = np.sqrt(6) * (radius ** 2) * np.cos(2 * theta)
+    zernike7_ = np.sqrt(8) * (3.0 * radius ** 3 - 2.0 * radius) * np.sin(theta)
+    zernike8_ = np.sqrt(8) * (3.0 * radius ** 3 - 2.0 * radius) * np.cos(theta)
+    zernike9_ = np.sqrt(8) * (radius ** 3) * np.sin(3 * theta)
+    zernike10_ = np.sqrt(8) * (radius ** 3) * np.cos(3 * theta)
+    zernike11_ = np.sqrt(5) * (6.0 * radius ** 4 - 6.0 * radius ** 2 + 1.0)
+
+    zernike1_4_11 = coef_r_const[0] * (zernike1_ + zernike4_ + zernike11_)
+    zernike2_8 = coef_r_const[1] * (zernike2_ + zernike8_)
+    zernike3_7 = coef_r_const[2] * (zernike3_ + zernike7_)
+    zernike5 = coef_r_const[3] * zernike5_
+    zernike6 = coef_r_const[4] * zernike6_
+    zernike9 = coef_r_const[5] * zernike9_
+    zernike10 = coef_r_const[6] * zernike10_
+
+    zernike_r_const_polynomial = zernike1_4_11 + zernike2_8 + zernike3_7 + zernike5 + zernike6 + zernike9 + zernike10
+
+    return zernike_r_const_polynomial
+
+
 class Constants:
 
     def __init__(self, physical_radius, ignore_radius,
@@ -773,9 +802,9 @@ class CirclePathMeasurementReading:
 
         self.res = self.__zernike_fitting()
 
-        self.res_zer = zernike_polynomial_calculation(self.res["x"],
-                                                      self.circle_path_radius,
-                                                      self.df_diff["radian"])
+        self.res_zer = zernike_r_const_polynomial_calculation(self.res["x"],
+                                                              self.circle_path_radius,
+                                                              self.df_diff["radian"])
 
     def h(self):
         mkhelp(self)
@@ -784,9 +813,9 @@ class CirclePathMeasurementReading:
 
         def minimize_funciton_sq(x, params_):
             radius_, theta_array_, height_array_ = params_
-            zernike_array_ = zernike_polynomial_calculation(coef=x,
-                                                            radius=radius_,
-                                                            theta=theta_array_)
+            zernike_array_ = zernike_r_const_polynomial_calculation(coef_r_const=x,
+                                                                    radius=radius_,
+                                                                    theta=theta_array_)
 
             residual = height_array_ - zernike_array_
             return residual
@@ -798,7 +827,7 @@ class CirclePathMeasurementReading:
         params = [radius, theta_array, height_array]
 
         optimize_result_sq = optimize.least_squares(fun=minimize_funciton_sq,
-                                                    x0=(np.ones(11) * 1e-9),
+                                                    x0=(np.ones(7) * 1e-9),
                                                     args=(params, ))
 
         return optimize_result_sq
