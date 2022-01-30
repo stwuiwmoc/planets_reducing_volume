@@ -801,7 +801,9 @@ class CirclePathMeasurementReading:
                                      "radian": np.deg2rad(self.df_raw_original["angle"].values),
                                      "height": height_diff})
 
-        self.optimize_result = self.__zernike_fitting()
+        zernike_fitting_result = self.__zernike_fitting()
+        self.optimize_result = zernike_fitting_result["optimize_result"]
+        self.zernike_polynomial_array = zernike_fitting_result["zernike_polynomial_array"]
 
     def h(self):
         mkhelp(self)
@@ -845,6 +847,23 @@ class CirclePathMeasurementReading:
             residual = height_array_ - zernike_array_
             return residual
 
+        def make_zernike_polynomial_from_r_const_zernike(zernike_r_const_polynomial_list: list[float]) -> ndarray:
+
+            zernike_polynomial_array_ = np.empty(11)
+            zernike_polynomial_array_[0] = zernike_r_const_polynomial_list[0]
+            zernike_polynomial_array_[1] = zernike_r_const_polynomial_list[1]
+            zernike_polynomial_array_[2] = zernike_r_const_polynomial_list[2]
+            zernike_polynomial_array_[3] = zernike_r_const_polynomial_list[0]
+            zernike_polynomial_array_[4] = zernike_r_const_polynomial_list[3]
+            zernike_polynomial_array_[5] = zernike_r_const_polynomial_list[4]
+            zernike_polynomial_array_[6] = zernike_r_const_polynomial_list[2]
+            zernike_polynomial_array_[7] = zernike_r_const_polynomial_list[1]
+            zernike_polynomial_array_[8] = zernike_r_const_polynomial_list[5]
+            zernike_polynomial_array_[9] = zernike_r_const_polynomial_list[6]
+            zernike_polynomial_array_[10] = zernike_r_const_polynomial_list[0]
+
+            return zernike_polynomial_array_
+
         radius = self.circle_path_radius
         theta_array = self.df_diff["radian"].values
         height_array = self.df_diff["height"].values
@@ -855,4 +874,9 @@ class CirclePathMeasurementReading:
                                                     x0=(np.ones(7) * 1e-9),
                                                     args=(params, ))
 
-        return optimize_result_sq
+        zernike_polynomial_array = make_zernike_polynomial_from_r_const_zernike(optimize_result_sq["x"])
+
+        result_dict = {"optimize_result": optimize_result_sq,
+                       "zernike_polynomial_array": zernike_polynomial_array}
+
+        return result_dict
