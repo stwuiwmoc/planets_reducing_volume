@@ -105,53 +105,54 @@ def oap_calculation(radius_of_curvature, off_axis_distance, clocking_angle_rad, 
     return oap_height
 
 
+def zernike_term_calculation(term_number: int,
+                             radius: ndarray,
+                             theta: ndarray) -> ndarray:
+    if term_number == 1:
+        return 1
+    if term_number == 2:
+        return 2 * (radius) * np.cos(theta)
+    if term_number == 3:
+        return 2 * (radius) * np.sin(theta)
+    if term_number == 4:
+        return np.sqrt(3) * (2.0 * radius ** 2 - 1.0)
+    if term_number == 5:
+        return np.sqrt(6) * (radius ** 2) * np.sin(2 * theta)
+    if term_number == 6:
+        return np.sqrt(6) * (radius ** 2) * np.cos(2 * theta)
+    if term_number == 7:
+        return np.sqrt(8) * (3.0 * radius ** 3 - 2.0 * radius) * np.sin(theta)
+    if term_number == 8:
+        return np.sqrt(8) * (3.0 * radius ** 3 - 2.0 * radius) * np.cos(theta)
+    if term_number == 9:
+        return np.sqrt(8) * (radius ** 3) * np.sin(3 * theta)
+    if term_number == 10:
+        return np.sqrt(8) * (radius ** 3) * np.cos(3 * theta)
+    if term_number == 11:
+        return np.sqrt(5) * (6.0 * radius ** 4 - 6.0 * radius ** 2 + 1.0)
+    else:
+        print("term_number must be 1~11")
+        return
+
+
 def zernike_polynomial_calculation(coef: list[float],
                                    radius: ndarray,
                                    theta: ndarray) -> ndarray:
 
-    zernike1 = coef[0] * 1
-    zernike2 = coef[1] * 2 * (radius) * np.cos(theta)
-    zernike3 = coef[2] * 2 * (radius) * np.sin(theta)
-    zernike4 = coef[3] * np.sqrt(3) * (2.0 * radius ** 2 - 1.0)
-    zernike5 = coef[4] * np.sqrt(6) * (radius ** 2) * np.sin(2 * theta)
-    zernike6 = coef[5] * np.sqrt(6) * (radius ** 2) * np.cos(2 * theta)
-    zernike7 = coef[6] * np.sqrt(8) * (3.0 * radius ** 3 - 2.0 * radius) * np.sin(theta)
-    zernike8 = coef[7] * np.sqrt(8) * (3.0 * radius ** 3 - 2.0 * radius) * np.cos(theta)
-    zernike9 = coef[8] * np.sqrt(8) * (radius ** 3) * np.sin(3 * theta)
-    zernike10 = coef[9] * np.sqrt(8) * (radius ** 3) * np.cos(3 * theta)
-    zernike11 = coef[10] * np.sqrt(5) * (6.0 * radius ** 4 - 6.0 * radius ** 2 + 1.0)
+    zernike1 = coef[0] * zernike_term_calculation(1, radius, theta)
+    zernike2 = coef[1] * zernike_term_calculation(2, radius, theta)
+    zernike3 = coef[2] * zernike_term_calculation(3, radius, theta)
+    zernike4 = coef[3] * zernike_term_calculation(4, radius, theta)
+    zernike5 = coef[4] * zernike_term_calculation(5, radius, theta)
+    zernike6 = coef[5] * zernike_term_calculation(6, radius, theta)
+    zernike7 = coef[6] * zernike_term_calculation(7, radius, theta)
+    zernike8 = coef[7] * zernike_term_calculation(8, radius, theta)
+    zernike9 = coef[8] * zernike_term_calculation(9, radius, theta)
+    zernike10 = coef[9] * zernike_term_calculation(10, radius, theta)
+    zernike11 = coef[10] * zernike_term_calculation(11, radius, theta)
 
     zernike_polynomial = zernike1 + zernike2 + zernike3 + zernike4 + zernike5 + zernike6 + zernike7 + zernike8 + zernike9 + zernike10 + zernike11
     return zernike_polynomial
-
-
-def zernike_r_const_polynomial_calculation(coef_r_const: list[float],
-                                           radius: float,
-                                           theta: ndarray) -> ndarray:
-
-    zernike1_ = 1
-    zernike2_ = 2 * (radius) * np.cos(theta)
-    zernike3_ = 2 * (radius) * np.sin(theta)
-    zernike4_ = np.sqrt(3) * (2.0 * radius ** 2 - 1.0)
-    zernike5_ = np.sqrt(6) * (radius ** 2) * np.sin(2 * theta)
-    zernike6_ = np.sqrt(6) * (radius ** 2) * np.cos(2 * theta)
-    zernike7_ = np.sqrt(8) * (3.0 * radius ** 3 - 2.0 * radius) * np.sin(theta)
-    zernike8_ = np.sqrt(8) * (3.0 * radius ** 3 - 2.0 * radius) * np.cos(theta)
-    zernike9_ = np.sqrt(8) * (radius ** 3) * np.sin(3 * theta)
-    zernike10_ = np.sqrt(8) * (radius ** 3) * np.cos(3 * theta)
-    zernike11_ = np.sqrt(5) * (6.0 * radius ** 4 - 6.0 * radius ** 2 + 1.0)
-
-    zernike1_4_11 = coef_r_const[0] * (zernike1_ + zernike4_ + zernike11_)
-    zernike2_8 = coef_r_const[1] * (zernike2_ + zernike8_)
-    zernike3_7 = coef_r_const[2] * (zernike3_ + zernike7_)
-    zernike5 = coef_r_const[3] * zernike5_
-    zernike6 = coef_r_const[4] * zernike6_
-    zernike9 = coef_r_const[5] * zernike9_
-    zernike10 = coef_r_const[6] * zernike10_
-
-    zernike_r_const_polynomial = zernike1_4_11 + zernike2_8 + zernike3_7 + zernike5 + zernike6 + zernike9 + zernike10
-
-    return zernike_r_const_polynomial
 
 
 class Constants:
@@ -800,22 +801,47 @@ class CirclePathMeasurementReading:
                                      "radian": np.deg2rad(self.df_raw_original["angle"].values),
                                      "height": height_diff})
 
-        self.res = self.__zernike_fitting()
-
-        self.res_zer = zernike_r_const_polynomial_calculation(self.res["x"],
-                                                              self.circle_path_radius,
-                                                              self.df_diff["radian"])
+        self.optimize_result = self.__zernike_fitting()
 
     def h(self):
         mkhelp(self)
+
+    def zernike_r_const_polynomial_calculation(self,
+                                               coef_r_const: list[float],
+                                               radius: float,
+                                               theta: ndarray) -> ndarray:
+
+        zernike1_ = zernike_term_calculation(1, radius, theta)
+        zernike2_ = zernike_term_calculation(2, radius, theta)
+        zernike3_ = zernike_term_calculation(3, radius, theta)
+        zernike4_ = zernike_term_calculation(4, radius, theta)
+        zernike5_ = zernike_term_calculation(5, radius, theta)
+        zernike6_ = zernike_term_calculation(6, radius, theta)
+        zernike7_ = zernike_term_calculation(7, radius, theta)
+        zernike8_ = zernike_term_calculation(8, radius, theta)
+        zernike9_ = zernike_term_calculation(9, radius, theta)
+        zernike10_ = zernike_term_calculation(10, radius, theta)
+        zernike11_ = zernike_term_calculation(11, radius, theta)
+
+        zernike1_4_11 = coef_r_const[0] * (zernike1_ + zernike4_ + zernike11_)
+        zernike2_8 = coef_r_const[1] * (zernike2_ + zernike8_)
+        zernike3_7 = coef_r_const[2] * (zernike3_ + zernike7_)
+        zernike5 = coef_r_const[3] * zernike5_
+        zernike6 = coef_r_const[4] * zernike6_
+        zernike9 = coef_r_const[5] * zernike9_
+        zernike10 = coef_r_const[6] * zernike10_
+
+        zernike_r_const_polynomial = zernike1_4_11 + zernike2_8 + zernike3_7 + zernike5 + zernike6 + zernike9 + zernike10
+
+        return zernike_r_const_polynomial
 
     def __zernike_fitting(self):
 
         def minimize_funciton_sq(x, params_):
             radius_, theta_array_, height_array_ = params_
-            zernike_array_ = zernike_r_const_polynomial_calculation(coef_r_const=x,
-                                                                    radius=radius_,
-                                                                    theta=theta_array_)
+            zernike_array_ = self.zernike_r_const_polynomial_calculation(coef_r_const=x,
+                                                                         radius=radius_,
+                                                                         theta=theta_array_)
 
             residual = height_array_ - zernike_array_
             return residual
