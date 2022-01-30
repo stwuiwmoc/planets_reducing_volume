@@ -787,14 +787,11 @@ class OapMinimize:
 class CirclePathMeasurementReading:
     def __init__(self,
                  Constants,
-                 circle_path_radius: float,
                  original_csv_fpath: str,
-                 deformed_csv_fpath: str,
-                 ignore_zernike_number_list: list[int]) -> None:
+                 deformed_csv_fpath: str
+                 ) -> None:
 
         self.consts = Constants
-        self.circle_path_radius = circle_path_radius
-        self.ignore_zernike_number_list = ignore_zernike_number_list
         self.df_raw_original = pd.read_csv(original_csv_fpath)
         self.df_raw_deformed = pd.read_csv(deformed_csv_fpath)
         height_diff = self.df_raw_deformed["height"].values - self.df_raw_original["height"].values
@@ -802,6 +799,23 @@ class CirclePathMeasurementReading:
         self.df_diff = pd.DataFrame({"degree": self.df_raw_original["angle"].values,
                                      "radian": np.deg2rad(self.df_raw_original["angle"].values),
                                      "height": height_diff})
+
+    def h(self):
+        mkhelp(self)
+
+
+class CirclePathZernikeFitting:
+    def __init__(self,
+                 Constants,
+                 circle_path_radius: float,
+                 df_diff: pd.DataFrame,
+                 ignore_zernike_number_list: list[int]
+                 ) -> None:
+
+        self.consts = Constants
+        self.circle_path_radius = circle_path_radius
+        self.df_diff = df_diff
+        self.ignore_zernike_number_list = ignore_zernike_number_list
 
         zernike_fitting_result = self.__zernike_fitting()
         self.optimize_result = zernike_fitting_result["optimize_result"]
