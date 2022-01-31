@@ -4,6 +4,26 @@ import matplotlib.pyplot as plt
 
 import planets_optimize_myclass as pom
 
+
+def mkfolder(suffix=""):
+    import os
+    """
+    Parameters
+    ----------
+    suffix : str, optional
+        The default is "".
+
+    Returns
+    -------
+    str ( script name + suffix )
+    """
+    filename = os.path.basename(__file__)
+    filename = filename.replace(".py", "") + suffix
+    folder = "mkfolder/" + filename + "/"
+    os.makedirs(folder, exist_ok=True)
+    return folder
+
+
 if __name__ == "__main__":
     importlib.reload(pom)
 
@@ -13,7 +33,8 @@ if __name__ == "__main__":
                            zernike_max_degree=10,
                            offset_height_percent=2)
 
-    input_filename_n = "../sag_integration_code/" + "mkfolder/psm_test_kagi_data_integration/0117e_height.csv"
+    serial_n = "0117l"
+    input_filename_n = "../sag_integration_code/" + "mkfolder/psm_test_kagi_data_integration/" + serial_n + "_height.csv"
 
     mes = pom.CirclePathMeasurementReading(Constants=CONSTS,
                                            original_csv_fpath=input_filename_n,
@@ -26,7 +47,7 @@ if __name__ == "__main__":
 
     circumference = -res.df_diff["radian"] * res.circle_path_radius * 1e3
 
-    fig1 = plt.figure(figsize=(10, 7))
+    fig1 = plt.figure(figsize=(10, 5))
     gs1 = fig1.add_gridspec(2, 1)
     fig1.suptitle(input_filename_n[-16:-11])
 
@@ -43,3 +64,4 @@ if __name__ == "__main__":
     ax12.set_xlabel("robot-arm scanning coordinate [mm]")
 
     fig1.tight_layout()
+    fig1.savefig(mkfolder() + serial_n + "_fig1.png")
