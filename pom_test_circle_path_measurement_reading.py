@@ -34,7 +34,7 @@ if __name__ == "__main__":
                            offset_height_percent=2)
 
     serial_0 = "0117e"
-    serial_n = "0117l"
+    serial_n = "0117j"
     input_filename_0 = "../sag_integration_code/" + "mkfolder/psm_test_kagi_data_integration/" + serial_0 + "_height.csv"
     input_filename_n = "../sag_integration_code/" + "mkfolder/psm_test_kagi_data_integration/" + serial_n + "_height.csv"
 
@@ -74,3 +74,17 @@ if __name__ == "__main__":
     ax21.set_ylabel("height_deform [nm]")
 
     fig2.savefig(mkfolder() + serial_n + "_fig2.png")
+
+    circumference = - res0n.df_diff["radian"] * res0n.circle_path_radius * 1e3
+
+    fig3 = plt.figure(figsize=(7, 3))
+    gs3 = fig3.add_gridspec(1, 1)
+    fig3.suptitle(serial_n + " - " + serial_0)
+
+    ax31 = fig3.add_subplot(gs2[0, 0])
+    ax31.plot(circumference, res0n.height_removed * 1e9)
+    ax31.grid()
+    ax31.set_xlabel("robot-arm scanning coordinate [mm]")
+    ax31.set_ylabel("height_deform [nm]")
+
+    fig2.savefig(mkfolder() + serial_n + "_fig3.png")
