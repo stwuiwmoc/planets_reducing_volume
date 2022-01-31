@@ -4,6 +4,26 @@ import matplotlib.pyplot as plt
 
 import planets_optimize_myclass as pom
 
+
+def mkfolder(suffix=""):
+    import os
+    """
+    Parameters
+    ----------
+    suffix : str, optional
+        The default is "".
+
+    Returns
+    -------
+    str ( script name + suffix )
+    """
+    filename = os.path.basename(__file__)
+    filename = filename.replace(".py", "") + suffix
+    folder = "mkfolder/" + filename + "/"
+    os.makedirs(folder, exist_ok=True)
+    return folder
+
+
 if __name__ == "__main__":
     importlib.reload(pom)
 
@@ -13,8 +33,10 @@ if __name__ == "__main__":
                            zernike_max_degree=10,
                            offset_height_percent=2)
 
-    input_filename_0 = "../sag_integration_code/" + "mkfolder/psm_test_kagi_data_integration/0117e_height.csv"
-    input_filename_n = "../sag_integration_code/" + "mkfolder/psm_test_kagi_data_integration/0117h_height.csv"
+    serial_0 = "0117e"
+    serial_n = "0117l"
+    input_filename_0 = "../sag_integration_code/" + "mkfolder/psm_test_kagi_data_integration/" + serial_0 + "_height.csv"
+    input_filename_n = "../sag_integration_code/" + "mkfolder/psm_test_kagi_data_integration/" + serial_n + "_height.csv"
 
     mes0n = pom.CirclePathMeasurementReading(Constants=CONSTS,
                                              original_csv_fpath=input_filename_0,
@@ -40,3 +62,15 @@ if __name__ == "__main__":
     ax12.set_xlabel("robot-arm theta [deg]")
 
     fig1.tight_layout()
+
+    fig2 = plt.figure(figsize=(7, 4))
+    gs2 = fig2.add_gridspec(1, 1)
+    fig2.suptitle(serial_n + " - " + serial_0)
+
+    ax21 = fig2.add_subplot(gs2[0, 0])
+    ax21.plot(res0n.df_diff["degree"], res0n.height_removed * 1e9)
+    ax21.grid()
+    ax21.set_xlabel("robot-arm theta [deg]")
+    ax21.set_ylabel("height_deform [nm]")
+
+    fig2.savefig(mkfolder() + serial_n + "_fig2.png")
