@@ -827,12 +827,19 @@ class CirclePathMeasurementReading:
 
         self.consts = Constants
         self.df_raw_original = pd.read_csv(original_csv_fpath)
-        self.df_raw_deformed = pd.read_csv(deformed_csv_fpath)
-        height_diff = self.df_raw_deformed["height"].values - self.df_raw_original["height"].values
 
-        self.df_diff = pd.DataFrame({"degree": self.df_raw_original["angle"].values,
-                                     "radian": np.deg2rad(self.df_raw_original["angle"].values),
-                                     "height": height_diff})
+        if deformed_csv_fpath == "":
+            self.df_diff = pd.DataFrame({"degree": self.df_raw_original["angle"].values,
+                                         "radian": np.deg2rad(self.df_raw_original["angle"].values),
+                                         "height": self.df_raw_original["height"].values})
+
+        else:
+            self.df_raw_deformed = pd.read_csv(deformed_csv_fpath)
+            height_diff = self.df_raw_deformed["height"].values - self.df_raw_original["height"].values
+
+            self.df_diff = pd.DataFrame({"degree": self.df_raw_original["angle"].values,
+                                         "radian": np.deg2rad(self.df_raw_original["angle"].values),
+                                         "height": height_diff})
 
     def h(self):
         mkhelp(self)
