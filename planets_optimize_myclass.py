@@ -312,8 +312,13 @@ class Surface:
         cbar.set_label(cbar_title, fontsize=fontsize)
         return ax
 
-    def make_circle_path_plot(self, figure, position=111,
-                              radius=0.870, height_magn=1e9, height_unit_str="[nm]"):
+    def make_circle_path_plot(self,
+                              figure,
+                              position=111,
+                              radius=0.870,
+                              height_magn=1e9,
+                              height_unit_str="[nm]"):
+
         fontsize = 15
         varid_radius_pixel_number = int(self.consts.varid_radius / self.consts.physical_radius * self.consts.pixel_number / 2)
         measurement_radius_idx = int(radius * 1e3)
@@ -328,26 +333,25 @@ class Surface:
                                            flags=flags)
 
         circle_path_line = height_magn * linear_polar_image[:, measurement_radius_idx]
+
+        geometric_degree = np.arange(360)  # CCW、pomでのx軸+方向を0degとする角度
+        robot_degree = geometric_degree - 90 - 10.814
+        robot_degree = np.where(robot_degree > 0,
+                                robot_degree,
+                                robot_degree + 360)
+
         height_pv = np.nanmax(circle_path_line) - np.nanmin(circle_path_line)
         height_pv_str = str(round(height_pv, 2))
 
         ax = figure.add_subplot(position)
-        ax.plot(circle_path_line)
+        ax.plot(robot_degree, circle_path_line)
         ax.grid()
-        ax.set_title(
-            "circle_path ( pv = " +
-            height_pv_str +
-            " " +
-            height_unit_str +
-            " )",
-            fontsize=fontsize)
+
+        ax.set_title("circle_path ( pv = " + height_pv_str + " " + height_unit_str + " )",
+                     fontsize=fontsize)
         ax.set_xlabel("degree", fontsize=fontsize)
-        ax.set_ylabel(
-            "heignt " +
-            height_unit_str +
-            "\nat R=" +
-            str(measurement_radius_idx),
-            fontsize=fontsize)
+        ax.set_ylabel("heignt " + height_unit_str + "\nat R=" + str(measurement_radius_idx),
+                      fontsize=fontsize)
         return ax
 
     def _make_masked_zernike_surface(self, zernike_number_list, zernike_value_array):
