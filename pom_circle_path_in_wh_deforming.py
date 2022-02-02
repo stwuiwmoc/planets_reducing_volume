@@ -13,6 +13,25 @@ import importlib
 import planets_optimize_myclass as pom
 
 
+def mkfolder(suffix=""):
+    import os
+    """
+    Parameters
+    ----------
+    suffix : str, optional
+        The default is "".
+
+    Returns
+    -------
+    str ( script name + suffix )
+    """
+    filename = os.path.basename(__file__)
+    filename = filename.replace(".py", "") + suffix
+    folder = "mkfolder/" + filename + "/"
+    os.makedirs(folder, exist_ok=True)
+    return folder
+
+
 def make_full_torque_value_array(torque_number_list, torque_value_aray):
     full_value_array = np.zeros(36)
     idx_array = np.array(torque_number_list) - 1
@@ -65,3 +84,4 @@ if __name__ == "__main__":
     wh_deformed_surface.make_image_plot(figure=fig, position=gs[0:2, 0:2])
     wh_deformed_surface.make_circle_path_plot(figure=fig, position=gs[1, 2])
     fig.tight_layout()
+    fig.savefig(mkfolder() + ".png")
