@@ -282,16 +282,25 @@ class Surface:
         volume_in_m3 = unit_pixel_volume.sum()
         return (volume_in_m3, offset_height_value)
 
-    def make_image_plot(self, figure, position=111,
-                        color_scale=False, cbar_min_percent=0, cbar_max_percent=100,
-                        pv_digits=2, rms_digits=2):
+    def make_image_plot(
+            self, figure,
+            position=111,
+            cbar_surface=None,
+            cbar_min_percent=0, cbar_max_percent=100,
+            pv_digits=2, rms_digits=2):
 
         cmap = cm.jet
         fontsize = 15
         title = "pv = " + str(round(self.pv * 1e6, pv_digits)) + " [um]" + "\n" + "RMS = " + str(round(self.rms * 1e6, rms_digits)) + " [um]"
 
-        cbar_min = np.nanmin(self.surface) + self.pv * cbar_min_percent / 100
-        cbar_max = np.nanmin(self.surface) + self.pv * cbar_max_percent / 100
+        if cbar_surface is None:
+            cbar_surface = self.surface
+        else:
+            pass
+
+        cbar_pv = np.nanmax(cbar_surface) - np.nanmin(cbar_surface)
+        cbar_min = np.nanmin(cbar_surface) + cbar_pv * cbar_min_percent / 100
+        cbar_max = np.nanmin(cbar_surface) + cbar_pv * cbar_max_percent / 100
 
         extent = [-self.consts.physical_radius, self.consts.physical_radius,
                   -self.consts.physical_radius, self.consts.physical_radius]
@@ -310,6 +319,50 @@ class Surface:
 
         cbar = figure.colorbar(mappable, ax=ax, cax=cax)
         cbar.set_label(cbar_title, fontsize=fontsize)
+        return ax
+
+    def make_3d_plot(
+            self, figure, position=111,
+            cbar_surface=None,
+            cbar_min_percent=0, cbar_max_percent=100,
+            zaxis_bottom_percent=30):
+
+        fontsize = 10
+
+        xx_ = self.consts.xx
+        yy_ = self.consts.yy
+
+        zz_bottom_value = np.nanmin(self.surface) + self.pv * zaxis_bottom_percent / 100
+
+        zz_ = np.where(self.consts.tf,
+                       self.surface,
+                       zz_bottom_value)
+
+        if cbar_surface is None:
+            cbar_surface = self.surface
+        else:
+            pass
+
+        cbar_pv = np.nanmax(cbar_surface) - np.nanmin(cbar_surface)
+        cbar_min = np.nanmin(cbar_surface) + cbar_pv * cbar_min_percent / 100
+        cbar_max = np.nanmin(cbar_surface) + cbar_pv * cbar_max_percent / 100
+
+        ax = figure.add_subplot(position, projection="3d")
+        ax.plot_surface(xx_, yy_, zz_, cmap=cm.jet, vmin=cbar_min, vmax=cbar_max)
+
+        ax.set_zlim(np.nanmin(cbar_surface), np.nanmax(cbar_surface))
+        ax.set_xlabel("x [m]", fontsize=fontsize)
+        ax.set_ylabel("y [m]", fontsize=fontsize)
+        ax.set_zticklabels([])
+
+        ax.view_init(elev=30, azim=-60)
+
+        norm = Normalize(vmin=cbar_min, vmax=cbar_max)
+        mappable = cm.ScalarMappable(norm=norm, cmap=cm.jet)
+        cbar = figure.colorbar(mappable, ax=ax, shrink=0.8)
+        cbar_title = "[m]"
+        cbar.set_label(cbar_title, fontsize=fontsize)
+
         return ax
 
     def make_circle_path_plot(self,
@@ -463,9 +516,10 @@ class StitchedCsvToSurface(Surface):
         constants : TYPE
             instance by class : Constants
         original_stitched_csv_fpath : str
-            filepath of measured (stitched) and not deformed 2d-csv data
+            変形前の測定データ[mm]のcsvパス
         deformed_stitched_csv_fpath : TYPE
-            filepath of measured (stitched) and deformed 2d-csv data
+            変形後の測定データ[mm]のcsvパス
+            "" ならoriginalだけで計算
         offset_height_percent : float
             ignore height in percent. if you set 2, the lower 2% is ignored in self._volume_calculation()
 
@@ -499,7 +553,8 @@ class StitchedCsvToSurface(Surface):
             size=(
                 self.consts.pixel_number,
                 self.consts.pixel_number))
-        masked_surface = self.consts.mask * np.array(img_resize)
+
+        masked_surface = self.consts.mask * np.array(img_resize) * 1e-3
         return masked_surface
 
 
