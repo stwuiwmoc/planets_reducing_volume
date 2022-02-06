@@ -36,6 +36,12 @@ if __name__ == "__main__":
         offset_height_percent=2
     )
 
+    mesE = pom.StitchedCsvToSurface(
+        constants=CONSTS,
+        original_stitched_csv_fpath="mkfolder/stitch2mesh/zer03_exelis.csv",
+        deformed_stitched_csv_fpath=""
+    )
+
     mes0 = pom.StitchedCsvToSurface(
         constants=CONSTS,
         original_stitched_csv_fpath="mkfolder/stitch2mesh/zer03_0923xm130_1007ym830.hei.v2_dense.csv",
@@ -46,6 +52,12 @@ if __name__ == "__main__":
         constants=CONSTS,
         original_stitched_csv_fpath="mkfolder/stitch2mesh/zer03_0131xm130allcc_0201cirAll.v4.8.hei_dense.csv",
         deformed_stitched_csv_fpath=""
+    )
+
+    zerE = pom.ZernikeRemovedSurface(
+        constants=CONSTS,
+        inputed_surface=mesE.surface,
+        removing_zernike_number_list=[1, 2, 3, 4, 5, 6]
     )
 
     zer0 = pom.ZernikeRemovedSurface(
@@ -60,13 +72,19 @@ if __name__ == "__main__":
         removing_zernike_number_list=[1, 2, 3, 4, 5, 6]
     )
 
-    filtered0 = pom.FilteredSurface(
+    filterE = pom.FilteredSurface(
+        constants=CONSTS,
+        inputed_surface=zerE.surface,
+        filter_parameter=50
+    )
+
+    filter0 = pom.FilteredSurface(
         constants=CONSTS,
         inputed_surface=zer0.surface,
         filter_parameter=50
     )
 
-    filtered8 = pom.FilteredSurface(
+    filter8 = pom.FilteredSurface(
         constants=CONSTS,
         inputed_surface=zer8.surface,
         filter_parameter=50
@@ -75,27 +93,41 @@ if __name__ == "__main__":
     cbar_min_percent_ = 35
     cbar_max_percent_ = 90
 
-    fig1 = plt.figure(figsize=(10, 14))
-    gs1 = fig1.add_gridspec(3, 2)
+    fig1 = plt.figure(figsize=(14, 14))
+    gs1 = fig1.add_gridspec(3, 3)
 
-    ax11 = mes0.make_image_plot(
+    ax19 = mesE.make_image_plot(
         fig1, gs1[0, 0],
-        None, cbar_min_percent_, cbar_max_percent_)
-    ax12 = mes8.make_image_plot(
-        fig1, gs1[0, 1],
         mes0.surface, cbar_min_percent_, cbar_max_percent_)
-    ax15 = zer0.make_image_plot(
+    ax19.set_title("exelis\n" + ax19.get_title())
+    ax11 = mes0.make_image_plot(
+        fig1, gs1[0, 1],
+        None, cbar_min_percent_, cbar_max_percent_)
+    ax11.set_title("before_polish\n" + ax11.get_title())
+    ax12 = mes8.make_image_plot(
+        fig1, gs1[0, 2],
+        mes0.surface, cbar_min_percent_, cbar_max_percent_)
+    ax12.set_title("after 8th polish\n" + ax12.get_title())
+
+    ax110 = zerE.make_image_plot(
         fig1, gs1[1, 0],
+        zer0.surface, cbar_min_percent_, cbar_max_percent_)
+    ax15 = zer0.make_image_plot(
+        fig1, gs1[1, 1],
         None, cbar_min_percent_, cbar_max_percent_)
     ax16 = zer8.make_image_plot(
-        fig1, gs1[1, 1],
+        fig1, gs1[1, 2],
         zer0.surface, cbar_min_percent_, cbar_max_percent_)
-    ax17 = filtered0.make_3d_plot(
+
+    ax111 = filterE.make_3d_plot(
         fig1, gs1[2, 0],
-        None, cbar_min_percent_, cbar_max_percent_)
-    ax18 = filtered8.make_3d_plot(
+        filter0.surface, cbar_min_percent_, cbar_max_percent_)
+    ax17 = filter0.make_3d_plot(
         fig1, gs1[2, 1],
-        filtered0.surface, cbar_min_percent_, cbar_max_percent_)
+        None, cbar_min_percent_, cbar_max_percent_)
+    ax18 = filter8.make_3d_plot(
+        fig1, gs1[2, 2],
+        filter0.surface, cbar_min_percent_, cbar_max_percent_)
 
     fig1.tight_layout()
     fig1.savefig(mkfolder() + "fig1.png")
