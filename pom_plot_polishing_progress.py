@@ -5,6 +5,26 @@ import importlib
 
 import planets_optimize_myclass as pom
 
+
+def mkfolder(suffix=""):
+    import os
+    """
+    Parameters
+    ----------
+    suffix : str, optional
+        The default is "".
+
+    Returns
+    -------
+    str ( script name + suffix )
+    """
+    filename = os.path.basename(__file__)
+    filename = filename.replace(".py", "") + suffix
+    folder = "mkfolder/" + filename + "/"
+    os.makedirs(folder, exist_ok=True)
+    return folder
+
+
 if __name__ == "__main__":
     importlib.reload(pom)
 
@@ -78,3 +98,4 @@ if __name__ == "__main__":
         filtered0.surface, cbar_min_percent_, cbar_max_percent_)
 
     fig1.tight_layout()
+    fig1.savefig(mkfolder() + "fig1.png")
