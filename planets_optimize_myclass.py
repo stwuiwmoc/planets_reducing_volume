@@ -463,9 +463,10 @@ class StitchedCsvToSurface(Surface):
         constants : TYPE
             instance by class : Constants
         original_stitched_csv_fpath : str
-            filepath of measured (stitched) and not deformed 2d-csv data
+            変形前の測定データ[mm]のcsvパス
         deformed_stitched_csv_fpath : TYPE
-            filepath of measured (stitched) and deformed 2d-csv data
+            変形後の測定データ[mm]のcsvパス
+            "" ならoriginalだけで計算
         offset_height_percent : float
             ignore height in percent. if you set 2, the lower 2% is ignored in self._volume_calculation()
 
@@ -499,7 +500,8 @@ class StitchedCsvToSurface(Surface):
             size=(
                 self.consts.pixel_number,
                 self.consts.pixel_number))
-        masked_surface = self.consts.mask * np.array(img_resize)
+
+        masked_surface = self.consts.mask * np.array(img_resize) * 1e-3
         return masked_surface
 
 
