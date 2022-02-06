@@ -58,16 +58,23 @@ if __name__ == "__main__":
     fig1 = plt.figure(figsize=(10, 14))
     gs1 = fig1.add_gridspec(3, 2)
 
-    ax11 = mes0.make_image_plot(fig1, gs1[0, 0], False, cbar_min_percent_, cbar_max_percent_)
-    ax12 = mes8.make_image_plot(fig1, gs1[0, 1], False, cbar_min_percent_, cbar_max_percent_)
-    ax15 = zer0.make_image_plot(fig1, gs1[1, 0], False, cbar_min_percent_, cbar_max_percent_)
-    ax16 = zer8.make_image_plot(fig1, gs1[1, 1], False, cbar_min_percent_, cbar_max_percent_)
+    ax11 = mes0.make_image_plot(
+        fig1, gs1[0, 0],
+        None, cbar_min_percent_, cbar_max_percent_)
+    ax12 = mes8.make_image_plot(
+        fig1, gs1[0, 1],
+        mes0.surface, cbar_min_percent_, cbar_max_percent_)
+    ax15 = zer0.make_image_plot(
+        fig1, gs1[1, 0],
+        None, cbar_min_percent_, cbar_max_percent_)
+    ax16 = zer8.make_image_plot(
+        fig1, gs1[1, 1],
+        zer0.surface, cbar_min_percent_, cbar_max_percent_)
     ax17 = filtered0.make_3d_plot(
         fig1, gs1[2, 0],
-        cbar_min_percent=cbar_min_percent_, cbar_max_percent=cbar_max_percent_)
+        None, cbar_min_percent_, cbar_max_percent_)
     ax18 = filtered8.make_3d_plot(
         fig1, gs1[2, 1],
-        cbar_surface=filtered0.surface,
-        cbar_min_percent=cbar_min_percent_, cbar_max_percent=cbar_max_percent_)
+        filtered0.surface, cbar_min_percent_, cbar_max_percent_)
 
     fig1.tight_layout()
