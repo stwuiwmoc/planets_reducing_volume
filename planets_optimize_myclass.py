@@ -312,6 +312,50 @@ class Surface:
         cbar.set_label(cbar_title, fontsize=fontsize)
         return ax
 
+    def make_3d_plot(
+            self, figure, position=111,
+            zaxis_bottom_percent=30,
+            cbar_surface=None,
+            cbar_min_percent=0, cbar_max_percent=100):
+
+        fontsize = 10
+
+        xx_ = self.consts.xx
+        yy_ = self.consts.yy
+
+        zz_bottom_value = np.nanmin(self.surface) + self.pv * zaxis_bottom_percent / 100
+
+        zz_ = np.where(self.consts.tf,
+                       self.surface,
+                       zz_bottom_value)
+
+        if cbar_surface is None:
+            cbar_surface = self.surface
+        else:
+            pass
+
+        cbar_pv = np.nanmax(cbar_surface) - np.nanmin(cbar_surface)
+        cbar_min = np.nanmin(cbar_surface) + cbar_pv * cbar_min_percent / 100
+        cbar_max = np.nanmin(cbar_surface) + cbar_pv * cbar_max_percent / 100
+
+        ax = figure.add_subplot(position, projection="3d")
+        ax.plot_surface(xx_, yy_, zz_, cmap=cm.jet, vmin=cbar_min, vmax=cbar_max)
+
+        ax.set_zlim(np.nanmin(cbar_surface), np.nanmax(cbar_surface))
+        ax.set_xlabel("x [m]", fontsize=fontsize)
+        ax.set_ylabel("y [m]", fontsize=fontsize)
+        ax.set_zticklabels([])
+
+        ax.view_init(elev=30, azim=-60)
+
+        norm = Normalize(vmin=cbar_min, vmax=cbar_max)
+        mappable = cm.ScalarMappable(norm=norm, cmap=cm.jet)
+        cbar = figure.colorbar(mappable, ax=ax, shrink=0.8)
+        cbar_title = "[m]"
+        cbar.set_label(cbar_title, fontsize=fontsize)
+
+        return ax
+
     def make_circle_path_plot(self,
                               figure,
                               position=111,
