@@ -282,16 +282,25 @@ class Surface:
         volume_in_m3 = unit_pixel_volume.sum()
         return (volume_in_m3, offset_height_value)
 
-    def make_image_plot(self, figure, position=111,
-                        color_scale=False, cbar_min_percent=0, cbar_max_percent=100,
-                        pv_digits=2, rms_digits=2):
+    def make_image_plot(
+            self, figure,
+            position=111,
+            cbar_surface=None,
+            cbar_min_percent=0, cbar_max_percent=100,
+            pv_digits=2, rms_digits=2):
 
         cmap = cm.jet
         fontsize = 15
         title = "pv = " + str(round(self.pv * 1e6, pv_digits)) + " [um]" + "\n" + "RMS = " + str(round(self.rms * 1e6, rms_digits)) + " [um]"
 
-        cbar_min = np.nanmin(self.surface) + self.pv * cbar_min_percent / 100
-        cbar_max = np.nanmin(self.surface) + self.pv * cbar_max_percent / 100
+        if cbar_surface is None:
+            cbar_surface = self.surface
+        else:
+            pass
+
+        cbar_pv = np.nanmax(cbar_surface) - np.nanmin(cbar_surface)
+        cbar_min = np.nanmin(cbar_surface) + cbar_pv * cbar_min_percent / 100
+        cbar_max = np.nanmin(cbar_surface) + cbar_pv * cbar_max_percent / 100
 
         extent = [-self.consts.physical_radius, self.consts.physical_radius,
                   -self.consts.physical_radius, self.consts.physical_radius]
@@ -314,9 +323,9 @@ class Surface:
 
     def make_3d_plot(
             self, figure, position=111,
-            zaxis_bottom_percent=30,
             cbar_surface=None,
-            cbar_min_percent=0, cbar_max_percent=100):
+            cbar_min_percent=0, cbar_max_percent=100,
+            zaxis_bottom_percent=30):
 
         fontsize = 10
 
