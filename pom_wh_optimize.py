@@ -70,17 +70,8 @@ if __name__ == "__main__":
         constants=CONSTS,
         surface=target_surface.surface - reproducted_surface.surface)
 
-    reproducted_restructed_surface = pom.ZernikeToSurface(
-        constants=CONSTS,
-        zernike_number_list=reproducted_zernike.remaining_zernike_number_list,
-        zernike_value_array=reproducted_zernike.remaining_reproducted_restructed_zernike_value_array)
-
-    result_restructed_surface = pom.Surface(
-        constants=CONSTS,
-        surface=target_surface.surface - reproducted_restructed_surface.surface)
-
-    cbar_min_percent_ = 40
-    cbar_max_percent_ = 100
+    cbar_min_percent_ = 15
+    cbar_max_percent_ = 90
 
     fig1 = plt.figure(figsize=(12, 12))
     gs1 = fig1.add_gridspec(3, 2)
