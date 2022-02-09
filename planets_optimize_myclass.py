@@ -105,9 +105,10 @@ def oap_calculation(radius_of_curvature, off_axis_distance, clocking_angle_rad, 
     return oap_height
 
 
-def zernike_term_calculation(term_number: int,
-                             radius: ndarray,
-                             theta: ndarray) -> ndarray:
+def zernike_term_calculation(
+        term_number: int,
+        radius: ndarray,
+        theta: ndarray) -> ndarray:
     """zernike_term_calculation
     zernikeの各項を計算する（係数は入ってない）
 
@@ -152,9 +153,10 @@ def zernike_term_calculation(term_number: int,
         return
 
 
-def zernike_polynomial_calculation(coef: list[float],
-                                   radius: ndarray,
-                                   theta: ndarray) -> ndarray:
+def zernike_polynomial_calculation(
+        coef: list[float],
+        radius: ndarray,
+        theta: ndarray) -> ndarray:
     """
     zernike多項式のarrayを計算する（係数込み）
 
@@ -191,8 +193,9 @@ def zernike_polynomial_calculation(coef: list[float],
 
 class Constants:
 
-    def __init__(self, physical_radius, ignore_radius,
-                 pixel_number, zernike_max_degree, offset_height_percent):
+    def __init__(
+            self, physical_radius, ignore_radius,
+            pixel_number, zernike_max_degree, offset_height_percent):
         """
         class : constants
 
@@ -220,9 +223,10 @@ class Constants:
         self.offset_height_percent = offset_height_percent
 
         self.varid_radius = physical_radius - ignore_radius
-        self.xx, self.yy = make_meshgrid(-physical_radius, physical_radius,
-                                         -physical_radius, physical_radius,
-                                         pixel_number)
+        self.xx, self.yy = make_meshgrid(
+            -physical_radius, physical_radius,
+            -physical_radius, physical_radius,
+            pixel_number)
         self.tf = np.where(self.xx ** 2 + self.yy ** 2 <= self.varid_radius**2, True, False)
         self.mask = np.where(self.tf, 1, np.nan)
         self.zernike_max_degree = zernike_max_degree
@@ -269,9 +273,10 @@ class Surface:
             100)
         offset_height_value = sorted_surface[offset_height_idx]
 
-        lower_ignored_surface = np.where(self.surface >= offset_height_value,
-                                         self.surface - offset_height_value,
-                                         0)
+        lower_ignored_surface = np.where(
+            self.surface >= offset_height_value,
+            self.surface - offset_height_value,
+            0)
 
         # 1pixelあたりの単位面積を計算
         physical_diameter = 2 * self.consts.physical_radius
@@ -302,12 +307,14 @@ class Surface:
         cbar_min = np.nanmin(cbar_surface) + cbar_pv * cbar_min_percent / 100
         cbar_max = np.nanmin(cbar_surface) + cbar_pv * cbar_max_percent / 100
 
-        extent = [-self.consts.physical_radius, self.consts.physical_radius,
-                  -self.consts.physical_radius, self.consts.physical_radius]
+        extent = [
+            -self.consts.physical_radius, self.consts.physical_radius,
+            -self.consts.physical_radius, self.consts.physical_radius]
 
         ax = figure.add_subplot(position)
-        ax.imshow(self.surface, interpolation="nearest", cmap=cmap,
-                  vmin=cbar_min, vmax=cbar_max, origin="lower", extent=extent)
+        ax.imshow(
+            self.surface, interpolation="nearest", cmap=cmap,
+            vmin=cbar_min, vmax=cbar_max, origin="lower", extent=extent)
         ax.set_title(title, fontsize=fontsize)
 
         divider = mpl_toolkits.axes_grid1.make_axes_locatable(ax)
@@ -334,9 +341,10 @@ class Surface:
 
         zz_bottom_value = np.nanmin(self.surface) + self.pv * zaxis_bottom_percent / 100
 
-        zz_ = np.where(self.consts.tf,
-                       self.surface,
-                       zz_bottom_value)
+        zz_ = np.where(
+            self.consts.tf,
+            self.surface,
+            zz_bottom_value)
 
         if cbar_surface is None:
             cbar_surface = self.surface
@@ -365,12 +373,13 @@ class Surface:
 
         return ax
 
-    def make_circle_path_plot(self,
-                              figure,
-                              position=111,
-                              radius=0.870,
-                              height_magn=1e9,
-                              height_unit_str="[nm]"):
+    def make_circle_path_plot(
+            self,
+            figure,
+            position=111,
+            radius=0.870,
+            height_magn=1e9,
+            height_unit_str="[nm]"):
 
         fontsize = 15
         varid_radius_pixel_number = int(self.consts.varid_radius / self.consts.physical_radius * self.consts.pixel_number / 2)
@@ -379,19 +388,21 @@ class Surface:
         image = np.where(self.consts.tf, self.surface, 0)
         flags = cv2.INTER_CUBIC + cv2.WARP_FILL_OUTLIERS + cv2.WARP_POLAR_LINEAR
 
-        linear_polar_image = cv2.warpPolar(src=image,
-                                           dsize=(int(self.consts.varid_radius * 1e3), 360),
-                                           center=(self.consts.pixel_number / 2, self.consts.pixel_number / 2),
-                                           maxRadius=varid_radius_pixel_number,
-                                           flags=flags)
+        linear_polar_image = cv2.warpPolar(
+            src=image,
+            dsize=(int(self.consts.varid_radius * 1e3), 360),
+            center=(self.consts.pixel_number / 2, self.consts.pixel_number / 2),
+            maxRadius=varid_radius_pixel_number,
+            flags=flags)
 
         circle_path_line = height_magn * linear_polar_image[:, measurement_radius_idx]
 
         geometric_degree = np.arange(360)  # CCW、pomでのx軸+方向を0degとする角度
         robot_degree = geometric_degree - 90 - 10.814
-        robot_degree = np.where(robot_degree > 0,
-                                robot_degree,
-                                robot_degree + 360)
+        robot_degree = np.where(
+            robot_degree > 0,
+            robot_degree,
+            robot_degree + 360)
 
         height_pv = np.nanmax(circle_path_line) - np.nanmin(circle_path_line)
         height_pv_str = str(round(height_pv, 2))
@@ -400,24 +411,28 @@ class Surface:
         ax.plot(robot_degree, circle_path_line)
         ax.grid()
 
-        ax.set_title("circle_path ( pv = " + height_pv_str + " " + height_unit_str + " )",
-                     fontsize=fontsize)
+        ax.set_title(
+            "circle_path ( pv = " + height_pv_str + " " + height_unit_str + " )",
+            fontsize=fontsize)
         ax.set_xlabel("degree", fontsize=fontsize)
-        ax.set_ylabel("heignt " + height_unit_str + "\nat R=" + str(measurement_radius_idx),
-                      fontsize=fontsize)
+        ax.set_ylabel(
+            "heignt " + height_unit_str + "\nat R=" + str(measurement_radius_idx),
+            fontsize=fontsize)
         return ax
 
     def _make_masked_zernike_surface(self, zernike_number_list, zernike_value_array):
         optical_wavelength = 500e-9
 
-        wavestruct = pr.prop_begin(beam_diameter=2 * self.consts.varid_radius,
-                                   lamda=optical_wavelength,
-                                   grid_n=self.consts.pixel_number,
-                                   beam_diam_fraction=1)
+        wavestruct = pr.prop_begin(
+            beam_diameter=2 * self.consts.varid_radius,
+            lamda=optical_wavelength,
+            grid_n=self.consts.pixel_number,
+            beam_diam_fraction=1)
 
-        wfe = pr.prop_zernikes(wavestruct,
-                               zernike_number_list,
-                               zernike_value_array)
+        wfe = pr.prop_zernikes(
+            wavestruct,
+            zernike_number_list,
+            zernike_value_array)
 
         masked_wfe = self.consts.mask * wfe
         return masked_wfe
@@ -433,13 +448,16 @@ class ZernikeRemovedSurface(Surface):
         self.inputed_surface = inputed_surface
         self.zernike_value_array = self._zernike_value_array_calculation(self.inputed_surface)
 
-        ignore_zernike_number_list = make_remaining_matrix(full_zernike_number_list,
-                                                           self.removing_zernike_number_list)
-        self.removing_zernike_value_array = make_remaining_matrix(self.zernike_value_array,
-                                                                  ignore_zernike_number_list)
+        ignore_zernike_number_list = make_remaining_matrix(
+            full_zernike_number_list,
+            self.removing_zernike_number_list)
+        self.removing_zernike_value_array = make_remaining_matrix(
+            self.zernike_value_array,
+            ignore_zernike_number_list)
 
-        self.removing_surface = super()._make_masked_zernike_surface(self.removing_zernike_number_list,
-                                                                     self.removing_zernike_value_array)
+        self.removing_surface = super()._make_masked_zernike_surface(
+            self.removing_zernike_number_list,
+            self.removing_zernike_value_array)
         self.surface = self.inputed_surface - self.removing_surface
 
         self.pv = super()._pv_calculation()
@@ -451,16 +469,15 @@ class ZernikeRemovedSurface(Surface):
         mkhelp(self)
 
     def _zernike_value_array_calculation(self, surface):
-        surface_without_nan = np.where(self.consts.tf,
-                                       surface,
-                                       0)
+        surface_without_nan = np.where(self.consts.tf, surface, 0)
 
-        zernike_value_array = pr.prop_fit_zernikes(wavefront0=surface_without_nan,
-                                                   pupil0=self.consts.tf,
-                                                   pupilradius0=self.consts.pixel_number // 2,
-                                                   nzer=self.consts.zernike_max_degree,
-                                                   xc=self.consts.pixel_number // 2,
-                                                   yc=self.consts.pixel_number // 2)
+        zernike_value_array = pr.prop_fit_zernikes(
+            wavefront0=surface_without_nan,
+            pupil0=self.consts.tf,
+            pupilradius0=self.consts.pixel_number // 2,
+            nzer=self.consts.zernike_max_degree,
+            xc=self.consts.pixel_number // 2,
+            yc=self.consts.pixel_number // 2)
         return zernike_value_array
 
 
@@ -491,8 +508,9 @@ class ZernikeToSurface(Surface):
         self.zernike_number_list = zernike_number_list
         self.zernike_value_array = zernike_value_array
 
-        self.surface = super()._make_masked_zernike_surface(self.zernike_number_list,
-                                                            self.zernike_value_array)
+        self.surface = super()._make_masked_zernike_surface(
+            self.zernike_number_list,
+            self.zernike_value_array)
         self.pv = super()._pv_calculation()
         self.rms = super()._rms_calculation()
         self.volume = super()._volume_calculation()[0]
@@ -574,11 +592,13 @@ class FilteredSurface(Surface):
         mkhelp(self)
 
     def __smoothing_filter(self):
-        surface_without_nan = np.where(self.consts.tf,
-                                       self.inputed_surface,
-                                       0)
-        filtered_surface = sp.ndimage.filters.uniform_filter(surface_without_nan,
-                                                             size=self.filter_parameter)
+        surface_without_nan = np.where(
+            self.consts.tf,
+            self.inputed_surface,
+            0)
+        filtered_surface = sp.ndimage.filters.uniform_filter(
+            surface_without_nan,
+            size=self.filter_parameter)
 
         masked_filtered_surface = self.consts.mask * filtered_surface
         return masked_filtered_surface
@@ -591,11 +611,13 @@ class OapSurface(Surface):
         self.off_axis_distance = off_axis_distance
         self.clocking_angle_rad = clocking_angle_rad
 
-        oap = oap_calculation(clocking_angle_rad=self.clocking_angle_rad,
-                              radius_of_curvature=self.radius_of_curvature,
-                              off_axis_distance=self.off_axis_distance,
-                              x_mesh=self.consts.xx,
-                              y_mesh=self.consts.yy)
+        oap = oap_calculation(
+            clocking_angle_rad=self.clocking_angle_rad,
+            radius_of_curvature=self.radius_of_curvature,
+            off_axis_distance=self.off_axis_distance,
+            x_mesh=self.consts.xx,
+            y_mesh=self.consts.yy)
+
         self.surface = self.consts.mask * oap
 
         self.pv = super()._pv_calculation()
@@ -758,9 +780,10 @@ class TorqueToZernike:
 
 
 class OapConstants:
-    def __init__(self,
-                 ideal_radius_of_curvature, ideal_off_axis_distance, ideal_clocking_angle_rad,
-                 delta_radius_of_curvature, delta_off_axis_distance, delta_clocking_angle_rad):
+    def __init__(
+            self,
+            ideal_radius_of_curvature, ideal_off_axis_distance, ideal_clocking_angle_rad,
+            delta_radius_of_curvature, delta_off_axis_distance, delta_clocking_angle_rad):
         """
 
 
@@ -799,9 +822,10 @@ class OapConstants:
         mkhelp(self)
 
     def __make_minimize_init_list(self):
-        minimize_init_list = [self.ideal_radius_of_curvature + self.delta_radius_of_curvature,
-                              self.ideal_off_axis_distance + self.delta_off_axis_distance,
-                              self.ideal_clocking_angle_rad + self.delta_clocking_angle_rad]
+        minimize_init_list = [
+            self.ideal_radius_of_curvature + self.delta_radius_of_curvature,
+            self.ideal_off_axis_distance + self.delta_off_axis_distance,
+            self.ideal_clocking_angle_rad + self.delta_clocking_angle_rad]
 
         return minimize_init_list
 
@@ -812,10 +836,11 @@ class OapMinimize:
         self.oap_consts = oap_constants
         self.inputed_surface = inputed_surface
 
-        ideal_oap = OapSurface(constants=self.consts,
-                               radius_of_curvature=self.oap_consts.ideal_radius_of_curvature,
-                               off_axis_distance=self.oap_consts.ideal_off_axis_distance,
-                               clocking_angle_rad=self.oap_consts.ideal_clocking_angle_rad)
+        ideal_oap = OapSurface(
+            constants=self.consts,
+            radius_of_curvature=self.oap_consts.ideal_radius_of_curvature,
+            off_axis_distance=self.oap_consts.ideal_off_axis_distance,
+            clocking_angle_rad=self.oap_consts.ideal_clocking_angle_rad)
 
         self.__ideal_oap_surface = ideal_oap.surface
 
@@ -824,10 +849,11 @@ class OapMinimize:
         print("OapMinimize start")
         start_time = time.time()
 
-        minimize_result = sp.optimize.minimize(fun=self.__minimize_input_function,
-                                               x0=self.oap_consts.minimize_init_list,
-                                               args=(self.minimize_args_list),
-                                               method="Powell")
+        minimize_result = sp.optimize.minimize(
+            fun=self.__minimize_input_function,
+            x0=self.oap_consts.minimize_init_list,
+            args=(self.minimize_args_list),
+            method="Powell")
 
         print("OapMinimize finished")
         end_time = time.time()
@@ -842,9 +868,10 @@ class OapMinimize:
         mkhelp(self)
 
     def __make_minimize_args_list(self):
-        args_list = [self.consts,
-                     self.inputed_surface,
-                     self.__ideal_oap_surface]
+        args_list = [
+            self.consts,
+            self.inputed_surface,
+            self.__ideal_oap_surface]
 
         return args_list
 
@@ -859,17 +886,19 @@ class OapMinimize:
 
         inputed_surface_physical_height = arg_inputed_surface + arg_ideal_oap_surface
 
-        test_oap_obj = OapSurface(constants=arg_consts,
-                                  radius_of_curvature=test_radius_of_curvature,
-                                  off_axis_distance=test_off_axis_distance,
-                                  clocking_angle_rad=test_clocking_angle_rad)
+        test_oap_obj = OapSurface(
+            constants=arg_consts,
+            radius_of_curvature=test_radius_of_curvature,
+            off_axis_distance=test_off_axis_distance,
+            clocking_angle_rad=test_clocking_angle_rad)
 
         test_oap_surface_physical_height = test_oap_obj.surface
 
         difference_of_surface = inputed_surface_physical_height - test_oap_surface_physical_height
 
-        difference_surface_obj = Surface(constants=arg_consts,
-                                         surface=difference_of_surface)
+        difference_surface_obj = Surface(
+            constants=arg_consts,
+            surface=difference_of_surface)
 
         volume = difference_surface_obj.volume
 
@@ -879,39 +908,41 @@ class OapMinimize:
 
 
 class CirclePathMeasurementReading:
-    def __init__(self,
-                 Constants,
-                 original_csv_fpath: str,
-                 deformed_csv_fpath: str
-                 ) -> None:
+    def __init__(
+            self,
+            Constants,
+            original_csv_fpath: str,
+            deformed_csv_fpath: str) -> None:
 
         self.consts = Constants
         self.df_raw_original = pd.read_csv(original_csv_fpath)
 
         if deformed_csv_fpath == "":
-            self.df_diff = pd.DataFrame({"degree": self.df_raw_original["angle"].values,
-                                         "radian": np.deg2rad(self.df_raw_original["angle"].values),
-                                         "height": self.df_raw_original["height"].values})
+            self.df_diff = pd.DataFrame({
+                "degree": self.df_raw_original["angle"].values,
+                "radian": np.deg2rad(self.df_raw_original["angle"].values),
+                "height": self.df_raw_original["height"].values})
 
         else:
             self.df_raw_deformed = pd.read_csv(deformed_csv_fpath)
             height_diff = self.df_raw_deformed["height"].values - self.df_raw_original["height"].values
 
-            self.df_diff = pd.DataFrame({"degree": self.df_raw_original["angle"].values,
-                                         "radian": np.deg2rad(self.df_raw_original["angle"].values),
-                                         "height": height_diff})
+            self.df_diff = pd.DataFrame({
+                "degree": self.df_raw_original["angle"].values,
+                "radian": np.deg2rad(self.df_raw_original["angle"].values),
+                "height": height_diff})
 
     def h(self):
         mkhelp(self)
 
 
 class CirclePathZernikeFitting:
-    def __init__(self,
-                 Constants,
-                 circle_path_radius: float,
-                 df_diff: pd.DataFrame,
-                 ignore_zernike_number_list: list[int]
-                 ) -> None:
+    def __init__(
+            self,
+            Constants,
+            circle_path_radius: float,
+            df_diff: pd.DataFrame,
+            ignore_zernike_number_list: list[int]) -> None:
         """CirclePathZernikeFitting
         zernike多項式を除去
 
@@ -945,9 +976,10 @@ class CirclePathZernikeFitting:
 
     def __zernike_fitting(self):
 
-        def zernike_r_const_polynomial_calculation(coef_r_const: list[float],
-                                                   radius: float,
-                                                   theta: ndarray) -> ndarray:
+        def zernike_r_const_polynomial_calculation(
+                coef_r_const: list[float],
+                radius: float,
+                theta: ndarray) -> ndarray:
             """zernike_r_const_polynomial_calculation
             radiusが固定値（＝円環パス）の場合のzernike 多項式の計算
             そのままのzernikeでフィッティングすると、
@@ -994,15 +1026,16 @@ class CirclePathZernikeFitting:
 
         def minimize_funciton_sq(x, params_):
             radius_, theta_array_, height_array_ = params_
-            zernike_array_ = zernike_r_const_polynomial_calculation(coef_r_const=x,
-                                                                    radius=radius_,
-                                                                    theta=theta_array_)
+            zernike_array_ = zernike_r_const_polynomial_calculation(
+                coef_r_const=x,
+                radius=radius_,
+                theta=theta_array_)
 
             residual = height_array_ - zernike_array_
             return residual
 
-        def make_zernike_polynomial_from_r_const_zernike(zernike_r_const_polynomial_list: list[float]
-                                                         ) -> ndarray:
+        def make_zernike_polynomial_from_r_const_zernike(
+                zernike_r_const_polynomial_list: list[float]) -> ndarray:
             """make_zernike_polynomial_from_r_const_zernike
             radius固定の場合のzernike係数ベクトルを通常のzernike係数ベクトルとして並べ直す
 
@@ -1044,14 +1077,15 @@ class CirclePathZernikeFitting:
 
         zernike_polynomial_array = make_zernike_polynomial_from_r_const_zernike(optimize_result_sq["x"])
 
-        result_dict = {"optimize_result": optimize_result_sq,
-                       "zernike_polynomial_array": zernike_polynomial_array}
+        result_dict = {
+            "optimize_result": optimize_result_sq,
+            "zernike_polynomial_array": zernike_polynomial_array}
 
         return result_dict
 
-    def __zernike_removing(self,
-                           zernike_polynomial_array: ndarray
-                           ) -> dict:
+    def __zernike_removing(
+            self,
+            zernike_polynomial_array: ndarray) -> dict:
         """__zernike_removing
         zernike係数ベクトルを用いてzernike成分を除去
 
@@ -1066,8 +1100,9 @@ class CirclePathZernikeFitting:
             removing_zernike: 除去するzernike成分の計算結果のarray
             residual: height - removing_zernike
         """
-        def make_remaining_array(ignore_list: list[int],
-                                 polynomial_array: ndarray) -> ndarray:
+        def make_remaining_array(
+                ignore_list: list[int],
+                polynomial_array: ndarray) -> ndarray:
             tf_array = np.zeros(11)
             for num in ignore_list:
                 tf_array[num - 1] = 1
@@ -1078,16 +1113,19 @@ class CirclePathZernikeFitting:
         height_array = self.df_diff["height"].values
         ignore_zernike_number_list = self.ignore_zernike_number_list
 
-        remaining_zernike_polynomial_array = make_remaining_array(ignore_list=ignore_zernike_number_list,
-                                                                  polynomial_array=zernike_polynomial_array)
+        remaining_zernike_polynomial_array = make_remaining_array(
+            ignore_list=ignore_zernike_number_list,
+            polynomial_array=zernike_polynomial_array)
 
-        removing_zernike_array = zernike_polynomial_calculation(coef=remaining_zernike_polynomial_array,
-                                                                radius=self.circle_path_radius,
-                                                                theta=radian_array)
+        removing_zernike_array = zernike_polynomial_calculation(
+            coef=remaining_zernike_polynomial_array,
+            radius=self.circle_path_radius,
+            theta=radian_array)
 
         residual_height_array = height_array - removing_zernike_array
 
-        result_dict = {"removing_zernike": removing_zernike_array,
-                       "residual": residual_height_array}
+        result_dict = {
+            "removing_zernike": removing_zernike_array,
+            "residual": residual_height_array}
 
         return result_dict
