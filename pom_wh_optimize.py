@@ -58,7 +58,6 @@ if __name__ == "__main__":
     reproducted_zernike = pom.TorqueToZernike(
         constants=CONSTS,
         torque_value_array=reproducted_torque.torque_value_array,
-        restructed_torque_value=5,
         ignore_zernike_number_list=reproducted_torque.ignore_zernike_number_list)
 
     reproducted_surface = pom.ZernikeToSurface(
