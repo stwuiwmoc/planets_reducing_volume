@@ -10,6 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import planets_optimize_myclass as pom
+import importlib
 
 
 def mkfolder(suffix=""):
@@ -33,10 +34,10 @@ def mkfolder(suffix=""):
 
 if __name__ == "__main__":
     importlib.reload(pom)
-    
+
     CONSTS = pom.Constants(
         physical_radius=925e-3,
-        ignore_radius=50e-3,
+        ignore_radius=175e-3,
         pixel_number=256,
         zernike_max_degree=10,
         offset_height_percent=2)
@@ -56,7 +57,7 @@ if __name__ == "__main__":
         target_zernike_number_list=np.arange(1, 11),
         target_zernike_value_array=zernike_removed_surface.zernike_value_array,
         ignore_zernike_number_list=[1, 2, 3, 4, 5, 6],
-        restructed_torque_value=5)
+        restructed_torque_value=4)
 
     reproducted_zernike = pom.TorqueToZernike(
         constants=CONSTS,
@@ -72,6 +73,8 @@ if __name__ == "__main__":
         constants=CONSTS,
         surface=target_surface.surface - reproducted_surface.surface)
 
+    volume_reduciton_rate = 1 - result_surface.volume / zernike_removed_surface.volume
+
     cbar_min_percent_ = 15
     cbar_max_percent_ = 90
 
@@ -80,11 +83,13 @@ if __name__ == "__main__":
 
     ax11 = zernike_removed_surface.make_image_plot(
         fig1, gs1[0:2, 0],
-        None, cbar_min_percent_, cbar_max_percent_)
+        None, cbar_min_percent_, cbar_max_percent_, 3, 3)
+    ax11.set_title(ax11.get_title() + "\n")
 
     ax12 = result_surface.make_image_plot(
         fig1, gs1[0:2, 1],
-        zernike_removed_surface.surface, cbar_min_percent_, cbar_max_percent_)
+        zernike_removed_surface.surface, cbar_min_percent_, cbar_max_percent_, 3, 3)
+    ax12.set_title(ax12.get_title() + "\nvolume_reduction = -" + str(round(volume_reduciton_rate * 1e2, 1)) + " %")
 
     ax13 = reproducted_zernike.make_torque_plot(fig1, gs1[2, :])
     fig1.tight_layout()
