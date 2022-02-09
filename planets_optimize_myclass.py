@@ -640,9 +640,18 @@ class ZernikeToTorque:
         self.restructed_torque_value = abs(restructed_torque_value)
 
         self.full_zernike_value_array = self.__make_full_zernike_value_array()
-        self.remaining_operation_matrix = make_remaining_matrix(self.consts.operation_matrix, self.ignore_zernike_number_list)
-        self.remaining_zernike_value_array = make_remaining_matrix(self.full_zernike_value_array, self.ignore_zernike_number_list)
-        self.remaining_zernike_number_list = make_remaining_matrix(1 + np.arange(self.consts.zernike_max_degree), self.ignore_zernike_number_list)
+
+        self.remaining_operation_matrix = make_remaining_matrix(
+            self.consts.operation_matrix,
+            self.ignore_zernike_number_list)
+
+        self.remaining_zernike_value_array = make_remaining_matrix(
+            self.full_zernike_value_array,
+            self.ignore_zernike_number_list)
+
+        self.remaining_zernike_number_list = make_remaining_matrix(
+            1 + np.arange(self.consts.zernike_max_degree),
+            self.ignore_zernike_number_list)
 
         make_torque_value_array_result = self.__make_torque_value_array()
         self.torque_value_array = make_torque_value_array_result["torque"]
@@ -667,8 +676,10 @@ class ZernikeToTorque:
             bounds=(-self.restructed_torque_value, self.restructed_torque_value))
 
         torque_value_array = optimize_result["x"]
-        result_dict = {"torque": torque_value_array,
-                       "optimize_result": optimize_result}
+
+        result_dict = {
+            "torque": torque_value_array,
+            "optimize_result": optimize_result}
 
         return result_dict
 
@@ -699,15 +710,17 @@ class TorqueToZernike:
         self.torque_value_array = torque_value_array
         self.ignore_zernike_number_list = ignore_zernike_number_list
 
-        self.remaining_operation_matrix = make_remaining_matrix(self.consts.operation_matrix,
-                                                                self.ignore_zernike_number_list)
+        self.remaining_operation_matrix = make_remaining_matrix(
+            self.consts.operation_matrix,
+            self.ignore_zernike_number_list)
 
         self.remaining_reproducted_zernike_value_array = np.dot(
             self.remaining_operation_matrix,
             self.torque_value_array)
 
-        self.remaining_zernike_number_list = make_remaining_matrix(1 + np.arange(self.consts.zernike_max_degree),
-                                                                   self.ignore_zernike_number_list)
+        self.remaining_zernike_number_list = make_remaining_matrix(
+            1 + np.arange(self.consts.zernike_max_degree),
+            self.ignore_zernike_number_list)
 
     def h(self):
         mkhelp(self)
