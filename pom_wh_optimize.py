@@ -75,22 +75,33 @@ if __name__ == "__main__":
 
     volume_reduciton_rate = 1 - result_surface.volume / zernike_removed_surface.volume
 
-    cbar_min_percent_ = 15
-    cbar_max_percent_ = 90
+    cbar_min_percent_ = 45
+    cbar_max_percent_ = 95
 
     fig1 = plt.figure(figsize=(12, 12))
-    gs1 = fig1.add_gridspec(3, 2)
+    gs1 = fig1.add_gridspec(4, 2)
 
     ax11 = zernike_removed_surface.make_image_plot(
         fig1, gs1[0:2, 0],
         None, cbar_min_percent_, cbar_max_percent_, 3, 3)
-    ax11.set_title(ax11.get_title() + "\n")
+    ax11.set_title("zer =< 6 removed\n" + ax11.get_title() + "\n")
 
     ax12 = result_surface.make_image_plot(
         fig1, gs1[0:2, 1],
         zernike_removed_surface.surface, cbar_min_percent_, cbar_max_percent_, 3, 3)
     ax12.set_title(ax12.get_title() + "\nvolume_reduction = -" + str(round(volume_reduciton_rate * 1e2, 1)) + " %")
 
-    ax13 = reproducted_zernike.make_torque_plot(fig1, gs1[2, :])
+    ax14 = fig1.add_subplot(gs1[2, :])
+    ax14.plot(
+        np.arange(1, 11), zernike_removed_surface.zernike_value_array,
+        marker="s", label="target_zernike")
+    ax14.plot(
+        reproducted_zernike.remaining_zernike_number_list, reproducted_zernike.remaining_reproducted_zernike_value_array,
+        marker="s", label="WH_reproducted_zernike")
+    ax14.legend()
+    ax14.grid()
+
+    ax13 = reproducted_zernike.make_torque_plot(fig1, gs1[3, :])
+
     fig1.tight_layout()
     fig1.savefig(mkfolder() + "fig1.png")
