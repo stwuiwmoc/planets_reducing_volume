@@ -702,18 +702,15 @@ class TorqueToZernike:
         self.remaining_operation_matrix = make_remaining_matrix(self.consts.operation_matrix,
                                                                 self.ignore_zernike_number_list)
 
-        self.remaining_reproducted_zernike_value_array = self.__make_reproducted_zernike_value_array(self.torque_value_array)
+        self.remaining_reproducted_zernike_value_array = np.dot(
+            self.remaining_operation_matrix,
+            self.torque_value_array)
+
         self.remaining_zernike_number_list = make_remaining_matrix(1 + np.arange(self.consts.zernike_max_degree),
                                                                    self.ignore_zernike_number_list)
 
     def h(self):
         mkhelp(self)
-
-    def __make_reproducted_zernike_value_array(self, using_torque_value_array):
-        remaining_reproducted_zernike_value_array = np.dot(
-            self.remaining_operation_matrix,
-            using_torque_value_array)
-        return remaining_reproducted_zernike_value_array
 
     def make_torque_plot(self, figure=plt.figure(), position=111):
         fontsize = 15
