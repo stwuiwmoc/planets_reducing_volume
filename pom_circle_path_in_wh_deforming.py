@@ -55,6 +55,8 @@ if __name__ == "__main__":
                                                                [5, -5, 5, -5, 5, -5])
     original_torque_value_array = make_full_torque_value_array([2, 8, 14, 20, 26, 32],
                                                                [5, -5, 5, -5, 5, -5])
+    original_torque_value_array = make_full_torque_value_array([3, 9, 15, 21, 27, 33],
+                                                               [5, -5, 5, -5, 5, -5])
     original_torque_value_array = make_full_torque_value_array([4, 10, 16, 22, 28, 34],
                                                                [5, -5, 5, -5, 5, -5])
     original_torque_value_array = make_full_torque_value_array([5, 11, 17, 23, 29, 35],
@@ -62,12 +64,18 @@ if __name__ == "__main__":
     original_torque_value_array = make_full_torque_value_array([6, 12, 18, 24, 30, 36],
                                                                [5, -5, 5, -5, 5, -5])
 
+    original_torque_value_array = make_full_torque_value_array([4, 10, 15, 21, 28, 34],
+                                                               [5, -5, 5, -5, 5, -5])
+    original_torque_value_array = make_full_torque_value_array([15, 21],
+                                                               [5, -5])
+
+
     original_torque_value_array = make_full_torque_value_array([1, 7, 13, 19, 25, 31, 3, 9, 15, 21, 27, 33, 4, 10, 16, 22, 28, 34, 5, 11, 17, 23, 29, 35, 6, 12, 18, 24, 30, 36],
                                                                [-5, 5, -5, 5, -5, 5, -5, 5, -5, 5, -5, 5, -5, 5, -5, 5, -5, 5, -5, 5, -5, 5, -5, 5, 5, -5, 5, -5, 5, -5])
     """
 
-    original_torque_value_array = make_full_torque_value_array([3, 9, 15, 21, 27, 33],
-                                                               [5, -5, 5, -5, 5, -5])
+    original_torque_value_array = make_full_torque_value_array([6, 12, 18, 24, 30, 36],
+                                                               [0, 5, 0, -5, 0, -5])
 
     wh_deformed_zernike = pom.TorqueToZernike(constants=CONSTS,
                                               torque_value_array=original_torque_value_array,
