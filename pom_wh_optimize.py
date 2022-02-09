@@ -32,6 +32,8 @@ def mkfolder(suffix=""):
 
 
 if __name__ == "__main__":
+    importlib.reload(pom)
+    
     CONSTS = pom.Constants(
         physical_radius=925e-3,
         ignore_radius=50e-3,
@@ -53,7 +55,8 @@ if __name__ == "__main__":
         constants=CONSTS,
         target_zernike_number_list=np.arange(1, 11),
         target_zernike_value_array=zernike_removed_surface.zernike_value_array,
-        ignore_zernike_number_list=[1])
+        ignore_zernike_number_list=[1, 2, 3, 4, 5, 6],
+        restructed_torque_value=5)
 
     reproducted_zernike = pom.TorqueToZernike(
         constants=CONSTS,

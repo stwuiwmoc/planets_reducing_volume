@@ -613,7 +613,8 @@ class ZernikeToTorque:
             constants,
             target_zernike_number_list: list[int],
             target_zernike_value_array: ndarray,
-            ignore_zernike_number_list: list[int]):
+            ignore_zernike_number_list: list[int],
+            restructed_torque_value: float):
 
         """ZernikeToTorque
         与えられたzernikeベクトルに制約付き最小二乗fittingするようなtorqueベクトルを計算
@@ -628,12 +629,15 @@ class ZernikeToTorque:
             zernike多項式の値
         ignore_zernike_number_list : list[int]
             WH研磨体積削減で無視するzernike多項式の項番号
+        restructed_torque_value : float
+            トルクの制限値
         """
 
         self.consts = constants
         self.target_zernike_number_list = target_zernike_number_list
         self.target_zernike_value_array = target_zernike_value_array
         self.ignore_zernike_number_list = ignore_zernike_number_list
+        self.restructed_torque_value = abs(restructed_torque_value)
 
         self.full_zernike_value_array = self.__make_full_zernike_value_array()
         self.remaining_operation_matrix = make_remaining_matrix(self.consts.operation_matrix, self.ignore_zernike_number_list)
@@ -660,7 +664,7 @@ class ZernikeToTorque:
         optimize_result = optimize.lsq_linear(
             A=self.remaining_operation_matrix,
             b=self.remaining_zernike_value_array,
-            bounds=(-5, 5))
+            bounds=(-self.restructed_torque_value, self.restructed_torque_value))
 
         torque_value_array = optimize_result["x"]
         result_dict = {"torque": torque_value_array,
