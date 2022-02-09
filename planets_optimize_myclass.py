@@ -611,27 +611,23 @@ class ZernikeToTorque:
     def __init__(
             self,
             constants,
-            target_zernike_number_list,
-            target_zernike_value_array,
-            ignore_zernike_number_list):
-        """
-        class : torque values in order to reproduct zernike values
+            target_zernike_number_list: list[int],
+            target_zernike_value_array: ndarray,
+            ignore_zernike_number_list: list[int]):
+
+        """ZernikeToTorque
+        与えられたzernikeベクトルに制約付き最小二乗fittingするようなtorqueベクトルを計算
 
         Parameters
         ----------
-        constants : TYPE
-            instance by class : Constants
-        target_zernike_number_list : 1d-list of int
-            zernike number which to use (1 means piston)
-        target_zernike_value_array : 1d-array of float
-            [m] value of zernike coefficient coresponding to target_zernike_number_list
-        ignore_zernike_number_list : 1d-list of int
-            zernike number which is not used in WH reproduction
-
-        Returns
-        -------
-        None.
-
+        constants : [type]
+            Constants
+        target_zernike_number_list : list[int]
+            target_zernike_value_arrayで与えたzernike多項式の項番号
+        target_zernike_value_array : ndarray[float]
+            zernike多項式の値
+        ignore_zernike_number_list : list[int]
+            WH研磨体積削減で無視するzernike多項式の項番号
         """
 
         self.consts = constants
@@ -644,7 +640,9 @@ class ZernikeToTorque:
         self.remaining_zernike_value_array = make_remaining_matrix(self.full_zernike_value_array, self.ignore_zernike_number_list)
         self.remaining_zernike_number_list = make_remaining_matrix(1 + np.arange(self.consts.zernike_max_degree), self.ignore_zernike_number_list)
 
-        self.torque_value_array = self.__make_torque_value_array()
+        make_torque_value_array_result = self.__make_torque_value_array()
+        self.torque_value_array = make_torque_value_array_result["torque"]
+        self.optimize_result = make_torque_value_array_result["optimize_result"]
 
     def h(self):
         mkhelp(self)
@@ -659,10 +657,16 @@ class ZernikeToTorque:
         return full_zernike_value_array
 
     def __make_torque_value_array(self):
-        inverse_operation_matrix = sp.linalg.pinv(1e9 * self.remaining_operation_matrix) * 1e9
+        optimize_result = optimize.lsq_linear(
+            A=self.remaining_operation_matrix,
+            b=self.remaining_zernike_value_array,
+            bounds=(-5, 5))
 
-        torque_value_array = np.dot(inverse_operation_matrix, self.remaining_zernike_value_array)
-        return torque_value_array
+        torque_value_array = optimize_result["x"]
+        result_dict = {"torque": torque_value_array,
+                       "optimize_result": optimize_result}
+
+        return result_dict
 
 
 class TorqueToZernike:
