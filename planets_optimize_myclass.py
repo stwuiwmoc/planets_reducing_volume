@@ -230,7 +230,8 @@ class Constants:
         self.tf = np.where(self.xx ** 2 + self.yy ** 2 <= self.varid_radius**2, True, False)
         self.mask = np.where(self.tf, 1, np.nan)
         self.zernike_max_degree = zernike_max_degree
-        self.operation_matrix = np.genfromtxt("raw_data/WT06_zer10_operation_matrix[m].csv", delimiter=",").T
+        operation_matrix_fpath = "mkfolder/make_opration_matrix/WT06_zer" + str(self.zernike_max_degree) + "_opration_matrix[m].csv"
+        self.operation_matrix = np.genfromtxt(operation_matrix_fpath, delimiter=",").T
 
     def h(self):
         mkhelp(self)
