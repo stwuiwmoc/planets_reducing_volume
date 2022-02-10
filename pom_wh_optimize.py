@@ -39,7 +39,7 @@ if __name__ == "__main__":
         physical_radius=925e-3,
         ignore_radius=175e-3,
         pixel_number=256,
-        zernike_max_degree=10,
+        zernike_max_degree=11,
         offset_height_percent=2)
 
     target_surface = pom.StitchedCsvToSurface(
@@ -54,7 +54,7 @@ if __name__ == "__main__":
 
     reproducted_torque = pom.ZernikeToTorque(
         constants=CONSTS,
-        target_zernike_number_list=np.arange(1, 11),
+        target_zernike_number_list=np.arange(CONSTS.zernike_max_degree) + 1,
         target_zernike_value_array=zernike_removed_surface.zernike_value_array,
         ignore_zernike_number_list=[1, 2, 3, 4, 5, 6],
         restructed_torque_value=4)
@@ -92,8 +92,9 @@ if __name__ == "__main__":
     ax12.set_title(ax12.get_title() + "\nvolume_reduction = -" + str(round(volume_reduciton_rate * 1e2, 1)) + " %")
 
     ax14 = fig1.add_subplot(gs1[2, :])
+    ax14_xaxis = np.arange(CONSTS.zernike_max_degree) + 1
     ax14.plot(
-        np.arange(1, 11), zernike_removed_surface.zernike_value_array,
+        ax14_xaxis, zernike_removed_surface.zernike_value_array,
         marker="s", label="target_zernike")
     ax14.plot(
         reproducted_zernike.remaining_zernike_number_list, reproducted_zernike.remaining_reproducted_zernike_value_array,
