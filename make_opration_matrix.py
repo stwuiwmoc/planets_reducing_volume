@@ -149,7 +149,7 @@ if __name__ == '__main__':
     zer_opration_matrix = np.empty((file_num, zer_order))
     opration_matrix = np.empty((file_num, tf.sum()))
 
-    df0 = read("_Fxx/PM3.5_36ptAxWT06_F00.smesh.txt")
+    df0 = read("raw_data/Fxx/PM3.5_36ptAxWT06_F00.smesh.txt")
     act_tuning = np.array([
         37., 37., 20., 20., -38., 38.,
         37., 37., 20., 20., -38., 38.,
@@ -172,7 +172,7 @@ if __name__ == '__main__':
 
         num = str(i + 1).zfill(2)
 
-        data_fname = "_Fxx/PM3.5_36ptAxWT06_F" + num + ".smesh.txt"
+        data_fname = "raw_data/Fxx/PM3.5_36ptAxWT06_F" + num + ".smesh.txt"
         dfxx = read(data_fname)
 
         diff = act_tuning[i] * tf * fem_interpolate(df0, dfxx) / 1000  # [mm] -> [m]
