@@ -246,6 +246,7 @@ class Surface:
         self.rms = self._rms_calculation()
         self.volume = self._volume_calculation()[0]
         self.offset_height_value = self._volume_calculation()[1]
+        self.zernike_value_array = self._zernike_value_array_calculation(self.surface)
 
     def h(self):
         mkhelp(self)
@@ -287,6 +288,35 @@ class Surface:
         unit_pixel_volume = unit_pixel_area * lower_ignored_surface
         volume_in_m3 = unit_pixel_volume.sum()
         return (volume_in_m3, offset_height_value)
+
+    def _zernike_value_array_calculation(self, surface):
+        surface_without_nan = np.where(self.consts.tf, surface, 0)
+
+        zernike_value_array = pr.prop_fit_zernikes(
+            wavefront0=surface_without_nan,
+            pupil0=self.consts.tf,
+            pupilradius0=self.consts.pixel_number // 2,
+            nzer=self.consts.zernike_max_degree,
+            xc=self.consts.pixel_number // 2,
+            yc=self.consts.pixel_number // 2)
+        return zernike_value_array
+
+    def _make_masked_zernike_surface(self, zernike_number_list, zernike_value_array):
+        optical_wavelength = 500e-9
+
+        wavestruct = pr.prop_begin(
+            beam_diameter=2 * self.consts.varid_radius,
+            lamda=optical_wavelength,
+            grid_n=self.consts.pixel_number,
+            beam_diam_fraction=1)
+
+        wfe = pr.prop_zernikes(
+            wavestruct,
+            zernike_number_list,
+            zernike_value_array)
+
+        masked_wfe = self.consts.mask * wfe
+        return masked_wfe
 
     def make_image_plot(
             self, figure,
@@ -421,23 +451,6 @@ class Surface:
             fontsize=fontsize)
         return ax
 
-    def _make_masked_zernike_surface(self, zernike_number_list, zernike_value_array):
-        optical_wavelength = 500e-9
-
-        wavestruct = pr.prop_begin(
-            beam_diameter=2 * self.consts.varid_radius,
-            lamda=optical_wavelength,
-            grid_n=self.consts.pixel_number,
-            beam_diam_fraction=1)
-
-        wfe = pr.prop_zernikes(
-            wavestruct,
-            zernike_number_list,
-            zernike_value_array)
-
-        masked_wfe = self.consts.mask * wfe
-        return masked_wfe
-
 
 class ZernikeRemovedSurface(Surface):
     def __init__(self, constants, inputed_surface, removing_zernike_number_list):
@@ -447,7 +460,7 @@ class ZernikeRemovedSurface(Surface):
         full_zernike_number_list = [i + 1 for i in range(self.consts.zernike_max_degree)]
 
         self.inputed_surface = inputed_surface
-        self.zernike_value_array = self._zernike_value_array_calculation(self.inputed_surface)
+        self.zernike_value_array = super()._zernike_value_array_calculation(self.inputed_surface)
 
         ignore_zernike_number_list = make_remaining_matrix(
             full_zernike_number_list,
@@ -468,18 +481,6 @@ class ZernikeRemovedSurface(Surface):
 
     def h(self):
         mkhelp(self)
-
-    def _zernike_value_array_calculation(self, surface):
-        surface_without_nan = np.where(self.consts.tf, surface, 0)
-
-        zernike_value_array = pr.prop_fit_zernikes(
-            wavefront0=surface_without_nan,
-            pupil0=self.consts.tf,
-            pupilradius0=self.consts.pixel_number // 2,
-            nzer=self.consts.zernike_max_degree,
-            xc=self.consts.pixel_number // 2,
-            yc=self.consts.pixel_number // 2)
-        return zernike_value_array
 
 
 class ZernikeToSurface(Surface):
@@ -563,6 +564,7 @@ class StitchedCsvToSurface(Surface):
         self.rms = super()._rms_calculation()
         self.volume = super()._volume_calculation()[0]
         self.offset_height_value = super()._volume_calculation()[1]
+        self.zernike_value_array = super()._zernike_value_array_calculation(self.surface)
 
     def __read_csv_to_masked_surface(self, filepath):
         raw = np.loadtxt(filepath)
@@ -588,6 +590,7 @@ class FilteredSurface(Surface):
         self.rms = super()._rms_calculation()
         self.volume = super()._volume_calculation()[0]
         self.offset_height_value = super()._volume_calculation()[1]
+        self.zernike_value_array = super()._zernike_value_array_calculation(self.surface)
 
     def h(self):
         mkhelp(self)
@@ -625,6 +628,7 @@ class OapSurface(Surface):
         self.rms = super()._rms_calculation()
         self.volume = super()._volume_calculation()[0]
         self.offset_height_value = super()._volume_calculation()[1]
+        self.zernike_value_array = super()._zernike_value_array_calculation(self.surface)
 
     def h(self):
         mkhelp(self)
