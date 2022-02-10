@@ -183,29 +183,22 @@ if __name__ == '__main__':
         diff = mask * diff * 1000  # [m] -> [mm]
         fit = mask * fit * 1000  # [m] -> [mm]
 
-        fig = plt.figure(figsize=(11, 10))
-        ax_df = df_plot(fig, "act" + num + " : 0.05 [Nm]", 221, df0, dfxx)
+        fig1 = plt.figure(figsize=(11, 10))
+        gs1 = fig1.add_gridspec(2, 2)
+        ax_df = df_plot(fig1, "act" + num + " : 0.05 [Nm]", gs1[0, 0], df0, dfxx)
         ax_dz = image_plot(
-            fig,
+            fig1,
             "act" + num + " : 1 [mm] ( x" + str(act_tuning[i]) + " )",
-            222, diff, diff, False)
+            gs1[0, 1], diff, diff, False)
 
-        ax_zer = zer_term_plot(fig, "zernike terms", 223, zer)
-        ax_fit = image_plot(fig, "zernike fitting", 224, fit, diff, False)
+        ax_zer = zer_term_plot(fig1, "zernike terms", gs1[1, 0], zer)
+        ax_fit = image_plot(fig1, "zernike fitting", gs1[1, 1], fit, diff, False)
 
-        fig = plt.figure(figsize=(8, 7))
-        ax_for_ppt = image_plot(
-            fig,
-            "F" + num,
-            111,
-            mask * diff,
-            mask * diff,
-            False)
-        fig.tight_layout()
+        fig1.tight_layout()
 
         picname = mkfolder() + "WT06_F" + num + ".png"
-        fig.savefig(picname)
-        fig.clf()
+        fig1.savefig(picname)
+        fig1.clf()
 
         print(num)
 
