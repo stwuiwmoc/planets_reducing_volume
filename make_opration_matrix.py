@@ -138,7 +138,7 @@ if __name__ == '__main__':
     file_num = 36
     px = 512
     m1_radi = 1850 / 2
-    zer_order = 10
+    zer_order = 11
 
     x_arr = y_arr = np.linspace(-m1_radi, m1_radi, px)
     xx, yy = np.meshgrid(x_arr, y_arr)
@@ -202,5 +202,5 @@ if __name__ == '__main__':
 
         print(num)
 
-    zer_save_fname = mkfolder() + "WT06_zer10_opration_matrix[m].csv"
+    zer_save_fname = mkfolder() + "WT06_zer" + str(zer_order) + "_opration_matrix[m].csv"
     np.savetxt(zer_save_fname, zer_opration_matrix, delimiter=",")
