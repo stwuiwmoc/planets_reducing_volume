@@ -682,11 +682,11 @@ class ZernikeToTorque:
         self.ignore_zernike_number_list = ignore_zernike_number_list
         self.restructed_torque_value = abs(restructed_torque_value)
 
-        self.remaining_operation_matrix = make_remaining_matrix(
+        self.__remaining_operation_matrix = make_remaining_matrix(
             self.consts.operation_matrix,
             self.ignore_zernike_number_list)
 
-        self.remaining_zernike_value_array = make_remaining_matrix(
+        self.__remaining_zernike_value_array = make_remaining_matrix(
             self.target_zernike_value_array,
             self.ignore_zernike_number_list)
 
@@ -699,8 +699,8 @@ class ZernikeToTorque:
 
     def __make_torque_value_array(self):
         optimize_result = optimize.lsq_linear(
-            A=self.remaining_operation_matrix,
-            b=self.remaining_zernike_value_array,
+            A=self.__remaining_operation_matrix,
+            b=self.__remaining_zernike_value_array,
             bounds=(-self.restructed_torque_value, self.restructed_torque_value))
 
         torque_value_array = optimize_result["x"]
