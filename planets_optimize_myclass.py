@@ -8,7 +8,6 @@ Created on Thu Dec  9 14:59:35 2021
 from numpy import ndarray
 import numpy as np
 import proper as pr
-import matplotlib.pyplot as plt
 import scipy as sp
 from scipy import optimize
 import cv2
@@ -737,43 +736,31 @@ class TorqueToZernike:
     def __init__(
             self,
             constants,
-            torque_value_array: ndarray,
-            ignore_zernike_number_list: list[int]):
+            torque_value_array: ndarray):
 
         """TorqueToZernike
         与えられたトルクに作用行列をかけてzernikeに変換
-        トルクのplot
+        zernike_value_arrayはlen() = Constants.
 
         Parameters
         ----------
         constants : [type]
-            Constant
+            Constant クラス
         torque_value_array : ndarray
             トルクベクトル
-        ignore_zernike_number_list : list[int]
-            無視するzernike多項式
         """
 
         self.consts = constants
         self.torque_value_array = torque_value_array
-        self.ignore_zernike_number_list = ignore_zernike_number_list
 
-        self.remaining_operation_matrix = make_remaining_matrix(
+        self.zernike_value_array = np.dot(
             self.consts.operation_matrix,
-            self.ignore_zernike_number_list)
-
-        self.remaining_reproducted_zernike_value_array = np.dot(
-            self.remaining_operation_matrix,
             self.torque_value_array)
-
-        self.remaining_zernike_number_list = make_remaining_matrix(
-            1 + np.arange(self.consts.zernike_max_degree),
-            self.ignore_zernike_number_list)
 
     def h(self):
         mkhelp(self)
 
-    def make_torque_plot(self, figure=plt.figure(), position=111):
+    def make_torque_plot(self, figure, position=111):
         fontsize = 15
         ax_title = "WH (black : 1-12, green : 13-24, violet : 25-36)"
 
