@@ -56,7 +56,7 @@ if __name__ == "__main__":
         constants=CONSTS,
         target_zernike_value_array=zernike_removed_surface.zernike_value_array,
         ignore_zernike_number_list=[1, 2, 3, 4, 5, 6],
-        restructed_torque_value=4)
+        restructed_torque_value=5)
 
     reproducted_zernike = pom.TorqueToZernike(
         constants=CONSTS,
@@ -77,34 +77,53 @@ if __name__ == "__main__":
 
     volume_reduciton_rate = 1 - result_surface.volume / zernike_removed_surface.volume
 
-    cbar_min_percent_ = 45
-    cbar_max_percent_ = 95
+    cbar_min_percent_ = 25
+    cbar_max_percent_ = 85
 
-    fig1 = plt.figure(figsize=(12, 12))
-    gs1 = fig1.add_gridspec(4, 2)
+    fig1 = plt.figure(figsize=(12, 16))
+    gs1 = fig1.add_gridspec(10, 2)
+
+    ax15 = target_surface.make_image_plot(
+        fig1, gs1[0:3, 0],
+        zernike_removed_surface.surface, cbar_min_percent_, cbar_max_percent_, 3, 3)
+    ax15.set_title("measured_surface\n" + ax15.get_title())
 
     ax11 = zernike_removed_surface.make_image_plot(
-        fig1, gs1[0:2, 0],
+        fig1, gs1[0:3, 1],
         None, cbar_min_percent_, cbar_max_percent_, 3, 3)
-    ax11.set_title("zer =< 6 removed\n" + ax11.get_title() + "\n")
+    ax11.set_title("zer =< 6 removed\n" + ax11.get_title())
 
     ax12 = result_surface.make_image_plot(
-        fig1, gs1[0:2, 1],
+        fig1, gs1[3:6, 1],
         zernike_removed_surface.surface, cbar_min_percent_, cbar_max_percent_, 3, 3)
-    ax12.set_title(ax12.get_title() + "\nvolume_reduction = -" + str(round(volume_reduciton_rate * 1e2, 1)) + " %")
+    ax12.set_title(ax12.get_title() + "\nvolume_reduction = -" + str(round(volume_reduciton_rate * 1e2, 1)) + "%")
 
-    ax14 = fig1.add_subplot(gs1[2, :])
+    ax16 = reproducted_surface.make_image_plot(
+        fig1, gs1[3:6, 0],
+        None, cbar_min_percent_, cbar_max_percent_, 3, 3)
+    ax16.set_title("WH reproducted surface\n" + ax16.get_title())
+
+    ax14 = fig1.add_subplot(gs1[6:8, :])
     ax14_xaxis = np.arange(CONSTS.zernike_max_degree) + 1
     ax14.plot(
+        ax14_xaxis, target_surface.zernike_value_array,
+        marker="s", label="measured_surface_zernike")
+    ax14.plot(
         ax14_xaxis, zernike_removed_surface.zernike_value_array,
-        marker="s", label="target_zernike")
+        marker="s", label="target_zernike (Z ≦ 6 is removed)")
     ax14.plot(
         ax14_xaxis, reproducted_zernike.zernike_value_array,
         marker="s", label="WH_reproducted_zernike")
-    ax14.legend()
-    ax14.grid()
 
-    ax13 = reproducted_zernike.make_torque_plot(fig1, gs1[3, :])
+    ax14.legend()
+    ax14.set_xticks(ax14_xaxis)
+    ax14.set_xticklabels(ax14_xaxis)
+    ax14.grid()
+    ax14.set_ylim(
+        target_surface.zernike_value_array.min() * 1.3,
+        target_surface.zernike_value_array.max() * 1.3)
+
+    ax13 = reproducted_zernike.make_torque_plot(fig1, gs1[8:, :])
 
     fig1.tight_layout()
     fig1.savefig(mkfolder() + "fig1.png")
