@@ -658,7 +658,6 @@ class ZernikeToTorque:
     def __init__(
             self,
             constants,
-            target_zernike_number_list: list[int],
             target_zernike_value_array: ndarray,
             ignore_zernike_number_list: list[int],
             restructed_torque_value: float):
@@ -669,9 +668,7 @@ class ZernikeToTorque:
         Parameters
         ----------
         constants : [type]
-            Constants
-        target_zernike_number_list : list[int]
-            target_zernike_value_arrayで与えたzernike多項式の項番号
+            Constants クラス
         target_zernike_value_array : ndarray[float]
             zernike多項式の値
         ignore_zernike_number_list : list[int]
@@ -681,23 +678,16 @@ class ZernikeToTorque:
         """
 
         self.consts = constants
-        self.target_zernike_number_list = target_zernike_number_list
         self.target_zernike_value_array = target_zernike_value_array
         self.ignore_zernike_number_list = ignore_zernike_number_list
         self.restructed_torque_value = abs(restructed_torque_value)
-
-        self.full_zernike_value_array = self.__make_full_zernike_value_array()
 
         self.remaining_operation_matrix = make_remaining_matrix(
             self.consts.operation_matrix,
             self.ignore_zernike_number_list)
 
         self.remaining_zernike_value_array = make_remaining_matrix(
-            self.full_zernike_value_array,
-            self.ignore_zernike_number_list)
-
-        self.remaining_zernike_number_list = make_remaining_matrix(
-            1 + np.arange(self.consts.zernike_max_degree),
+            self.target_zernike_value_array,
             self.ignore_zernike_number_list)
 
         make_torque_value_array_result = self.__make_torque_value_array()
@@ -706,15 +696,6 @@ class ZernikeToTorque:
 
     def h(self):
         mkhelp(self)
-
-    def __make_full_zernike_value_array(self):
-        target_zernike_number_idx_array = np.array(self.target_zernike_number_list) - 1
-
-        full_zernike_value_array = np.zeros(self.consts.zernike_max_degree)
-        for i in range(len(self.target_zernike_value_array)):
-            target_zernike_number_idx = target_zernike_number_idx_array[i]
-            full_zernike_value_array[target_zernike_number_idx] = self.target_zernike_value_array[i]
-        return full_zernike_value_array
 
     def __make_torque_value_array(self):
         optimize_result = optimize.lsq_linear(
@@ -738,9 +719,9 @@ class TorqueToZernike:
             constants,
             torque_value_array: ndarray):
 
-        """TorqueToZernike
+        """
         与えられたトルクに作用行列をかけてzernikeに変換
-        zernike_value_arrayはlen() = Constants.
+        len(self.zernike_value_array) = Constants.zernike_max_degree
 
         Parameters
         ----------

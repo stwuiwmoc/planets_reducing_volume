@@ -54,24 +54,26 @@ if __name__ == "__main__":
 
     reproducted_torque = pom.ZernikeToTorque(
         constants=CONSTS,
-        target_zernike_number_list=np.arange(CONSTS.zernike_max_degree) + 1,
         target_zernike_value_array=zernike_removed_surface.zernike_value_array,
         ignore_zernike_number_list=[1, 2, 3, 4, 5, 6],
         restructed_torque_value=4)
 
     reproducted_zernike = pom.TorqueToZernike(
         constants=CONSTS,
-        torque_value_array=reproducted_torque.torque_value_array,
-        ignore_zernike_number_list=reproducted_torque.ignore_zernike_number_list)
+        torque_value_array=reproducted_torque.torque_value_array)
 
     reproducted_surface = pom.ZernikeToSurface(
         constants=CONSTS,
-        zernike_number_list=reproducted_zernike.remaining_zernike_number_list,
-        zernike_value_array=reproducted_zernike.remaining_reproducted_zernike_value_array)
+        zernike_value_array=reproducted_zernike.zernike_value_array)
+
+    reproducted_zernike_removed_surface = pom.ZernikeRemovedSurface(
+        constants=CONSTS,
+        inputed_surface=reproducted_surface.surface,
+        removing_zernike_number_list=zernike_removed_surface.removing_zernike_number_list)
 
     result_surface = pom.Surface(
         constants=CONSTS,
-        surface=target_surface.surface - reproducted_surface.surface)
+        surface=target_surface.surface - reproducted_zernike_removed_surface.surface)
 
     volume_reduciton_rate = 1 - result_surface.volume / zernike_removed_surface.volume
 
@@ -97,7 +99,7 @@ if __name__ == "__main__":
         ax14_xaxis, zernike_removed_surface.zernike_value_array,
         marker="s", label="target_zernike")
     ax14.plot(
-        reproducted_zernike.remaining_zernike_number_list, reproducted_zernike.remaining_reproducted_zernike_value_array,
+        ax14_xaxis, reproducted_zernike.zernike_value_array,
         marker="s", label="WH_reproducted_zernike")
     ax14.legend()
     ax14.grid()
