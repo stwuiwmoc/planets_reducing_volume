@@ -42,6 +42,8 @@ if __name__ == "__main__":
         zernike_max_degree=11,
         offset_height_percent=2)
 
+    torque_value_limit = 5
+
     target_surface = pom.StitchedCsvToSurface(
         constants=CONSTS,
         original_stitched_csv_fpath="mkfolder/stitch2mesh/zer03_0131xm130allcc_0201cirAll.v4.8.hei_dense.csv",
@@ -56,7 +58,7 @@ if __name__ == "__main__":
         constants=CONSTS,
         target_zernike_value_array=zernike_removed_surface.zernike_value_array,
         ignore_zernike_number_list=[1, 2, 3, 4, 5, 6],
-        restructed_torque_value=5)
+        restructed_torque_value=torque_value_limit)
 
     reproducted_zernike = pom.TorqueToZernike(
         constants=CONSTS,
@@ -98,10 +100,10 @@ if __name__ == "__main__":
         zernike_removed_surface.surface, cbar_min_percent_, cbar_max_percent_, 3, 3)
     ax12.set_title(ax12.get_title() + "\nvolume_reduction = -" + str(round(volume_reduciton_rate * 1e2, 1)) + "%")
 
-    ax16 = reproducted_surface.make_image_plot(
+    ax16 = reproducted_zernike_removed_surface.make_image_plot(
         fig1, gs1[3:6, 0],
-        None, cbar_min_percent_, cbar_max_percent_, 3, 3)
-    ax16.set_title("WH reproducted surface\n" + ax16.get_title())
+        zernike_removed_surface.surface, cbar_min_percent_, cbar_max_percent_, 3, 3)
+    ax16.set_title("WH reproducted surface (Z ≦ 6 is removed)\n" + ax16.get_title())
 
     ax14 = fig1.add_subplot(gs1[6:8, :])
     ax14_xaxis = np.arange(CONSTS.zernike_max_degree) + 1
@@ -124,6 +126,7 @@ if __name__ == "__main__":
         target_surface.zernike_value_array.max() * 1.3)
 
     ax13 = reproducted_zernike.make_torque_plot(fig1, gs1[8:, :])
+    ax13.set_title(ax13.get_title() + " Limit : " + str(torque_value_limit) + " [mm]")
 
     fig1.tight_layout()
     fig1.savefig(mkfolder() + "fig1.png")
