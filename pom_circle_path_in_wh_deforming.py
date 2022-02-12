@@ -78,7 +78,6 @@ if __name__ == "__main__":
         [15, 21],
         [5, -5])
 
-
     original_torque_value_array = make_full_torque_value_array(
         [1, 7, 13, 19, 25, 31, 3, 9, 15, 21, 27, 33, 4, 10, 16, 22, 28, 34, 5, 11, 17, 23, 29, 35, 6, 12, 18, 24, 30, 36],
         [-5, 5, -5, 5, -5, 5, -5, 5, -5, 5, -5, 5, -5, 5, -5, 5, -5, 5, -5, 5, -5, 5, -5, 5, 5, -5, 5, -5, 5, -5])
@@ -90,19 +89,21 @@ if __name__ == "__main__":
 
     wh_deformed_zernike = pom.TorqueToZernike(
         constants=CONSTS,
-        torque_value_array=original_torque_value_array,
-        restructed_torque_value=5,
-        ignore_zernike_number_list=[1, 2, 3, 4, 5, 6])
+        torque_value_array=original_torque_value_array)
 
     wh_deformed_surface = pom.ZernikeToSurface(
         constants=CONSTS,
-        zernike_number_list=wh_deformed_zernike.remaining_zernike_number_list,
-        zernike_value_array=wh_deformed_zernike.remaining_reproducted_zernike_value_array)
+        zernike_value_array=wh_deformed_zernike.reproducted_zernike_value_array)
+
+    zernike_removed_surface = pom.ZernikeRemovedSurface(
+        constants=CONSTS,
+        inputed_surface=wh_deformed_surface.surface,
+        removing_zernike_number_list=[1, 2, 3, 4, 5, 6])
 
     fig = plt.figure(figsize=(15, 7))
     gs = fig.add_gridspec(2, 3)
     wh_deformed_zernike.make_torque_plot(figure=fig, position=gs[0, 2])
-    wh_deformed_surface.make_image_plot(figure=fig, position=gs[0:2, 0:2])
-    wh_deformed_surface.make_circle_path_plot(figure=fig, position=gs[1, 2])
+    zernike_removed_surface.make_image_plot(figure=fig, position=gs[0:2, 0:2])
+    zernike_removed_surface.make_circle_path_plot(figure=fig, position=gs[1, 2])
     fig.tight_layout()
     fig.savefig(mkfolder() + ".png")
