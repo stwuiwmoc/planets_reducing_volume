@@ -673,6 +673,7 @@ class ZernikeToTorque:
             zernike多項式の値
         ignore_zernike_number_list : list[int]
             WH研磨体積削減で無視するzernike多項式の項番号
+            無視しない場合は空のリストを渡す
         restructed_torque_value : float
             トルクの制限値
         """
@@ -682,25 +683,57 @@ class ZernikeToTorque:
         self.ignore_zernike_number_list = ignore_zernike_number_list
         self.restructed_torque_value = abs(restructed_torque_value)
 
-        self.__remaining_operation_matrix = make_remaining_matrix(
-            self.consts.operation_matrix,
-            self.ignore_zernike_number_list)
+        if len(self.ignore_zernike_number_list) == 0:
+            make_torque_value_array_result = self.__make_torque_value_array(
+                operation_matrix=self.consts.operation_matrix,
+                zernike_value_array=self.target_zernike_value_array)
 
-        self.__remaining_zernike_value_array = make_remaining_matrix(
-            self.target_zernike_value_array,
-            self.ignore_zernike_number_list)
+            self.torque_value_array = make_torque_value_array_result["torque"]
+            self.optimize_result = make_torque_value_array_result["optimize_result"]
 
-        make_torque_value_array_result = self.__make_torque_value_array()
-        self.torque_value_array = make_torque_value_array_result["torque"]
-        self.optimize_result = make_torque_value_array_result["optimize_result"]
+        else:
+            remaining_operation_matrix = make_remaining_matrix(
+                self.consts.operation_matrix,
+                self.ignore_zernike_number_list)
+
+            remaining_zernike_value_array = make_remaining_matrix(
+                self.target_zernike_value_array,
+                self.ignore_zernike_number_list)
+
+            make_torque_value_array_result = self.__make_torque_value_array(
+                operation_matrix=remaining_operation_matrix,
+                zernike_value_array=remaining_zernike_value_array)
+
+            self.torque_value_array = make_torque_value_array_result["torque"]
+            self.optimize_result = make_torque_value_array_result["optimize_result"]
 
     def h(self):
         mkhelp(self)
 
-    def __make_torque_value_array(self):
+    def __make_torque_value_array(
+            self,
+            operation_matrix: ndarray,
+            zernike_value_array: ndarray) -> dict:
+        """__make_torque_value_array
+        線形モデルb = Axの行列形式に対して制約付き最小二乗フィッティング
+
+        Parameters
+        ----------
+        operation_matrix : ndarray
+            作用行列（線形モデルのAに該当）
+        zernike_value_array : ndarray
+            zernike係数ベクトル（線形モデルのbに該当）
+
+        Returns
+        -------
+        dict
+            "torque" : fittingに必要なtorque（線形モデルのxに該当）
+            "optimize_result" : fittingの詳細結果
+        """
+
         optimize_result = optimize.lsq_linear(
-            A=self.__remaining_operation_matrix,
-            b=self.__remaining_zernike_value_array,
+            A=operation_matrix,
+            b=zernike_value_array,
             bounds=(-self.restructed_torque_value, self.restructed_torque_value))
 
         torque_value_array = optimize_result["x"]

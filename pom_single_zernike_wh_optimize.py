@@ -38,9 +38,11 @@ if __name__ == "__main__":
 
     torque_value_limit = np.inf
 
-    for zernike_num in range(2, 12):
+    for i in range(CONSTS.zernike_max_degree):
+        print(i)
+        zernike_num = i + 1
         target_zernike_value_array = np.zeros(CONSTS.zernike_max_degree)
-        target_zernike_value_array[zernike_num - 1] = 1e-6
+        target_zernike_value_array[i] = 1e-6
 
         target_surface = pom.ZernikeToSurface(
             constants=CONSTS,
@@ -49,7 +51,7 @@ if __name__ == "__main__":
         wh_torque = pom.ZernikeToTorque(
             constants=CONSTS,
             target_zernike_value_array=target_zernike_value_array,
-            ignore_zernike_number_list=[1],
+            ignore_zernike_number_list=[],
             restructed_torque_value=torque_value_limit)
 
         wh_reproducted_zernike = pom.TorqueToZernike(
