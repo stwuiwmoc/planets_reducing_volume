@@ -85,25 +85,23 @@ if __name__ == "__main__":
     fig1 = plt.figure(figsize=(12, 16))
     gs1 = fig1.add_gridspec(10, 2)
 
-    ax15 = target_surface.make_image_plot(
-        fig1, gs1[0:3, 0],
-        zernike_removed_surface.surface, cbar_min_percent_, cbar_max_percent_, 3, 3)
-    ax15.set_title("measured_surface\n" + ax15.get_title())
-
     ax11 = zernike_removed_surface.make_image_plot(
-        fig1, gs1[0:3, 1],
+        fig1, gs1[0:3, 0],
         None, cbar_min_percent_, cbar_max_percent_, 3, 3)
-    ax11.set_title("zer =< 6 removed\n" + ax11.get_title())
+    ax11.set_title("measured (zer ≦ 6 is removed)\n" + ax11.get_title())
 
-    ax12 = result_surface.make_image_plot(
-        fig1, gs1[3:6, 1],
-        zernike_removed_surface.surface, cbar_min_percent_, cbar_max_percent_, 3, 3)
-    ax12.set_title(ax12.get_title() + "\nvolume_reduction = -" + str(round(volume_reduciton_rate * 1e2, 1)) + "%")
+    ax17 = reproducted_surface.make_image_plot(fig1, gs1[0:3, 1])
+    ax17.set_title("WH reproducted surface\n" + ax17.get_title())
 
     ax16 = reproducted_zernike_removed_surface.make_image_plot(
         fig1, gs1[3:6, 0],
         zernike_removed_surface.surface, cbar_min_percent_, cbar_max_percent_, 3, 3)
     ax16.set_title("WH reproducted surface (Z ≦ 6 is removed)\n" + ax16.get_title())
+
+    ax12 = result_surface.make_image_plot(
+        fig1, gs1[3:6, 1],
+        zernike_removed_surface.surface, cbar_min_percent_, cbar_max_percent_, 3, 3)
+    ax12.set_title(ax12.get_title() + "\nvolume_reduction = -" + str(round(volume_reduciton_rate * 1e2, 1)) + "%")
 
     ax14 = fig1.add_subplot(gs1[6:8, :])
     ax14_xaxis = np.arange(CONSTS.zernike_max_degree) + 1
