@@ -39,8 +39,7 @@ if __name__ == "__main__":
 
     target_surface = pom.ZernikeToSurface(
         constants=CONSTS,
-        zernike_number_list=[7],
-        zernike_value_array=np.array([2e-7]))
+        zernike_value_array=np.array([0, 0, 0, 0, 0, 0, 2e-7, 0, 0, 0, 0]))
 
     filtered = pom.FilteredSurface(
         constants=CONSTS,

@@ -301,8 +301,24 @@ class Surface:
             yc=self.consts.pixel_number // 2)
         return zernike_value_array
 
-    def _make_masked_zernike_surface(self, zernike_number_list, zernike_value_array):
+    def _make_masked_zernike_surface(self, full_zernike_value_array: ndarray) -> ndarray:
+        """_make_masked_zernike_surface
+            決まった半径でnp.nanでmaskされたzernike平面を作る
+
+        Parameters
+        ----------
+        full_zernike_value_array : ndarray
+            zernike係数ベクトル len() = Constants.zernike_max_degree
+
+        Returns
+        -------
+        ndarray
+            zernike係数ベクトルによって作られる2次元平面
+        """
+
         optical_wavelength = 500e-9
+
+        full_zernike_number_list = [i + 1 for i in range(self.consts.zernike_max_degree)]
 
         wavestruct = pr.prop_begin(
             beam_diameter=2 * self.consts.varid_radius,
@@ -312,8 +328,8 @@ class Surface:
 
         wfe = pr.prop_zernikes(
             wavestruct,
-            zernike_number_list,
-            zernike_value_array)
+            full_zernike_number_list,
+            full_zernike_value_array)
 
         masked_wfe = self.consts.mask * wfe
         return masked_wfe
@@ -453,26 +469,34 @@ class Surface:
 
 
 class ZernikeRemovedSurface(Surface):
-    def __init__(self, constants, inputed_surface, removing_zernike_number_list):
+    def __init__(
+            self, constants,
+            inputed_surface: ndarray,
+            removing_zernike_number_list: list[int]):
+        """ZernikeRemovedSurface
+        input_surfaceからremoving_zernike_number_listで指定したzernike項を除去してsurfaceとして返す
+
+        Parameters
+        ----------
+        constants : [type]
+            Constantsクラス
+        inputed_surface : ndarray
+            zernikeを除去したいsurface
+        removing_zernike_number_list : list[int]
+            除去したいzernikeの項数
+        """
         self.consts = constants
         self.removing_zernike_number_list = removing_zernike_number_list
 
-        full_zernike_number_list = [i + 1 for i in range(self.consts.zernike_max_degree)]
+        inputed_zernike_value_array = super()._zernike_value_array_calculation(inputed_surface)
 
-        self.inputed_surface = inputed_surface
-        self.zernike_value_array = super()._zernike_value_array_calculation(self.inputed_surface)
+        removing_zernike_value_array = self.__make_full_length_zernike(
+            original_value_array=inputed_zernike_value_array,
+            removing_number_list=self.removing_zernike_number_list)
 
-        ignore_zernike_number_list = make_remaining_matrix(
-            full_zernike_number_list,
-            self.removing_zernike_number_list)
-        self.removing_zernike_value_array = make_remaining_matrix(
-            self.zernike_value_array,
-            ignore_zernike_number_list)
-
-        self.removing_surface = super()._make_masked_zernike_surface(
-            self.removing_zernike_number_list,
-            self.removing_zernike_value_array)
-        self.surface = self.inputed_surface - self.removing_surface
+        removing_surface = super()._make_masked_zernike_surface(removing_zernike_value_array)
+        self.zernike_value_array = inputed_zernike_value_array - removing_zernike_value_array
+        self.surface = inputed_surface - removing_surface
 
         self.pv = super()._pv_calculation()
         self.rms = super()._rms_calculation()
@@ -482,37 +506,34 @@ class ZernikeRemovedSurface(Surface):
     def h(self):
         mkhelp(self)
 
+    def __make_full_length_zernike(self, original_value_array, removing_number_list):
+        removing_value_array = np.zeros(self.consts.zernike_max_degree)
+        for i in range(len(removing_number_list)):
+            idx = removing_number_list[i] - 1
+            removing_value_array[idx] = original_value_array[idx]
+        return removing_value_array
+
 
 class ZernikeToSurface(Surface):
 
-    def __init__(self, constants, zernike_number_list, zernike_value_array):
-        """
-        class : 2d surface from zernike values
+    def __init__(
+            self, constants,
+            zernike_value_array: ndarray):
+        """ZernikeToSurface
+        zernike係数ベクトルから平面を計算する
 
         Parameters
         ----------
-        constants : object
-            instance by class : Constants
-        zernike_number_list : 1d-list of int
-            zernike number which to use (1 means piston)
-        zernike_value_array : 1d-array of float
-            [m] value of zernike coefficient coresponding to zernike_number_list
-        offset_height_percent : float
-            ignore height in percent. if you set 2, the lower 2% is ignored in self._volume_calculation()
-
-        Returns
-        -------
-        None.
-
+        constants : [type]
+            Constant クラス
+        zernike_value_array : ndarray
+            zernike係数ベクトル len() = Constants.zernike_max_degree
         """
 
         self.consts = constants
-        self.zernike_number_list = zernike_number_list
         self.zernike_value_array = zernike_value_array
 
-        self.surface = super()._make_masked_zernike_surface(
-            self.zernike_number_list,
-            self.zernike_value_array)
+        self.surface = super()._make_masked_zernike_surface(self.zernike_value_array)
         self.pv = super()._pv_calculation()
         self.rms = super()._rms_calculation()
         self.volume = super()._volume_calculation()[0]
