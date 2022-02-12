@@ -93,7 +93,7 @@ if __name__ == "__main__":
 
     wh_deformed_surface = pom.ZernikeToSurface(
         constants=CONSTS,
-        zernike_value_array=wh_deformed_zernike.reproducted_zernike_value_array)
+        zernike_value_array=wh_deformed_zernike.zernike_value_array)
 
     zernike_removed_surface = pom.ZernikeRemovedSurface(
         constants=CONSTS,

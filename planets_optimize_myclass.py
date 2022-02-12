@@ -740,12 +740,12 @@ class TorqueToZernike:
 
         """TorqueToZernike
         与えられたトルクに作用行列をかけてzernikeに変換
-        トルクのplot
+        zernike_value_arrayはlen() = Constants.
 
         Parameters
         ----------
         constants : [type]
-            Constant
+            Constant クラス
         torque_value_array : ndarray
             トルクベクトル
         """
@@ -753,7 +753,7 @@ class TorqueToZernike:
         self.consts = constants
         self.torque_value_array = torque_value_array
 
-        self.reproducted_zernike_value_array = np.dot(
+        self.zernike_value_array = np.dot(
             self.consts.operation_matrix,
             self.torque_value_array)
 
