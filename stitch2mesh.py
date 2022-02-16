@@ -65,19 +65,21 @@ if __name__ == "__main__":
     varid_radi = m1_radi - ignore_radi
     zer_fit_order = 10
 
-    fname = "raw_data/0131xm130allcc_0201cirAll.v4.8.hei_dense.txt"
+    fname = "raw_data/0207xm130All2_0208cir_0208ykagomeAllCc.v4.8.hei_dense.txt"
     shaped = np.loadtxt(fname)[:, 1:4]
 
-    xx, yy = np.meshgrid(np.linspace(-m1_radi, m1_radi, px),
-                         np.linspace(-m1_radi, m1_radi, px))
+    xx, yy = np.meshgrid(
+        np.linspace(-m1_radi, m1_radi, px),
+        np.linspace(-m1_radi, m1_radi, px))
 
     z_mesh = interpolate(shaped, xx, yy) * 1e-6  # mm単位に合わせる
 
     tf = ~np.isnan(z_mesh)
     mask = np.where(tf, 1, np.nan)
 
-    zer, fit = pr.prop_fit_zernikes(tf * z_mesh * 1e-3,  # properでの指定は単位 [m]
-                                    tf, px / 2, zer_fit_order, xc=px / 2, yc=px / 2, FIT=True)
+    zer, fit = pr.prop_fit_zernikes(
+        tf * z_mesh * 1e-3,  # properでの指定は単位 [m]
+        tf, px / 2, zer_fit_order, xc=px / 2, yc=px / 2, FIT=True)
 
     # mask_varid = np.where(xx**2+yy**2<varid_radi**2, True, np.nan)
 
@@ -109,7 +111,9 @@ if __name__ == "__main__":
 
     fig.savefig(mkfolder() + fname[9:-4] + ".png")
 
-    np.savetxt(mkfolder() + "zer03_" + fname[9:-4] + ".csv",
-               diff_zer03)
-    np.savetxt(mkfolder() + "zer10_" + fname[9:-4] + ".csv",
-               diff_zer10)
+    np.savetxt(
+        mkfolder() + "zer03_" + fname[9:-4] + ".csv",
+        diff_zer03)
+    np.savetxt(
+        mkfolder() + "zer10_" + fname[9:-4] + ".csv",
+        diff_zer10)
