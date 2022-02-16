@@ -31,7 +31,7 @@ if __name__ == "__main__":
 
     CONSTS = pom.Constants(
         physical_radius=925e-3,
-        ignore_radius=175e-3,
+        ignore_radius=0,
         pixel_number=1024,
         zernike_max_degree=11,
         offset_height_percent=2)
@@ -42,7 +42,7 @@ if __name__ == "__main__":
         print(i)
         zernike_num = i + 1
         target_zernike_value_array = np.zeros(CONSTS.zernike_max_degree)
-        target_zernike_value_array[i] = 1e-6
+        target_zernike_value_array[i] = 5e-7
 
         target_surface = pom.ZernikeToSurface(
             constants=CONSTS,
@@ -68,6 +68,7 @@ if __name__ == "__main__":
 
         fig1 = plt.figure(figsize=(10, 10))
         gs1 = fig1.add_gridspec(4, 2)
+        fig1.suptitle("zernike " + str(zernike_num))
 
         ax11 = wh_reproducted_surface.make_image_plot(fig1, gs1[0:2, 0])
 
