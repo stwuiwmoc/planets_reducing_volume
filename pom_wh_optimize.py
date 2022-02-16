@@ -75,7 +75,7 @@ if __name__ == "__main__":
 
     result_surface = pom.Surface(
         constants=CONSTS,
-        surface=target_surface.surface - reproducted_zernike_removed_surface.surface)
+        surface=zernike_removed_surface.surface - reproducted_zernike_removed_surface.surface)
 
     volume_reduciton_rate = 1 - result_surface.volume / zernike_removed_surface.volume
 
