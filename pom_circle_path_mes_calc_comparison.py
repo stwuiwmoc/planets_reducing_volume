@@ -48,11 +48,16 @@ if __name__ == "__main__":
     ignore_zernike_number_list = [1, 2, 3, 4, 5, 6, 7, 8]
 
     # measurement
-    serials = ["0117e", "0117f", "0117g", "0117h", "0117j", "0117k", "0117l", "0117i"]
-    ptn: int = 6
+    ptn: int = 4
 
-    input_filename_0 = "../sag_integration_code/" + "mkfolder/psm_test_kagi_data_integration/" + serials[0] + "_height.csv"
-    input_filename_n = "../sag_integration_code/" + "mkfolder/psm_test_kagi_data_integration/" + serials[ptn] + "_height.csv"
+    # serials = ["0117e", "0117f", "0117g", "0117h", "0117j", "0117k", "0117l", "0117i"]
+    # folderpath = "mkfolder/psm_test_kagi_data_integration/"
+
+    serials = ["0217ym870CirB", "", "", "", "0217ym870CirD", "0217ym870CirE", "0217ym870CirF"]
+    folderpath = "mkfolder/kagi_hei_to_csv/"
+
+    input_filename_0 = "../sag_integration_code/" + folderpath + serials[0] + "_height.csv"
+    input_filename_n = "../sag_integration_code/" + folderpath + serials[ptn] + "_height.csv"
 
     mes_raw0n = pom.CirclePathMeasurementReading(
         Constants=CONSTS,
