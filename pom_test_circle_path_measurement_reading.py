@@ -27,25 +27,28 @@ def mkfolder(suffix=""):
 if __name__ == "__main__":
     importlib.reload(pom)
 
-    CONSTS = pom.Constants(physical_radius=925e-3,
-                           ignore_radius=25e-3,
-                           pixel_number=1024,
-                           zernike_max_degree=10,
-                           offset_height_percent=2)
+    CONSTS = pom.Constants(
+        physical_radius=925e-3,
+        ignore_radius=25e-3,
+        pixel_number=1024,
+        zernike_max_degree=10,
+        offset_height_percent=2)
 
-    serial_0 = "0117e"
-    serial_n = "0117j"
-    input_filename_0 = "../sag_integration_code/" + "mkfolder/psm_test_kagi_data_integration/" + serial_0 + "_height.csv"
-    input_filename_n = "../sag_integration_code/" + "mkfolder/psm_test_kagi_data_integration/" + serial_n + "_height.csv"
+    serial_0 = "0217ym870CirB"
+    serial_n = "0217ym870CirG"
+    input_filename_0 = "../sag_integration_code/" + "mkfolder/kagi_hei_to_csv/" + serial_0 + "_height.csv"
+    input_filename_n = "../sag_integration_code/" + "mkfolder/kagi_hei_to_csv/" + serial_n + "_height.csv"
 
-    mes0n = pom.CirclePathMeasurementReading(Constants=CONSTS,
-                                             original_csv_fpath=input_filename_0,
-                                             deformed_csv_fpath=input_filename_n)
+    mes0n = pom.CirclePathMeasurementReading(
+        Constants=CONSTS,
+        original_csv_fpath=input_filename_0,
+        deformed_csv_fpath=input_filename_n)
 
-    res0n = pom.CirclePathZernikeFitting(Constants=CONSTS,
-                                         circle_path_radius=870e-3,
-                                         df_diff=mes0n.df_diff,
-                                         ignore_zernike_number_list=[1, 2, 3, 4, 5, 6, 7, 8, 11])
+    res0n = pom.CirclePathZernikeFitting(
+        Constants=CONSTS,
+        circle_path_radius=870e-3,
+        df_diff=mes0n.df_diff,
+        ignore_zernike_number_list=[1, 2, 3, 4, 5, 6, 7, 8, 11])
 
     fig1 = plt.figure(figsize=(7, 7))
     gs1 = fig1.add_gridspec(2, 1)
