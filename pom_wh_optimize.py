@@ -37,7 +37,7 @@ if __name__ == "__main__":
 
     CONSTS = pom.Constants(
         physical_radius=925e-3,
-        ignore_radius=175e-3,
+        ignore_radius=50e-3,
         pixel_number=256,
         zernike_max_degree=11,
         offset_height_percent=2)
@@ -46,7 +46,7 @@ if __name__ == "__main__":
 
     target_surface = pom.StitchedCsvToSurface(
         constants=CONSTS,
-        original_stitched_csv_fpath="mkfolder/stitch2mesh/zer03_0131xm130allcc_0201cirAll.v4.8.hei_dense.csv",
+        original_stitched_csv_fpath="mkfolder/stitch2mesh/zer03_0207xm130All2_0208cir_0208ykagomeAllCc.v4.8.hei_dense.csv",
         deformed_stitched_csv_fpath="")
 
     zernike_removed_surface = pom.ZernikeRemovedSurface(
@@ -79,8 +79,8 @@ if __name__ == "__main__":
 
     volume_reduciton_rate = 1 - result_surface.volume / zernike_removed_surface.volume
 
-    cbar_min_percent_ = 25
-    cbar_max_percent_ = 85
+    cbar_min_percent_ = 55
+    cbar_max_percent_ = 95
 
     fig1 = plt.figure(figsize=(12, 16))
     gs1 = fig1.add_gridspec(10, 2)
