@@ -44,6 +44,10 @@ if __name__ == "__main__":
 
     torque_value_limit = 5
 
+    cbar_min_percent_ = 60
+    cbar_max_percent_ = 90
+    zaxis_bottom_percent_ = 50
+
     target_surface = pom.StitchedCsvToSurface(
         constants=CONSTS,
         original_stitched_csv_fpath="mkfolder/stitch2mesh/zer03_0207xm130All2_0208cir_0208ykagomeAllCc.v4.8.hei_dense.csv",
@@ -78,9 +82,6 @@ if __name__ == "__main__":
         surface=zernike_removed_surface.surface - reproducted_zernike_removed_surface.surface)
 
     volume_reduciton_rate = 1 - result_surface.volume / zernike_removed_surface.volume
-
-    cbar_min_percent_ = 55
-    cbar_max_percent_ = 95
 
     fig1 = plt.figure(figsize=(12, 16))
     gs1 = fig1.add_gridspec(10, 2)
@@ -128,3 +129,28 @@ if __name__ == "__main__":
 
     fig1.tight_layout()
     fig1.savefig(mkfolder() + "fig1.png")
+
+    flat_surface = pom.Surface(
+        constants=CONSTS,
+        surface=np.ones([CONSTS.pixel_number, CONSTS.pixel_number]) * (zernike_removed_surface.pv * 0.3 + np.nanmin(zernike_removed_surface.surface)))
+
+    fig2 = plt.figure(figsize=(16, 12))
+    gs2 = fig2.add_gridspec(2, 2)
+
+    ax21 = zernike_removed_surface.make_3d_plot(
+        fig2, gs2[0, 1],
+        None, cbar_min_percent_, cbar_max_percent_, zaxis_bottom_percent_)
+
+    ax22 = flat_surface.make_3d_plot(
+        fig2, gs2[0, 0],
+        zernike_removed_surface.surface, cbar_min_percent_, cbar_max_percent_, zaxis_bottom_percent_)
+
+    ax23 = result_surface.make_3d_plot(
+        fig2, gs2[1, 1],
+        zernike_removed_surface.surface, cbar_min_percent_, cbar_max_percent_, zaxis_bottom_percent_)
+
+    ax24 = reproducted_zernike_removed_surface.make_3d_plot(
+        fig2, gs2[1, 0],
+        zernike_removed_surface.surface, cbar_min_percent_, cbar_max_percent_, zaxis_bottom_percent_)
+
+    fig2.tight_layout()
