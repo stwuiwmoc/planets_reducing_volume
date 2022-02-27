@@ -70,7 +70,7 @@ if __name__ == "__main__":
         df_diff=mes_raw0n.df_diff,
         ignore_zernike_number_list=ignore_zernike_number_list)
 
-    # calculate
+    # operation matrix (omx) calculate
     torque_number_list = [0 + ptn, 6 + ptn, 12 + ptn, 18 + ptn, 24 + ptn, 30 + ptn]
     torque_value_array = np.array([5, -5, 5, -5, 5, -5])
 
@@ -110,6 +110,16 @@ if __name__ == "__main__":
         constants=CONSTS,
         inputed_surface=fem_composited_surface.surface,
         removing_zernike_number_list=[1, 2, 3, 4])
+
+    # omx and fem comparison
+    fem_omx_diff_surface = pom.Surface(
+        constants=CONSTS,
+        surface=fem_composited_surface.surface - omx_deformed_surface.surface)
+
+    fem_omx_diff_zernike_removed_surface = pom.ZernikeRemovedSurface(
+        constants=CONSTS,
+        inputed_surface=fem_omx_diff_surface.surface,
+        removing_zernike_number_list=ignore_zernike_number_list)
 
     # plot
 
@@ -156,3 +166,30 @@ if __name__ == "__main__":
 
     fig2.tight_layout()
     fig2.savefig(mkfolder() + serials[ptn] + "_fig2.png")
+
+    fig3 = plt.figure(figsize=(15, 10))
+    gs3 = fig3.add_gridspec(2, 3)
+
+    ax31 = fem_composited_surface.make_image_plot(
+        figure=fig3, position=gs3[0, 0], cbar_surface=None)
+    ax31.set_title("FEM model\n" + ax31.get_title())
+
+    ax32 = fem_composited_zernike_removed_surface.make_image_plot(
+        figure=fig3, position=gs3[1, 0], cbar_surface=fem_composited_surface.surface)
+
+    ax33 = omx_deformed_surface.make_image_plot(
+        figure=fig3, position=gs3[0, 1], cbar_surface=fem_composited_surface.surface)
+    ax33.set_title("operation matrix model\n" + ax33.get_title())
+
+    ax34 = omx_deformed_zernike_removed_surface.make_image_plot(
+        figure=fig3, position=gs3[1, 1], cbar_surface=fem_composited_surface.surface)
+
+    ax35 = fem_omx_diff_surface.make_image_plot(
+        figure=fig3, position=gs3[0, 2], cbar_surface=None)
+    ax35.set_title("residual by ( FEM - OM )\n" + ax35.get_title())
+
+    ax36 = fem_omx_diff_zernike_removed_surface.make_image_plot(
+        figure=fig3, position=gs3[1, 2], cbar_surface=fem_omx_diff_surface.surface)
+
+    fig3.tight_layout()
+    fig3.savefig(mkfolder() + serials[ptn] + "_fig3.png")
