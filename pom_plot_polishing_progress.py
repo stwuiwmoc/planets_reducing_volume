@@ -42,7 +42,7 @@ if __name__ == "__main__":
 
     mesE = pom.StitchedCsvToSurface(
         constants=CONSTS,
-        original_stitched_csv_fpath="mkfolder/stitch2mesh/zer03_exelis.csv",
+        original_stitched_csv_fpath="mkfolder/exelis_rawdata_edit/exelis_reshaped_mm.csv",
         deformed_stitched_csv_fpath=""
     )
 

@@ -652,7 +652,7 @@ class StitchedCsvToSurface(Surface):
         self.zernike_value_array = super()._zernike_value_array_calculation(self.surface)
 
     def __read_csv_to_masked_surface(self, filepath):
-        raw = np.loadtxt(filepath)
+        raw = np.loadtxt(filepath, delimiter=",")
         raw_zero_fill = np.where(np.isnan(raw), 0, raw)
         image = PIL.Image.fromarray(raw_zero_fill)
         img_resize = image.resize(
