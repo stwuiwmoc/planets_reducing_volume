@@ -26,12 +26,12 @@ def mkfolder(suffix=""):
     return folder
 
 
-def make_full_torque_value_array(torque_number_list, torque_value_aray):
+def make_full_torque_value_array(torque_number_list_, torque_value_array_):
     full_value_array = np.zeros(36)
-    idx_array = np.array(torque_number_list) - 1
+    idx_array = np.array(torque_number_list_) - 1
     for i in range(len(idx_array)):
         idx = idx_array[i]
-        full_value_array[idx] = torque_value_aray[i]
+        full_value_array[idx] = torque_value_array_[i]
     return full_value_array
 
 
@@ -71,9 +71,12 @@ if __name__ == "__main__":
         ignore_zernike_number_list=ignore_zernike_number_list)
 
     # calculate
+    torque_number_list = [0 + ptn, 6 + ptn, 12 + ptn, 18 + ptn, 24 + ptn, 30 + ptn]
+    torque_value_array = np.array([5, -5, 5, -5, 5, -5])
+
     original_torque_value_array = make_full_torque_value_array(
-        [0 + ptn, 6 + ptn, 12 + ptn, 18 + ptn, 24 + ptn, 30 + ptn],
-        [5, -5, 5, -5, 5, -5])
+        torque_number_list_=torque_number_list,
+        torque_value_array_=torque_value_array)
 
     wh_deformed_zernike = pom.TorqueToZernike(
         constants=CONSTS,
