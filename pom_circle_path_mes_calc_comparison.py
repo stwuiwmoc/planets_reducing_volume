@@ -42,13 +42,13 @@ if __name__ == "__main__":
         physical_radius=925e-3,
         ignore_radius=25e-3,
         pixel_number=256,
-        zernike_max_degree=10,
+        zernike_max_degree=11,
         offset_height_percent=0)
 
     ignore_zernike_number_list = [1, 2, 3, 4, 5, 6, 7, 8]
 
     # measurement
-    ptn: int = 4
+    ptn: int = 6
 
     # serials = ["0117e", "0117f", "0117g", "0117h", "0117j", "0117k", "0117l", "0117i"]
     # folderpath = "mkfolder/psm_test_kagi_data_integration/"
@@ -86,15 +86,20 @@ if __name__ == "__main__":
         constants=CONSTS,
         zernike_value_array=wh_deformed_zernike.zernike_value_array)
 
+    wh_deformed_zernike_removed_surface = pom.ZernikeRemovedSurface(
+        constants=CONSTS,
+        inputed_surface=wh_deformed_surface.surface,
+        removing_zernike_number_list=ignore_zernike_number_list)
+
     # plot
 
     fig1 = plt.figure(figsize=(7, 10))
     gs1 = fig1.add_gridspec(3, 2)
 
-    ax11 = wh_deformed_surface.make_image_plot(figure=fig1, position=gs1[0:2, :])
-    ax11 = wh_deformed_surface.make_torque_fulcrum_plot(ax=ax11, torque_value_array=original_torque_value_array)
+    ax11 = wh_deformed_zernike_removed_surface.make_image_plot(figure=fig1, position=gs1[0:2, :])
+    ax11 = wh_deformed_zernike_removed_surface.make_torque_fulcrum_plot(ax=ax11, torque_value_array=original_torque_value_array)
 
-    ax12 = wh_deformed_surface.make_circle_path_plot(figure=fig1, position=gs1[2, :], line_label="model")
+    ax12 = wh_deformed_zernike_removed_surface.make_circle_path_plot(figure=fig1, position=gs1[2, :], line_label="model")
     ax12.plot(mes_zer0n.df_diff["degree"], mes_zer0n.height_removed * 1e9, label="measurement " + serials[ptn])
     ax12.legend()
 
