@@ -511,7 +511,8 @@ class Surface:
     def make_zernike_value_plot(
             self,
             figure,
-            position):
+            position,
+            label_=""):
 
         xaxis = np.arange(self.consts.zernike_max_degree) + 1
         xaxis_min = 0.5
@@ -519,7 +520,7 @@ class Surface:
 
         ax = figure.add_subplot(position)
 
-        ax.plot(xaxis, self.zernike_value_array, marker="s")
+        ax.plot(xaxis, self.zernike_value_array, marker="s", label=label_)
         ax.hlines([0], xaxis_min, xaxis_max, color="gray")
         ax.grid()
 
@@ -528,6 +529,8 @@ class Surface:
 
         ax.set_xlabel("zernike terms")
         ax.set_ylabel("zernike values [m]")
+
+        ax.legend()
 
         return ax
 
