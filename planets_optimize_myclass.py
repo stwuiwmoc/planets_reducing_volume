@@ -512,7 +512,7 @@ class Surface:
             self,
             figure,
             position,
-            label_=""):
+            label_=None):
 
         xaxis = np.arange(self.consts.zernike_max_degree) + 1
         xaxis_min = 0.5
@@ -530,7 +530,8 @@ class Surface:
         ax.set_xlabel("zernike terms")
         ax.set_ylabel("zernike values [m]")
 
-        ax.legend()
+        if label_ is not None:
+            ax.legend()
 
         return ax
 
