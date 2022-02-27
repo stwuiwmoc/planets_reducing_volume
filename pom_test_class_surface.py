@@ -46,6 +46,11 @@ if __name__ == "__main__":
         inputed_surface=exelis.surface,
         filter_parameter=100)
 
+    fem = pom.FemTxtToSurface(
+        constants=CONSTS,
+        wt_version=6,
+        wt_number=1)
+
     parent = pom.Surface(
         constants=CONSTS,
         surface=exelis.surface)
