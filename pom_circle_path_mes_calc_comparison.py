@@ -78,17 +78,17 @@ if __name__ == "__main__":
         torque_number_list_=torque_number_list,
         torque_value_array_=torque_value_array)
 
-    om_deformed_zernike = pom.TorqueToZernike(
+    omx_deformed_zernike = pom.TorqueToZernike(
         constants=CONSTS,
         torque_value_array=original_torque_value_array)
 
-    om_deformed_surface = pom.ZernikeToSurface(
+    omx_deformed_surface = pom.ZernikeToSurface(
         constants=CONSTS,
-        zernike_value_array=om_deformed_zernike.zernike_value_array)
+        zernike_value_array=omx_deformed_zernike.zernike_value_array)
 
-    om_deformed_zernike_removed_surface = pom.ZernikeRemovedSurface(
+    omx_deformed_zernike_removed_surface = pom.ZernikeRemovedSurface(
         constants=CONSTS,
-        inputed_surface=om_deformed_surface.surface,
+        inputed_surface=omx_deformed_surface.surface,
         removing_zernike_number_list=ignore_zernike_number_list)
 
     # plot
@@ -96,21 +96,20 @@ if __name__ == "__main__":
     fig1 = plt.figure(figsize=(7, 10))
     gs1 = fig1.add_gridspec(3, 2)
 
-    ax11 = om_deformed_zernike_removed_surface.make_image_plot(figure=fig1, position=gs1[0:2, :])
-    ax11 = om_deformed_zernike_removed_surface.make_torque_fulcrum_plot(ax=ax11, torque_value_array=original_torque_value_array)
+    ax11 = omx_deformed_zernike_removed_surface.make_image_plot(figure=fig1, position=gs1[0:2, :])
+    ax11 = omx_deformed_zernike_removed_surface.make_torque_fulcrum_plot(ax=ax11, torque_value_array=original_torque_value_array)
 
-    ax12 = om_deformed_zernike_removed_surface.make_circle_path_plot(figure=fig1, position=gs1[2, :], line_label="model")
+    ax12 = omx_deformed_zernike_removed_surface.make_circle_path_plot(figure=fig1, position=gs1[2, :], line_label="model")
     ax12.plot(mes_zer0n.df_diff["degree"], mes_zer0n.height_removed * 1e9, label="measurement " + serials[ptn])
     ax12.legend()
 
-    pv_calc_str = ax12.get_title()[19:25]
+    pv_omx = float(ax12.get_title()[19:25])
     pv_mes = 1e9 * (mes_zer0n.height_removed.max() - mes_zer0n.height_removed.min())
-    pv_ratio_str = str(round(pv_mes / float(pv_calc_str), 3))
 
     ax12.set_title(
         "measurement pv = " + str(round(pv_mes, 2)) + " [nm] / " +
-        "model pv = " + pv_calc_str + " [nm]\n" +
-        "measurement / model = " + pv_ratio_str)
+        "model pv = " + str(round(pv_omx, 2)) + " [nm]\n" +
+        "measurement / model = " + str(round(pv_mes / pv_omx, 3)))
 
     fig1.tight_layout()
     fig1.savefig(mkfolder() + serials[ptn] + "_fig1.png")
