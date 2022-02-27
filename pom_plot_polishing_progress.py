@@ -147,3 +147,4 @@ if __name__ == "__main__":
     ax23.set_ylim(mesE.zernike_value_array.min(), mesE.zernike_value_array.max())
 
     fig2.tight_layout()
+    fig2.savefig(mkfolder() + "fig2.png")
