@@ -117,3 +117,7 @@ if __name__ == "__main__":
     np.savetxt(
         mkfolder() + "zer10_" + fname[9:-4] + ".csv",
         diff_zer10)
+
+    np.savetxt(
+        mkfolder() + fname[9:-4] + ".csv",
+        z_mesh * mask)
