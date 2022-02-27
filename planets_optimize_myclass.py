@@ -438,7 +438,8 @@ class Surface:
             position=111,
             radius=0.870,
             height_magn=1e9,
-            height_unit_str="[nm]"):
+            height_unit_str="[nm]",
+            line_label=""):
 
         fontsize = 15
         varid_radius_pixel_number = int(self.consts.varid_radius / self.consts.physical_radius * self.consts.pixel_number / 2)
@@ -467,7 +468,7 @@ class Surface:
         height_pv_str = str(round(height_pv, 2))
 
         ax = figure.add_subplot(position)
-        ax.plot(robot_degree, circle_path_line)
+        ax.plot(robot_degree, circle_path_line, label=line_label)
         ax.grid()
 
         ax.set_title(
@@ -477,6 +478,47 @@ class Surface:
         ax.set_ylabel(
             "heignt " + height_unit_str + "\nat R=" + str(measurement_radius_idx),
             fontsize=fontsize)
+        return ax
+
+    def make_torque_fulcrum_plot(
+            self,
+            ax,
+            torque_value_array: np.ndarray,
+            init_theta=150):
+
+        def polar_coordinate_conversion(radius_: float, theta_, init_theta_):
+            x_coordinate = radius_ * np.cos(np.deg2rad(theta_ + init_theta_))
+            y_coordinate = radius_ * np.sin(np.deg2rad(theta_ + init_theta_))
+            return x_coordinate, y_coordinate
+
+        def decide_points_symbol(torque_value_array_, polar_coordinate_):
+            plus_x, plus_y = np.where(
+                torque_value_array_ > 0,
+                polar_coordinate_,
+                np.nan)
+            minus_x, minus_y = np.where(torque_value_array_ < 0,
+                                        polar_coordinate_,
+                                        np.nan)
+
+            return (plus_x, plus_y), (minus_x, minus_y)
+
+        df = pd.read_csv("raw_data/torque_fulcrum_coordinate.csv", index_col="idx")
+
+        polar_coordinate = polar_coordinate_conversion(
+            radius_=df["radius"],
+            theta_=df["theta"],
+            init_theta_=init_theta)
+
+        plus, minus = decide_points_symbol(
+            torque_value_array,
+            polar_coordinate)
+
+        ax.scatter(plus[0], plus[1], s=120, c="black")
+        ax.scatter(plus[0], plus[1], s=50, c="red")
+
+        ax.scatter(minus[0], minus[1], s=120, c="white")
+        ax.scatter(minus[0], minus[1], s=50, c="blue")
+
         return ax
 
 
