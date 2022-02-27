@@ -104,11 +104,11 @@ if __name__ == "__main__":
         zernike_removed_surface.surface, cbar_min_percent_, cbar_max_percent_, 3, 3)
     ax12.set_title(ax12.get_title() + "\nvolume_reduction = -" + str(round(volume_reduciton_rate * 1e2, 1)) + "%")
 
-    ax14 = fig1.add_subplot(gs1[6:8, :])
+    ax14 = target_surface.make_zernike_value_plot(
+        fig1, gs1[6:8, :],
+        label_="measured_surface_zernike")
+
     ax14_xaxis = np.arange(CONSTS.zernike_max_degree) + 1
-    ax14.plot(
-        ax14_xaxis, target_surface.zernike_value_array,
-        marker="s", label="measured_surface_zernike")
     ax14.plot(
         ax14_xaxis, zernike_removed_surface.zernike_value_array,
         marker="s", label="target_zernike (Z ≦ 6 is removed)")
@@ -117,9 +117,6 @@ if __name__ == "__main__":
         marker="s", label="WH_reproducted_zernike")
 
     ax14.legend()
-    ax14.set_xticks(ax14_xaxis)
-    ax14.set_xticklabels(ax14_xaxis)
-    ax14.grid()
     ax14.set_ylim(
         target_surface.zernike_value_array.min() * 1.3,
         target_surface.zernike_value_array.max() * 1.3)

@@ -508,6 +508,33 @@ class Surface:
 
         return ax
 
+    def make_zernike_value_plot(
+            self,
+            figure,
+            position,
+            label_=None):
+
+        xaxis = np.arange(self.consts.zernike_max_degree) + 1
+        xaxis_min = 0.5
+        xaxis_max = self.consts.zernike_max_degree + 0.5
+
+        ax = figure.add_subplot(position)
+
+        ax.plot(xaxis, self.zernike_value_array, marker="s", label=label_)
+        ax.hlines([0], xaxis_min, xaxis_max, color="gray")
+        ax.grid()
+
+        ax.set_xticks(xaxis)
+        ax.set_xlim(xaxis_min, xaxis_max)
+
+        ax.set_xlabel("zernike terms")
+        ax.set_ylabel("zernike values [m]")
+
+        if label_ is not None:
+            ax.legend()
+
+        return ax
+
 
 class ZernikeRemovedSurface(Surface):
     def __init__(
