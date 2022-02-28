@@ -135,10 +135,11 @@ if __name__ == "__main__":
     fig1.tight_layout()
     fig1.savefig(mkfolder() + "fig1.png")
 
-    fig2 = plt.figure(figsize=(7, 12))
+    fig2 = plt.figure(figsize=(7, 10))
     gs2 = fig2.add_gridspec(3, 1)
 
     ax21 = mesE.make_zernike_value_plot(figure=fig2, position=gs2[0, 0])
+    ax21.set_ylim(mesE.zernike_value_array.min(), mesE.zernike_value_array.max())
 
     ax22 = mes0.make_zernike_value_plot(figure=fig2, position=gs2[1, 0])
     ax22.set_ylim(mesE.zernike_value_array.min(), mesE.zernike_value_array.max())
