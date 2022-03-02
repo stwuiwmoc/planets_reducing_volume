@@ -690,7 +690,7 @@ class KagiStitchToSurface(Surface):
                 points=xy_old_mm,
                 values=z_old_array_nm,
                 xi=(x_new_mesh_mm, y_new_mesh_mm),
-                method="linear",
+                method="cubic",
                 fill_value=0)
 
             return z_new_mesh_nm
