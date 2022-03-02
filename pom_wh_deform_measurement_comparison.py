@@ -11,28 +11,29 @@ import importlib
 
 if __name__ == "__main__":
     importlib.reload(pom)
-    CONSTS = pom.Constants(physical_radius=925e-3,
-                           ignore_radius=25e-3,
-                           pixel_number=1024,
-                           zernike_max_degree=10,
-                           offset_height_percent=2)
+    CONSTS = pom.Constants(
+        physical_radius=925e-3,
+        ignore_radius=50e-3,
+        pixel_number=1024,
+        zernike_max_degree=10,
+        offset_height_percent=2)
 
-    diff = pom.StitchedCsvToSurface(
+    wt_all_natural = pom.KagiStitchToSurface(
         constants=CONSTS,
-        original_stitched_csv_fpath="mkfolder/stitch2mesh/zer03_1215xm1301214ym870-510cir.v4.22.hei_dense.csv",
-        deformed_stitched_csv_fpath="mkfolder/stitch2mesh/zer03_1215xm1301216ym870-510cir.v4.21.hei_dense.csv")
+        txt_fpath="raw_data/1215xm1301214ym870-510cir.v4.22.hei_dense.txt")
+
+    wt_deformed = pom.KagiStitchToSurface(
+        constants=CONSTS,
+        txt_fpath="raw_data/1215xm1301216ym870-510cir.v4.21.hei_dense.txt")
+
+    diff = pom.Surface(
+        constants=CONSTS,
+        surface=wt_deformed.surface - wt_all_natural.surface)
 
     zernike_removed = pom.ZernikeRemovedSurface(
         constants=CONSTS,
         inputed_surface=diff.surface,
-        removing_zernike_number_list=[
-            1,
-            2,
-            3,
-            4,
-            5,
-            7,
-            8])
+        removing_zernike_number_list=[1, 2, 3, 4, 5, 6])
 
     fig1 = plt.figure(figsize=(5, 10))
     gs1 = fig1.add_gridspec(2, 1)

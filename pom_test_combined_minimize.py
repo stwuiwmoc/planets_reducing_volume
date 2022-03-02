@@ -33,28 +33,29 @@ def mkfolder(suffix=""):
 
 if __name__ == "__main__":
     importlib.reload(pom)
-    CONSTS = pom.Constants(physical_radius=925e-3,
-                           ignore_radius=25e-3,
-                           pixel_number=1024,
-                           zernike_max_degree=10,
-                           offset_height_percent=2)
+    CONSTS = pom.Constants(
+        physical_radius=925e-3,
+        ignore_radius=25e-3,
+        pixel_number=1024,
+        zernike_max_degree=10,
+        offset_height_percent=2)
 
-    OAP = pom.OapConstants(ideal_radius_of_curvature=8667e-3,
-                           ideal_off_axis_distance=1800e-3,
-                           ideal_clocking_angle_rad=0,
-                           delta_radius_of_curvature=0,
-                           delta_off_axis_distance=0,
-                           delta_clocking_angle_rad=0)
+    OAP = pom.OapConstants(
+        ideal_radius_of_curvature=8667e-3,
+        ideal_off_axis_distance=1800e-3,
+        ideal_clocking_angle_rad=0,
+        delta_radius_of_curvature=0,
+        delta_off_axis_distance=0,
+        delta_clocking_angle_rad=0)
 
-    exelis = pom.StitchedCsvToSurface(
-        constants=CONSTS,
-        original_stitched_csv_fpath="mkfolder/exelis_rawdata_edit/exelis_reshaped.csv",
-        deformed_stitched_csv_fpath="")
+    exelis = pom.ExelisCsvToSurface(
+        constants=CONSTS)
 
     # smoothing
-    filtered_exelis = pom.FilteredSurface(constants=CONSTS,
-                                          inputed_surface=exelis.surface,
-                                          filter_parameter=100)
+    filtered_exelis = pom.FilteredSurface(
+        constants=CONSTS,
+        inputed_surface=exelis.surface,
+        filter_parameter=100)
 
     ideal_oap = pom.OapSurface(
         constants=CONSTS,
@@ -63,9 +64,10 @@ if __name__ == "__main__":
         clocking_angle_rad=OAP.ideal_clocking_angle_rad)
 
     # oap minimize
-    oap_minimize = pom.OapMinimize(constants=CONSTS,
-                                   oap_constants=OAP,
-                                   inputed_surface=filtered_exelis.surface)
+    oap_minimize = pom.OapMinimize(
+        constants=CONSTS,
+        oap_constants=OAP,
+        inputed_surface=filtered_exelis.surface)
 
     optimized_oap = pom.OapSurface(
         constants=CONSTS,
@@ -82,39 +84,26 @@ if __name__ == "__main__":
     # wh minimize
     zernike_removed = pom.ZernikeRemovedSurface(
         constants=CONSTS,
-        inputed_surface=oap_optimized_exelis.surface,
-        removing_zernike_number_list=[
-            1,
-            2,
-            3,
-            4,
-            5,
-            6])
+        inputed_surface=filtered_exelis.surface,
+        removing_zernike_number_list=[1, 2, 3, 4, 5, 6])
 
     fitting_torque = pom.ZernikeToTorque(
         constants=CONSTS,
-        target_zernike_number_list=[
-            i +
-            1 for i in range(
-                CONSTS.zernike_max_degree)],
         target_zernike_value_array=zernike_removed.zernike_value_array,
-        ignore_zernike_number_list=zernike_removed.removing_zernike_number_list)
+        ignore_zernike_number_list=[1, 2, 3, 4, 5, 6],
+        restructed_torque_value=5)
 
     wh_optimized_zernike = pom.TorqueToZernike(
         constants=CONSTS,
-        torque_value_array=fitting_torque.torque_value_array,
-        restructed_torque_value=5,
-        ignore_zernike_number_list=zernike_removed.removing_zernike_number_list)
+        torque_value_array=fitting_torque.torque_value_array)
 
     wh_optimized_surface = pom.ZernikeToSurface(
         constants=CONSTS,
-        zernike_number_list=wh_optimized_zernike.remaining_zernike_number_list,
-        zernike_value_array=wh_optimized_zernike.remaining_reproducted_zernike_value_array)
+        zernike_value_array=wh_optimized_zernike.zernike_value_array)
 
     wh_optimized_exelis = pom.Surface(
         constants=CONSTS,
-        surface=zernike_removed.inputed_surface -
-        wh_optimized_surface.surface)
+        surface=filtered_exelis.surface - wh_optimized_surface.surface)
 
     fig = plt.figure(figsize=(10, 22))
     gs = fig.add_gridspec(4, 2)
