@@ -10,6 +10,7 @@ import numpy as np
 import proper as pr
 import scipy as sp
 from scipy import optimize
+from scipy import interpolate
 import cv2
 import PIL
 import time
@@ -231,9 +232,21 @@ class Constants:
         self.zernike_max_degree = zernike_max_degree
         operation_matrix_fpath = "mkfolder/make_opration_matrix/WT06_zer" + str(self.zernike_max_degree) + "_opration_matrix[m].csv"
         self.operation_matrix = np.genfromtxt(operation_matrix_fpath, delimiter=",").T
+        self.act_tuning_array = self.__make_act_tuning_array()
 
     def h(self):
         mkhelp(self)
+
+    def __make_act_tuning_array(self):
+        act_tuning = np.array([
+            37., 37., 20., 20., -38., 38.,
+            37., 37., 20., 20., -38., 38.,
+            37., 37., 20., 20., -38., 38.,
+            37., 37., 20., 20., -38., 38.,
+            37., 37., 20., 20., -38., 38.,
+            37., 37., 20., 20., -38., 38.])
+
+        return act_tuning
 
 
 class Surface:
@@ -655,6 +668,9 @@ class StitchedCsvToSurface(Surface):
         self.offset_height_value = super()._volume_calculation()[1]
         self.zernike_value_array = super()._zernike_value_array_calculation(self.surface)
 
+    def h(self):
+        mkhelp(self)
+
     def __read_csv_to_masked_surface(self, filepath):
         raw = np.loadtxt(filepath, delimiter=",")
         raw_zero_fill = np.where(np.isnan(raw), 0, raw)
@@ -695,6 +711,109 @@ class FilteredSurface(Surface):
 
         masked_filtered_surface = self.consts.mask * filtered_surface
         return masked_filtered_surface
+
+
+class FemTxtToSurface(Surface):
+
+    def __init__(
+            self,
+            constants,
+            wt_version: int,
+            wt_number: int):
+        """__init__
+        鍵谷先生のFEMモデル計算結果のtxtファイルからsurfaceを作る
+        surfaceの値は (Fxx - F00) * (Constants.act_tuning_array のwt_numberに対応した値)
+
+        Parameters
+        ----------
+        constants : Constants
+            Constantsクラス
+        wt_version : int
+            鍵谷先生の出力ファイルのWTのバージョン
+        wt_number : int
+            計算したWTのact番号 1~36
+        """
+
+        self.consts = constants
+        self.wt_number = wt_number
+
+        self.fpath_original = "raw_data/Fxx/PM3.5_36ptAxWT" + str(wt_version).zfill(2) + "_F00.smesh.txt"
+        self.fpath_deformed = "raw_data/Fxx/PM3.5_36ptAxWT" + str(wt_version).zfill(2) + "_F" + str(wt_number).zfill(2) + ".smesh.txt"
+        df_original = self.__read_file(self.fpath_original)
+        df_deformed = self.__read_file(self.fpath_deformed)
+
+        self.surface = self.__interpolation(df00=df_original, dfxx=df_deformed)
+
+        self.pv = super()._pv_calculation()
+        self.rms = super()._rms_calculation()
+        self.volume = super()._volume_calculation()[0]
+        self.offset_height_value = super()._volume_calculation()[1]
+        self.zernike_value_array = super()._zernike_value_array_calculation(self.surface)
+
+    def h(self):
+        mkhelp(self)
+
+    def __read_file(self, fpath: str) -> pd.DataFrame:
+        """__read_file
+        鍵谷先生のFEM出力データを読み出してdataframeとして出力
+
+        Parameters
+        ----------
+        fpath : str
+            読み込むfilepath
+
+        Returns
+        -------
+        pd.DataFrame
+            主に使うのはx, y, dz
+        """
+
+        df = pd.read_csv(
+            fpath,
+            sep="\\s+",
+            skiprows=7,
+            header=None)
+
+        df.columns = ["x", "y", "z", "color", "dx", "dy", "dz"]
+        return df
+
+    def __interpolation(
+            self,
+            df00: pd.DataFrame,
+            dfxx: pd.DataFrame) -> ndarray:
+        """__interpolation
+        FEM出力の点群をメッシュとして補間
+
+        Parameters
+        ----------
+        df00 : pd.DataFrame
+            変形前のFEM出力のDataFrame
+        dfxx : pd.DataFrame
+            変形後のFEM出力のDataFrame
+
+        Returns
+        -------
+        ndarray
+            変形前後でのz方向変位の2次元array (size = pixel_number * pixel_number)
+        """
+
+        x_1d = df00["x"]
+        y_1d = df00["y"]
+        dw_1d = dfxx["dz"] - df00["dz"]
+
+        xy_old = np.stack([x_1d, y_1d], axis=1)
+
+        dw_mesh = interpolate.griddata(
+            points=xy_old,
+            values=dw_1d,
+            xi=(self.consts.xx, self.consts.yy),
+            method="linear",
+            fill_value=0)
+
+        act_tuning_value = self.consts.act_tuning_array[self.wt_number - 1]
+        masked_surface = dw_mesh * self.consts.mask * act_tuning_value
+
+        return masked_surface
 
 
 class OapSurface(Surface):
