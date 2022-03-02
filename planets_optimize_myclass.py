@@ -809,6 +809,19 @@ class ExelisCsvToSurface(Surface):
         return deleted
 
     def __data_resize(self, surface: ndarray) -> ndarray:
+        """__data_resize
+        Exelisの1023 ** 2をpixel_number**2にリサイズ
+
+        Parameters
+        ----------
+        surface : ndarray
+            元の2次元array
+
+        Returns
+        -------
+        ndarray
+            size()=pixel_number**2 の2次元array
+        """
         inner_nan_removed = np.where(
             np.isnan(surface),
             np.nanmean(surface),
