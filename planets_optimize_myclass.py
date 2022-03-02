@@ -688,7 +688,17 @@ class KagiStitchToSurface(Surface):
     def __init__(
             self,
             constants,
-            txt_fpath):
+            txt_fpath: str):
+        """__init__
+        鍵谷先生のステッチ出力からSurfaceを作成
+
+        Parameters
+        ----------
+        constants :
+            Constantsクラス
+        txt_fpath : str
+            ステッチ出力のファイルパス
+        """
 
         self.consts = constants
         self.stitched_txt_filepath = txt_fpath
@@ -708,11 +718,32 @@ class KagiStitchToSurface(Surface):
         ステッチファイル出力ははxy座標は[mm]、z座標は[nm]
         """
         def stitched_data_interpolation(
-                x_old_array_mm,
-                y_old_array_mm,
-                z_old_array_nm,
-                x_new_mesh_mm,
-                y_new_mesh_mm):
+                x_old_array_mm: ndarray[float],
+                y_old_array_mm: ndarray[float],
+                z_old_array_nm: ndarray[float],
+                x_new_mesh_mm: ndarray[float, float],
+                y_new_mesh_mm: ndarray[float, float]) -> ndarray[float, float]:
+            """stitched_data_interpolation
+            データをメッシュに補間
+
+            Parameters
+            ----------
+            x_old_array_mm : ndarray[float]
+                1次元array [mm]
+            y_old_array_mm : ndarray[float]
+                1次元array [mm]
+            z_old_array_nm : ndarray[float]
+                1次元array [nm] ※単位注意
+            x_new_mesh_mm : ndarray[float, float]
+                2次元array [mm]
+            y_new_mesh_mm : ndarray[float, float]
+                2次元array [mm]
+
+            Returns
+            -------
+            ndarray[float, float]
+                z座標値の2次元array [nm]
+            """
 
             xy_old_mm = np.stack([x_old_array_mm, y_old_array_mm], axis=1)
             z_new_mesh_nm = interpolate.griddata(
