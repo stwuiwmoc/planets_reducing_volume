@@ -684,6 +684,64 @@ class StitchedCsvToSurface(Surface):
         return masked_surface
 
 
+class KagiStitchToSurface(Surface):
+    def __init__(
+            self,
+            constants,
+            txt_fpath):
+
+        self.consts = constants
+        self.stitched_txt_filepath = txt_fpath
+        self.surface = self.consts.mask * self.__read_txt_and_interpolation()
+        self.pv = super()._pv_calculation()
+        self.rms = super()._rms_calculation()
+        self.volume = super()._volume_calculation()[0]
+        self.offset_height_value = super()._volume_calculation()[1]
+        self.zernike_value_array = super()._zernike_value_array_calculation(self.surface)
+
+    def h(self):
+        mkhelp(self)
+
+    def __read_txt_and_interpolation(self):
+        """__read_txt_and_interpolation
+        txtを読み込んで、メッシュに補間し、単位をmeterに換算
+        ステッチファイル出力ははxy座標は[mm]、z座標は[nm]
+        """
+        def stitched_data_interpolation(
+                x_old_array_mm,
+                y_old_array_mm,
+                z_old_array_nm,
+                x_new_mesh_mm,
+                y_new_mesh_mm):
+
+            xy_old_mm = np.stack([x_old_array_mm, y_old_array_mm], axis=1)
+            z_new_mesh_nm = interpolate.griddata(
+                points=xy_old_mm,
+                values=z_old_array_nm,
+                xi=(x_new_mesh_mm, y_new_mesh_mm),
+                method="linear",
+                fill_value=0)
+
+            return z_new_mesh_nm
+
+        filepath = self.stitched_txt_filepath
+
+        raw = np.loadtxt(filepath)
+        x_raw_array = raw[:, 1]
+        y_raw_array = raw[:, 2]
+        z_raw_array = raw[:, 3]
+
+        z_mesh_nm = stitched_data_interpolation(
+            x_old_array_mm=x_raw_array,
+            y_old_array_mm=y_raw_array,
+            z_old_array_nm=z_raw_array,
+            x_new_mesh_mm=self.consts.xx * 1e3,
+            y_new_mesh_mm=self.consts.yy * 1e3)
+
+        z_mesh_meter = z_mesh_nm * 1e-9
+        return z_mesh_meter
+
+
 class FilteredSurface(Surface):
     def __init__(self, constants, inputed_surface, filter_parameter):
         self.consts = constants
