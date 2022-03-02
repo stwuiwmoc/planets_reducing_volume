@@ -773,6 +773,56 @@ class KagiStitchToSurface(Surface):
         return z_mesh_meter
 
 
+class ExelisCsvToSurface(Surface):
+    def __init__(
+            self,
+            constants,
+            csv_filepath: str = "raw_data/digitFig01.csv"):
+
+        self.consts = constants
+        self.filepath = csv_filepath
+        reshaped_surface = self.__raw_data_reshape()
+        self.surface = 1e-6 * self.consts.mask * self.__data_resize(reshaped_surface)
+
+        self.pv = super()._pv_calculation()
+        self.rms = super()._rms_calculation()
+        self.volume = super()._volume_calculation()[0]
+        self.offset_height_value = super()._volume_calculation()[1]
+        self.zernike_value_array = super()._zernike_value_array_calculation(self.surface)
+
+    def h(self):
+        mkhelp(self)
+
+    def __raw_data_reshape(self):
+        filepath = self.filepath
+        raw = np.genfromtxt(
+            fname=filepath,
+            delimiter=",",
+            encoding="utf-8_sig")
+
+        reshaped = raw.reshape((1024, 1026))
+
+        # 縦横の5.52182だけが並ぶ行と列を削除して1023*1023に成形
+        deleted_temp = np.delete(reshaped, 0, 0)
+        deleted = np.delete(deleted_temp, [0, 1024, 1025], 1)
+
+        return deleted
+
+    def __data_resize(self, surface: ndarray) -> ndarray:
+        inner_nan_removed = np.where(
+            np.isnan(surface),
+            np.nanmean(surface),
+            surface)
+
+        image = PIL.Image.fromarray(inner_nan_removed)
+        img_resize = image.resize(
+            size=(
+                self.consts.pixel_number,
+                self.consts.pixel_number))
+
+        return img_resize
+
+
 class FilteredSurface(Surface):
     def __init__(self, constants, inputed_surface, filter_parameter):
         self.consts = constants
