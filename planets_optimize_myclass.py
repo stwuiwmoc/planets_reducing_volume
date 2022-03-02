@@ -726,7 +726,21 @@ class FemTxtToSurface(Surface):
     def h(self):
         mkhelp(self)
 
-    def __read_file(self, fpath) -> pd.DataFrame:
+    def __read_file(self, fpath: str) -> pd.DataFrame:
+        """__read_file
+        鍵谷先生のFEM出力データを読み出してdataframeとして出力
+
+        Parameters
+        ----------
+        fpath : str
+            読み込むfilepath
+
+        Returns
+        -------
+        pd.DataFrame
+            主に使うのはx, y, dz
+        """
+
         df = pd.read_csv(
             fpath,
             sep="\\s+",
@@ -740,6 +754,21 @@ class FemTxtToSurface(Surface):
             self,
             df00: pd.DataFrame,
             dfxx: pd.DataFrame) -> ndarray:
+        """__interpolation
+        FEM出力の点群をメッシュとして補間
+
+        Parameters
+        ----------
+        df00 : pd.DataFrame
+            変形前のFEM出力のDataFrame
+        dfxx : pd.DataFrame
+            変形後のFEM出力のDataFrame
+
+        Returns
+        -------
+        ndarray
+            変形前後でのz方向変位の2次元array (size = pixel_number * pixel_number)
+        """
 
         x_1d = df00["x"]
         y_1d = df00["y"]
