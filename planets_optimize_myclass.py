@@ -624,66 +624,6 @@ class ZernikeToSurface(Surface):
         mkhelp(self)
 
 
-class StitchedCsvToSurface(Surface):
-    def __init__(
-            self,
-            constants,
-            original_stitched_csv_fpath,
-            deformed_stitched_csv_fpath):
-        """
-        class : 2d-surface from measured (stitched) 2d-csv data
-
-        Parameters
-        ----------
-        constants : TYPE
-            instance by class : Constants
-        original_stitched_csv_fpath : str
-            変形前の測定データ[mm]のcsvパス
-        deformed_stitched_csv_fpath : TYPE
-            変形後の測定データ[mm]のcsvパス
-            "" ならoriginalだけで計算
-        offset_height_percent : float
-            ignore height in percent. if you set 2, the lower 2% is ignored in self._volume_calculation()
-
-        Returns
-        -------
-        None.
-
-        """
-        self.consts = constants
-
-        if deformed_stitched_csv_fpath == "":
-            self.surface = self.__read_csv_to_masked_surface(original_stitched_csv_fpath)
-
-        else:
-            self.original_masked_surface = self.__read_csv_to_masked_surface(
-                original_stitched_csv_fpath)
-            self.deformed_masked_surface = self.__read_csv_to_masked_surface(
-                deformed_stitched_csv_fpath)
-            self.surface = self.deformed_masked_surface - self.original_masked_surface
-
-        self.pv = super()._pv_calculation()
-        self.rms = super()._rms_calculation()
-        self.volume = super()._volume_calculation()[0]
-        self.offset_height_value = super()._volume_calculation()[1]
-        self.zernike_value_array = super()._zernike_value_array_calculation(self.surface)
-
-    def h(self):
-        mkhelp(self)
-
-    def __read_csv_to_masked_surface(self, filepath):
-        raw = np.loadtxt(filepath, delimiter=",")
-        raw_zero_fill = np.where(np.isnan(raw), 0, raw)
-        image = PIL.Image.fromarray(raw_zero_fill)
-        img_resize = image.resize(
-            size=(
-                self.consts.pixel_number,
-                self.consts.pixel_number))
-
-        masked_surface = self.consts.mask * np.array(img_resize) * 1e-3
-        return masked_surface
-
-
 class KagiStitchToSurface(Surface):
     def __init__(
             self,
