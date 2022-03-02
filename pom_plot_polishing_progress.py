@@ -40,11 +40,8 @@ if __name__ == "__main__":
     cbar_max_percent_ = 90
     zaxis_bottom_percent_ = 20
 
-    mesE = pom.StitchedCsvToSurface(
-        constants=CONSTS,
-        original_stitched_csv_fpath="mkfolder/exelis_rawdata_edit/exelis_reshaped_mm.csv",
-        deformed_stitched_csv_fpath=""
-    )
+    mesE = pom.ExelisCsvToSurface(
+        constants=CONSTS)
 
     mes0 = pom.KagiStitchToSurface(
         constants=CONSTS,
