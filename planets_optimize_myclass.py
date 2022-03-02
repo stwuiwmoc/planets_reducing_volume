@@ -718,30 +718,30 @@ class KagiStitchToSurface(Surface):
         ステッチファイル出力ははxy座標は[mm]、z座標は[nm]
         """
         def stitched_data_interpolation(
-                x_old_array_mm: ndarray[float],
-                y_old_array_mm: ndarray[float],
-                z_old_array_nm: ndarray[float],
-                x_new_mesh_mm: ndarray[float, float],
-                y_new_mesh_mm: ndarray[float, float]) -> ndarray[float, float]:
+                x_old_array_mm: ndarray,
+                y_old_array_mm: ndarray,
+                z_old_array_nm: ndarray,
+                x_new_mesh_mm: ndarray,
+                y_new_mesh_mm: ndarray) -> ndarray:
             """stitched_data_interpolation
             データをメッシュに補間
 
             Parameters
             ----------
-            x_old_array_mm : ndarray[float]
+            x_old_array_mm : ndarray
                 1次元array [mm]
-            y_old_array_mm : ndarray[float]
+            y_old_array_mm : ndarray
                 1次元array [mm]
-            z_old_array_nm : ndarray[float]
+            z_old_array_nm : ndarray
                 1次元array [nm] ※単位注意
-            x_new_mesh_mm : ndarray[float, float]
+            x_new_mesh_mm : ndarray
                 2次元array [mm]
-            y_new_mesh_mm : ndarray[float, float]
+            y_new_mesh_mm : ndarray
                 2次元array [mm]
 
             Returns
             -------
-            ndarray[float, float]
+            ndarray
                 z座標値の2次元array [nm]
             """
 
