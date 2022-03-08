@@ -48,10 +48,9 @@ if __name__ == "__main__":
     cbar_max_percent_ = 90
     zaxis_bottom_percent_ = 50
 
-    target_surface = pom.StitchedCsvToSurface(
+    target_surface = pom.KagiStitchToSurface(
         constants=CONSTS,
-        original_stitched_csv_fpath="mkfolder/stitch2mesh/zer03_0207xm130All2_0208cir_0208ykagomeAllCc.v4.8.hei_dense.csv",
-        deformed_stitched_csv_fpath="")
+        txt_fpath="raw_data/0207xm130All2_0208cir_0208ykagomeAllCc.v4.8.hei_dense.txt")
 
     zernike_removed_surface = pom.ZernikeRemovedSurface(
         constants=CONSTS,

@@ -21,10 +21,8 @@ if __name__ == "__main__":
         zernike_max_degree=11,
         offset_height_percent=2)
 
-    exelis = pom.StitchedCsvToSurface(
-        constants=CONSTS,
-        original_stitched_csv_fpath="mkfolder/exelis_rawdata_edit/exelis_reshaped.csv",
-        deformed_stitched_csv_fpath="")
+    exelis = pom.ExelisCsvToSurface(
+        constants=CONSTS)
 
     removed = pom.ZernikeRemovedSurface(
         constants=CONSTS,

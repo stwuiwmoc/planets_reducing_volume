@@ -40,22 +40,16 @@ if __name__ == "__main__":
     cbar_max_percent_ = 90
     zaxis_bottom_percent_ = 20
 
-    mesE = pom.StitchedCsvToSurface(
-        constants=CONSTS,
-        original_stitched_csv_fpath="mkfolder/exelis_rawdata_edit/exelis_reshaped_mm.csv",
-        deformed_stitched_csv_fpath=""
-    )
+    mesE = pom.ExelisCsvToSurface(
+        constants=CONSTS)
 
-    mes0 = pom.StitchedCsvToSurface(
+    mes0 = pom.KagiStitchToSurface(
         constants=CONSTS,
-        original_stitched_csv_fpath="mkfolder/stitch2mesh/zer03_0923xm130_1007ym830.hei.v2_dense.csv",
-        deformed_stitched_csv_fpath=""
-    )
+        txt_fpath="raw_data/0923xm130_1007ym830.hei.v2_dense.txt")
 
-    mesN = pom.StitchedCsvToSurface(
+    mesN = pom.KagiStitchToSurface(
         constants=CONSTS,
-        original_stitched_csv_fpath="mkfolder/stitch2mesh/zer03_0207xm130All2_0208cir_0208ykagomeAllCc.v4.8.hei_dense.csv",
-        deformed_stitched_csv_fpath=""
+        txt_fpath="raw_data/0228xm130_3degintAll_0301ym870-510CirAll_0228ykagomeACc.v4.6.hei_dense.txt"
     )
 
     zerE = pom.ZernikeRemovedSurface(
