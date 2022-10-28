@@ -1,5 +1,6 @@
 # %%
 import importlib
+
 import matplotlib.pyplot as plt
 
 import planets_optimize_myclass as pom
@@ -36,9 +37,9 @@ if __name__ == "__main__":
     serial_n = "0117l"
     input_filename_n = "../sag_integration_code/" + "mkfolder/psm_test_kagi_data_integration/" + serial_n + "_height.csv"
 
-    mes = pom.CirclePathMeasurementReading(Constants=CONSTS,
-                                           original_csv_fpath=input_filename_n,
-                                           deformed_csv_fpath="")
+    mes = pom.CirclePathMeasurementCsvReading(Constants=CONSTS,
+                                              original_csv_fpath=input_filename_n,
+                                              deformed_csv_fpath="")
 
     res = pom.CirclePathZernikeFitting(Constants=CONSTS,
                                        circle_path_radius=870e-3,

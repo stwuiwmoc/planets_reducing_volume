@@ -1,7 +1,8 @@
 # %%
 
-import matplotlib.pyplot as plt
 import importlib
+
+import matplotlib.pyplot as plt
 import numpy as np
 
 import planets_optimize_myclass as pom
@@ -59,7 +60,7 @@ if __name__ == "__main__":
     input_filename_0 = "../sag_integration_code/" + folderpath + serials[0] + "_height.csv"
     input_filename_n = "../sag_integration_code/" + folderpath + serials[ptn] + "_height.csv"
 
-    mes_raw0n = pom.CirclePathMeasurementReading(
+    mes_raw0n = pom.CirclePathMeasurementCsvReading(
         Constants=CONSTS,
         original_csv_fpath=input_filename_0,
         deformed_csv_fpath=input_filename_n)
