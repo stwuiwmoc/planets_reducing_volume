@@ -6,8 +6,9 @@ Created on Wed Dec 29 20:12:37 2021
 """
 # %%
 
-import numpy as np
 import importlib
+
+import numpy as np
 
 import planets_optimize_myclass as pom
 

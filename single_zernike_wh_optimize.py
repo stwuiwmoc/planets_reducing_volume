@@ -1,10 +1,11 @@
 # %%
 
-import numpy as np
+import importlib
+
 import matplotlib.pyplot as plt
+import numpy as np
 
 import planets_optimize_myclass as pom
-import importlib
 
 
 def mkfolder(suffix=""):

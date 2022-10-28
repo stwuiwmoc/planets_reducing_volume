@@ -1,7 +1,8 @@
 # %%
 
-import matplotlib.pyplot as plt
 import importlib
+
+import matplotlib.pyplot as plt
 
 import planets_optimize_myclass as pom
 

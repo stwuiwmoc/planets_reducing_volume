@@ -6,9 +6,10 @@ Created on Tue Dec 28 17:01:34 2021
 """
 # %%
 
-import numpy as np
-import matplotlib.pyplot as plt
 import importlib
+
+import matplotlib.pyplot as plt
+import numpy as np
 
 import planets_optimize_myclass as pom
 
