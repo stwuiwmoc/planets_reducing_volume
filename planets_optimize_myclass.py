@@ -1242,6 +1242,16 @@ class CirclePathMeasurementCsvReading:
         mkhelp(self)
 
 
+class CirclePathMeasurementTxtReading:
+    def __init__(
+            self,
+            Constants,
+            original_csv_fpath: str,
+            deformed_csv_fpath: str) -> None:
+
+        pass
+
+
 class CirclePathZernikeFitting:
     def __init__(
             self,
