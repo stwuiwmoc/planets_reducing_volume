@@ -4,21 +4,20 @@ Created on Thu Dec  9 14:59:35 2021
 
 @author: swimc
 """
-# %%
-from numpy import ndarray
+import time
+
+import cv2
+import mpl_toolkits.axes_grid1
 import numpy as np
+import pandas as pd
+import PIL
 import proper as pr
 import scipy as sp
-from scipy import optimize
-from scipy import interpolate
-import cv2
-import PIL
-import time
-import pandas as pd
-
 from matplotlib import cm
 from matplotlib.colors import Normalize
-import mpl_toolkits.axes_grid1
+# %%
+from numpy import ndarray
+from scipy import interpolate, optimize
 
 
 def mkfolder(suffix=""):
@@ -1214,7 +1213,7 @@ class OapMinimize:
         return volume
 
 
-class CirclePathMeasurementReading:
+class CirclePathMeasurementCsvReading:
     def __init__(
             self,
             Constants,
@@ -1260,7 +1259,7 @@ class CirclePathZernikeFitting:
         circle_path_radius : float
             円環パスの半径 [m]
         df_diff : pd.DataFrame
-            CirclePathMeasurementReading の df_diff
+            CirclePathMeasurementCsvReading の df_diff
         ignore_zernike_number_list : list[int]
             zernikeでfittingした後に除去する項（中身は1~11まで）
         """

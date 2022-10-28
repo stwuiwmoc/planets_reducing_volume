@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 # %%
+import os
+
+import matplotlib.cm as cm
+import matplotlib.pyplot as plt
+import mpl_toolkits.axes_grid1
 import numpy as np
 import pandas as pd
-import os
 import proper as pr
 import scipy as sp
-
-import matplotlib.pyplot as plt
-import matplotlib.cm as cm
 from matplotlib.colors import Normalize
-import mpl_toolkits.axes_grid1
 
 
 def mkfolder(suffix=""):
