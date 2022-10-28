@@ -1243,13 +1243,80 @@ class CirclePathMeasurementCsvReading:
 
 
 class CirclePathMeasurementTxtReading:
+
     def __init__(
             self,
-            Constants,
-            original_csv_fpath: str,
-            deformed_csv_fpath: str) -> None:
+            Constants: Constants,
+            original_txt_fpath: str,
+            deformed_txt_fpath: str) -> None:
+        """鍵谷先生の円環パス逐次積分結果を読み込んで、
+        CirclePathMeasurementCsvReadingで使っているものと同じ形式のdataframeを作る
 
-        pass
+        Parameters
+        ----------
+        Constants : Constants
+            自作インスタンス
+        original_txt_fpath : str
+            変形前の円環パス逐次積分結果のファイルパス（.txt）
+        deformed_txt_fpath : str
+            変形後の円環パス逐次積分結果のファイルパス（.txt）
+        """
+
+        self.consts = Constants
+
+        self.df_raw_original = self.__read_txt(
+            txt_filepath=original_txt_fpath)
+
+        self.df_raw_deformed = self.__read_txt(
+            txt_filepath=deformed_txt_fpath)
+
+        height_diff = self.df_raw_deformed["height"].values - self.df_raw_original["height"].values
+
+        self.df_diff = pd.DataFrame({
+            "degree": self.df_raw_original["angle"].values,
+            "radian": np.deg2rad(self.df_raw_original["angle"].values),
+            "height": height_diff,
+        })
+
+    def h(self):
+        mkhelp(self)
+
+    def __read_txt(self, txt_filepath: str) -> pd.DataFrame:
+        """鍵谷先生の円環パス逐次積分結果を読み込んで、
+        CirclePathMeasurementCsvReadingで使っているものと同じ形式のdataframeを作る
+
+        Parameters
+        ----------
+        txt_filepath : str
+            鍵谷先生の作る円環パス逐次積分結果（.txt）
+
+        Returns
+        -------
+        pd.DataFrame
+            angle : [deg] 角度
+            height : [m] 高さ
+        """
+
+        df_raw = pd.read_csv(
+            txt_filepathskiprows=1, names=["x", "y", "z", "beam"],
+            delimiter=" ", index_col=None, skipfooter=2, engine="python")
+
+        angle_raw_array = np.rad2deg(
+            np.arcsin(
+                df_raw["x"].values / np.sqrt(df_raw["x"].values**2 + df_raw["y"].values**2)))
+
+        angle_array = angle_raw_array.copy()
+        min_idx = angle_raw_array.argmin()
+        max_idx = angle_raw_array.argmax()
+        angle_array[max_idx:min_idx] = -angle_raw_array[max_idx:min_idx] + 2 * angle_raw_array.max()
+        angle_array[min_idx:] = angle_raw_array[min_idx:] + (angle_array.max() - angle_array.min())
+
+        df = pd.DataFrame({
+            "degree": angle_array,
+            "height": df_raw["z"].values * 1e-9
+        })
+
+        return df
 
 
 class CirclePathZernikeFitting:
