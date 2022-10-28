@@ -1273,8 +1273,8 @@ class CirclePathMeasurementTxtReading:
         height_diff = self.df_raw_deformed["height"].values - self.df_raw_original["height"].values
 
         self.df_diff = pd.DataFrame({
-            "degree": self.df_raw_original["angle"].values,
-            "radian": np.deg2rad(self.df_raw_original["angle"].values),
+            "degree": self.df_raw_original["degree"].values,
+            "radian": np.deg2rad(self.df_raw_original["degree"].values),
             "height": height_diff,
         })
 
@@ -1298,7 +1298,7 @@ class CirclePathMeasurementTxtReading:
         """
 
         df_raw = pd.read_csv(
-            txt_filepathskiprows=1, names=["x", "y", "z", "beam"],
+            txt_filepath, skiprows=1, names=["x", "y", "z", "beam"],
             delimiter=" ", index_col=None, skipfooter=2, engine="python")
 
         angle_raw_array = np.rad2deg(
