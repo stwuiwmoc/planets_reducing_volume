@@ -1421,9 +1421,10 @@ class CirclePathZernikeFitting:
             return zernike_r_const_polynomial
 
         def minimize_funciton_sq(x, params_):
-            radius_, theta_array_, height_array_ = params_
+            pupil_radius_, radius_, theta_array_, height_array_ = params_
             zernike_array_ = zernike_r_const_polynomial_calculation(
                 coef_r_const=x,
+                pupil_radius=pupil_radius_,
                 radius=radius_,
                 theta=theta_array_)
 
