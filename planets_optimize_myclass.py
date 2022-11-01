@@ -1515,6 +1515,7 @@ class CirclePathZernikeFitting:
 
         removing_zernike_array = zernike_polynomial_calculation(
             coef=remaining_zernike_polynomial_array,
+            pupil_radius=self.consts.varid_radius,
             radius=self.circle_path_radius,
             theta=radian_array)
 
