@@ -161,6 +161,7 @@ def zernike_term_calculation(
 
 def zernike_polynomial_calculation(
         coef: list[float],
+        pupil_radius: float,
         radius: ndarray,
         theta: ndarray) -> ndarray:
     """
@@ -170,10 +171,12 @@ def zernike_polynomial_calculation(
     ----------
     coef : list[float]
         zernike係数ベクトル
+    pupil_radius : float
+        [m] 瞳の半径
     radius : ndarray
-        半径 [m]
+        [m] 半径の1次元array
     theta : ndarray
-        角度 [rad]
+        [rad] 角度の1次元array
 
     Returns
     -------
@@ -181,17 +184,17 @@ def zernike_polynomial_calculation(
         zernike多項式のarray
     """
 
-    zernike1 = coef[0] * zernike_term_calculation(1, radius, theta)
-    zernike2 = coef[1] * zernike_term_calculation(2, radius, theta)
-    zernike3 = coef[2] * zernike_term_calculation(3, radius, theta)
-    zernike4 = coef[3] * zernike_term_calculation(4, radius, theta)
-    zernike5 = coef[4] * zernike_term_calculation(5, radius, theta)
-    zernike6 = coef[5] * zernike_term_calculation(6, radius, theta)
-    zernike7 = coef[6] * zernike_term_calculation(7, radius, theta)
-    zernike8 = coef[7] * zernike_term_calculation(8, radius, theta)
-    zernike9 = coef[8] * zernike_term_calculation(9, radius, theta)
-    zernike10 = coef[9] * zernike_term_calculation(10, radius, theta)
-    zernike11 = coef[10] * zernike_term_calculation(11, radius, theta)
+    zernike1 = coef[0] * zernike_term_calculation(1, pupil_radius, radius, theta)
+    zernike2 = coef[1] * zernike_term_calculation(2, pupil_radius, radius, theta)
+    zernike3 = coef[2] * zernike_term_calculation(3, pupil_radius, radius, theta)
+    zernike4 = coef[3] * zernike_term_calculation(4, pupil_radius, radius, theta)
+    zernike5 = coef[4] * zernike_term_calculation(5, pupil_radius, radius, theta)
+    zernike6 = coef[5] * zernike_term_calculation(6, pupil_radius, radius, theta)
+    zernike7 = coef[6] * zernike_term_calculation(7, pupil_radius, radius, theta)
+    zernike8 = coef[7] * zernike_term_calculation(8, pupil_radius, radius, theta)
+    zernike9 = coef[8] * zernike_term_calculation(9, pupil_radius, radius, theta)
+    zernike10 = coef[9] * zernike_term_calculation(10, pupil_radius, radius, theta)
+    zernike11 = coef[10] * zernike_term_calculation(11, pupil_radius, radius, theta)
 
     zernike_polynomial = zernike1 + zernike2 + zernike3 + zernike4 + zernike5 + zernike6 + zernike7 + zernike8 + zernike9 + zernike10 + zernike11
     return zernike_polynomial
