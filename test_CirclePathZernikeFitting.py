@@ -38,10 +38,19 @@ if __name__ == "__main__":
     original_filepath = "raw_data/220117xrmEAi.v5.40.hei.txt"
     deformed_filepath = "raw_data/220117xrmFEi.v5.40.hei.txt"
 
+    ignore_zernike_number_list = [1, 2, 3, 4, 5, 6, 7, 8]
+
     measurement_diff = pom.CirclePathMeasurementTxtReading(
         Constants=CONSTS,
         original_txt_fpath=original_filepath,
         deformed_txt_fpath=deformed_filepath
+    )
+
+    residual = pom.CirclePathZernikeFitting(
+        Constants=CONSTS,
+        circle_path_radius=870e-3,
+        df_diff=measurement_diff.df_diff,
+        ignore_zernike_number_list=ignore_zernike_number_list
     )
 
     # plot
