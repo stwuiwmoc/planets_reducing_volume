@@ -1358,71 +1358,75 @@ class CirclePathZernikeFitting:
 
         zernike_fitting_result = self.__zernike_fitting()
         self.optimize_result = zernike_fitting_result["optimize_result"]
-        self.zernike_polynomial_array = zernike_fitting_result["zernike_polynomial_array"]
+        self.zernike_r_const_polynomial_array = zernike_fitting_result["zernike_r_const_polynomial_array"]
 
-        zernike_removing_result = self.__zernike_removing(zernike_polynomial_array=self.zernike_polynomial_array)
+        """
+        zernike_removing_result = self.__zernike_removing(
+            zernike_r_const_polynomial_array=self.zernike_r_const_polynomial_array)
         self.removing_zernike = zernike_removing_result["removing_zernike"]
         self.height_removed = zernike_removing_result["residual"]
+        """
 
     def h(self):
         mkhelp(self)
 
+    def __zernike_r_const_polynomial_calculation(
+            self,
+            coef_r_const: list[float],
+            pupil_radius: float,
+            radius: float,
+            theta: ndarray) -> ndarray:
+        """zernike_r_const_polynomial_calculation
+        radiusが固定値（＝円環パス）の場合のzernike 多項式の計算
+        そのままのzernikeでフィッティングすると、
+        thetaによる計算結果の部分が全く同じ値になる項（1, 4, 11など）が出て各係数が独立ではなくなってしまう
+
+        Parameters
+        ----------
+        coef_r_const : list[float]
+            radius固定値の時のzernike係数ベクトル
+        pupil_radius : float
+            [m] 瞳の半径
+        radius : float
+            [m] 円環パスの半径（固定値なのでarrayではない）
+        theta : ndarray
+            [rad] 角度
+
+        Returns
+        -------
+        ndarray
+            zernike 多項式の計算結果
+        """
+
+        zernike1_ = zernike_term_calculation(1, pupil_radius, radius, theta)
+        zernike2_ = zernike_term_calculation(2, pupil_radius, radius, theta)
+        zernike3_ = zernike_term_calculation(3, pupil_radius, radius, theta)
+        zernike4_ = zernike_term_calculation(4, pupil_radius, radius, theta)
+        zernike5_ = zernike_term_calculation(5, pupil_radius, radius, theta)
+        zernike6_ = zernike_term_calculation(6, pupil_radius, radius, theta)
+        zernike7_ = zernike_term_calculation(7, pupil_radius, radius, theta)
+        zernike8_ = zernike_term_calculation(8, pupil_radius, radius, theta)
+        zernike9_ = zernike_term_calculation(9, pupil_radius, radius, theta)
+        zernike10_ = zernike_term_calculation(10, pupil_radius, radius, theta)
+        zernike11_ = zernike_term_calculation(11, pupil_radius, radius, theta)
+
+        zernike1_4_11 = coef_r_const[0] * (zernike1_ + zernike4_ + zernike11_)
+        zernike2_8 = coef_r_const[1] * (zernike2_ + zernike8_)
+        zernike3_7 = coef_r_const[2] * (zernike3_ + zernike7_)
+        zernike5 = coef_r_const[3] * zernike5_
+        zernike6 = coef_r_const[4] * zernike6_
+        zernike9 = coef_r_const[5] * zernike9_
+        zernike10 = coef_r_const[6] * zernike10_
+
+        zernike_r_const_polynomial = zernike1_4_11 + zernike2_8 + zernike3_7 + zernike5 + zernike6 + zernike9 + zernike10
+
+        return zernike_r_const_polynomial
+
     def __zernike_fitting(self):
-
-        def zernike_r_const_polynomial_calculation(
-                coef_r_const: list[float],
-                pupil_radius: float,
-                radius: float,
-                theta: ndarray) -> ndarray:
-            """zernike_r_const_polynomial_calculation
-            radiusが固定値（＝円環パス）の場合のzernike 多項式の計算
-            そのままのzernikeでフィッティングすると、
-            thetaによる計算結果の部分が全く同じ値になる項（1, 4, 11など）が出て各係数が独立ではなくなってしまう
-
-            Parameters
-            ----------
-            coef_r_const : list[float]
-                radius固定値の時のzernike係数ベクトル
-            pupil_radius : float
-                [m] 瞳の半径
-            radius : float
-                [m] 円環パスの半径（固定値なのでarrayではない）
-            theta : ndarray
-                [rad] 角度
-
-            Returns
-            -------
-            ndarray
-                zernike 多項式の計算結果
-            """
-
-            zernike1_ = zernike_term_calculation(1, pupil_radius, radius, theta)
-            zernike2_ = zernike_term_calculation(2, pupil_radius, radius, theta)
-            zernike3_ = zernike_term_calculation(3, pupil_radius, radius, theta)
-            zernike4_ = zernike_term_calculation(4, pupil_radius, radius, theta)
-            zernike5_ = zernike_term_calculation(5, pupil_radius, radius, theta)
-            zernike6_ = zernike_term_calculation(6, pupil_radius, radius, theta)
-            zernike7_ = zernike_term_calculation(7, pupil_radius, radius, theta)
-            zernike8_ = zernike_term_calculation(8, pupil_radius, radius, theta)
-            zernike9_ = zernike_term_calculation(9, pupil_radius, radius, theta)
-            zernike10_ = zernike_term_calculation(10, pupil_radius, radius, theta)
-            zernike11_ = zernike_term_calculation(11, pupil_radius, radius, theta)
-
-            zernike1_4_11 = coef_r_const[0] * (zernike1_ + zernike4_ + zernike11_)
-            zernike2_8 = coef_r_const[1] * (zernike2_ + zernike8_)
-            zernike3_7 = coef_r_const[2] * (zernike3_ + zernike7_)
-            zernike5 = coef_r_const[3] * zernike5_
-            zernike6 = coef_r_const[4] * zernike6_
-            zernike9 = coef_r_const[5] * zernike9_
-            zernike10 = coef_r_const[6] * zernike10_
-
-            zernike_r_const_polynomial = zernike1_4_11 + zernike2_8 + zernike3_7 + zernike5 + zernike6 + zernike9 + zernike10
-
-            return zernike_r_const_polynomial
 
         def minimize_funciton_sq(x, params_):
             pupil_radius_, radius_, theta_array_, height_array_ = params_
-            zernike_array_ = zernike_r_const_polynomial_calculation(
+            zernike_array_ = self.__zernike_r_const_polynomial_calculation(
                 coef_r_const=x,
                 pupil_radius=pupil_radius_,
                 radius=radius_,
@@ -1430,37 +1434,6 @@ class CirclePathZernikeFitting:
 
             residual = height_array_ - zernike_array_
             return residual
-
-        def make_zernike_polynomial_from_r_const_zernike(
-                zernike_r_const_polynomial_list: list[float]) -> ndarray:
-            """make_zernike_polynomial_from_r_const_zernike
-            radius固定の場合のzernike係数ベクトルを通常のzernike係数ベクトルとして並べ直す
-
-            Parameters
-            ----------
-            zernike_r_const_polynomial_list : list[float]
-                radius固定の場合のzernike係数
-
-            Returns
-            -------
-            ndarray
-                通常のzernike係数ベクトル len(ndarray) = 11
-            """
-
-            zernike_polynomial_array_ = np.empty(11)
-            zernike_polynomial_array_[0] = zernike_r_const_polynomial_list[0]
-            zernike_polynomial_array_[1] = zernike_r_const_polynomial_list[1]
-            zernike_polynomial_array_[2] = zernike_r_const_polynomial_list[2]
-            zernike_polynomial_array_[3] = zernike_r_const_polynomial_list[0]
-            zernike_polynomial_array_[4] = zernike_r_const_polynomial_list[3]
-            zernike_polynomial_array_[5] = zernike_r_const_polynomial_list[4]
-            zernike_polynomial_array_[6] = zernike_r_const_polynomial_list[2]
-            zernike_polynomial_array_[7] = zernike_r_const_polynomial_list[1]
-            zernike_polynomial_array_[8] = zernike_r_const_polynomial_list[5]
-            zernike_polynomial_array_[9] = zernike_r_const_polynomial_list[6]
-            zernike_polynomial_array_[10] = zernike_r_const_polynomial_list[0]
-
-            return zernike_polynomial_array_
 
         pupil_radius = self.consts.varid_radius
         radius = self.circle_path_radius
@@ -1473,24 +1446,22 @@ class CirclePathZernikeFitting:
                                                     x0=(np.ones(7) * 1e-9),
                                                     args=(params, ))
 
-        zernike_polynomial_array = make_zernike_polynomial_from_r_const_zernike(optimize_result_sq["x"])
-
         result_dict = {
             "optimize_result": optimize_result_sq,
-            "zernike_polynomial_array": zernike_polynomial_array}
+            "zernike_r_const_polynomial_array": optimize_result_sq["x"]}
 
         return result_dict
 
     def __zernike_removing(
             self,
-            zernike_polynomial_array: ndarray) -> dict:
+            zernike_r_const_polynomial_array: ndarray) -> dict:
         """__zernike_removing
         zernike係数ベクトルを用いてzernike成分を除去
 
         Parameters
         ----------
-        zernike_polynomial_array : ndarray
-            通常のzernike係数ベクトル
+        zernike_r_const_polynomial_array : ndarray
+            半径一定の場合のzernike係数ベクトル
 
         Returns
         -------
@@ -1498,24 +1469,12 @@ class CirclePathZernikeFitting:
             removing_zernike: 除去するzernike成分の計算結果のarray
             residual: height - removing_zernike
         """
-        def make_remaining_array(
-                ignore_list: list[int],
-                polynomial_array: ndarray) -> ndarray:
-            tf_array = np.zeros(11)
-            for num in ignore_list:
-                tf_array[num - 1] = 1
-            remaining_polynomial_array = tf_array * polynomial_array
-            return remaining_polynomial_array
 
         radian_array = self.df_diff["radian"].values
         height_array = self.df_diff["height"].values
         ignore_zernike_number_list = self.ignore_zernike_number_list
 
-        remaining_zernike_polynomial_array = make_remaining_array(
-            ignore_list=ignore_zernike_number_list,
-            polynomial_array=zernike_polynomial_array)
-
-        removing_zernike_array = zernike_polynomial_calculation(
+        removing_zernike_array = self.__zernike_r_const_polynomial_calculation(
             coef=remaining_zernike_polynomial_array,
             pupil_radius=self.consts.varid_radius,
             radius=self.circle_path_radius,
