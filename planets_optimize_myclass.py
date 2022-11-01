@@ -1462,11 +1462,12 @@ class CirclePathZernikeFitting:
 
             return zernike_polynomial_array_
 
+        pupil_radius = self.consts.varid_radius
         radius = self.circle_path_radius
         theta_array = self.df_diff["radian"].values
         height_array = self.df_diff["height"].values
 
-        params = [radius, theta_array, height_array]
+        params = [pupil_radius, radius, theta_array, height_array]
 
         optimize_result_sq = optimize.least_squares(fun=minimize_funciton_sq,
                                                     x0=(np.ones(7) * 1e-9),
