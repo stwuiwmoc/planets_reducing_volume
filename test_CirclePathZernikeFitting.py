@@ -38,7 +38,7 @@ if __name__ == "__main__":
     original_filepath = "raw_data/220117xrmEAi.v5.40.hei.txt"
     deformed_filepath = "raw_data/220117xrmFEi.v5.40.hei.txt"
 
-    diff = pom.CirclePathMeasurementTxtReading(
+    measurement_diff = pom.CirclePathMeasurementTxtReading(
         Constants=CONSTS,
         original_txt_fpath=original_filepath,
         deformed_txt_fpath=deformed_filepath
@@ -50,7 +50,7 @@ if __name__ == "__main__":
     gs1 = fig1.add_gridspec(1, 1)
 
     ax11 = fig1.add_subplot(gs1[0, 0])
-    ax11.plot(diff.df_diff["degree"], diff.df_diff["height"])
+    ax11.plot(measurement_diff.df_diff["degree"], measurement_diff.df_diff["height"])
 
     ax11.set_xlabel("degree")
     ax11.set_ylabel("height [m]")
