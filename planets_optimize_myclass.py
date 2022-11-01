@@ -1371,6 +1371,7 @@ class CirclePathZernikeFitting:
 
         def zernike_r_const_polynomial_calculation(
                 coef_r_const: list[float],
+                pupil_radius: float,
                 radius: float,
                 theta: ndarray) -> ndarray:
             """zernike_r_const_polynomial_calculation
@@ -1382,10 +1383,12 @@ class CirclePathZernikeFitting:
             ----------
             coef_r_const : list[float]
                 radius固定値の時のzernike係数ベクトル
+            pupil_radius : float
+                [m] 瞳の半径
             radius : float
-                円環パスの半径（固定値なのでarrayではない）
+                [m] 円環パスの半径（固定値なのでarrayではない）
             theta : ndarray
-                角度 [rad]
+                [rad] 角度
 
             Returns
             -------
@@ -1393,17 +1396,17 @@ class CirclePathZernikeFitting:
                 zernike 多項式の計算結果
             """
 
-            zernike1_ = zernike_term_calculation(1, radius, theta)
-            zernike2_ = zernike_term_calculation(2, radius, theta)
-            zernike3_ = zernike_term_calculation(3, radius, theta)
-            zernike4_ = zernike_term_calculation(4, radius, theta)
-            zernike5_ = zernike_term_calculation(5, radius, theta)
-            zernike6_ = zernike_term_calculation(6, radius, theta)
-            zernike7_ = zernike_term_calculation(7, radius, theta)
-            zernike8_ = zernike_term_calculation(8, radius, theta)
-            zernike9_ = zernike_term_calculation(9, radius, theta)
-            zernike10_ = zernike_term_calculation(10, radius, theta)
-            zernike11_ = zernike_term_calculation(11, radius, theta)
+            zernike1_ = zernike_term_calculation(1, pupil_radius, radius, theta)
+            zernike2_ = zernike_term_calculation(2, pupil_radius, radius, theta)
+            zernike3_ = zernike_term_calculation(3, pupil_radius, radius, theta)
+            zernike4_ = zernike_term_calculation(4, pupil_radius, radius, theta)
+            zernike5_ = zernike_term_calculation(5, pupil_radius, radius, theta)
+            zernike6_ = zernike_term_calculation(6, pupil_radius, radius, theta)
+            zernike7_ = zernike_term_calculation(7, pupil_radius, radius, theta)
+            zernike8_ = zernike_term_calculation(8, pupil_radius, radius, theta)
+            zernike9_ = zernike_term_calculation(9, pupil_radius, radius, theta)
+            zernike10_ = zernike_term_calculation(10, pupil_radius, radius, theta)
+            zernike11_ = zernike_term_calculation(11, pupil_radius, radius, theta)
 
             zernike1_4_11 = coef_r_const[0] * (zernike1_ + zernike4_ + zernike11_)
             zernike2_8 = coef_r_const[1] * (zernike2_ + zernike8_)
