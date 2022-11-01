@@ -106,7 +106,8 @@ def oap_calculation(radius_of_curvature, off_axis_distance, clocking_angle_rad, 
 
 def zernike_term_calculation(
         term_number: int,
-        radius: ndarray,
+        pupil_radius: float,
+        normalization_radius: ndarray,
         theta: ndarray) -> ndarray:
     """zernike_term_calculation
     zernikeの各項を計算する（係数は入ってない）
@@ -114,39 +115,45 @@ def zernike_term_calculation(
     Parameters
     ----------
     term_number : int
-        計算したいzernikeの項の番号（1~11）
+        [無次元] 計算したいzernikeの項の番号（1～11）
+    pupil_radius : float
+        [m] 瞳の半径
     radius : ndarray
-        半径 [m]
+        [m] 半径の1次元array
     theta : ndarray
-        角度 [rad]
+        [rad] 角度の1次元array
 
     Returns
     -------
     ndarray
         zernikeのどれか一つの項の計算結果（係数は入ってない）
     """
+
+    # zernike多項式は単位円上での話なので、瞳半径で1になるように正規化する
+    normalization_radius = normalization_radius / pupil_radius
+
     if term_number == 1:
         return 1
     if term_number == 2:
-        return 2 * (radius) * np.cos(theta)
+        return 2 * normalization_radius * np.cos(theta)
     if term_number == 3:
-        return 2 * (radius) * np.sin(theta)
+        return 2 * normalization_radius * np.sin(theta)
     if term_number == 4:
-        return np.sqrt(3) * (2.0 * radius ** 2 - 1.0)
+        return np.sqrt(3) * (2.0 * normalization_radius ** 2 - 1.0)
     if term_number == 5:
-        return np.sqrt(6) * (radius ** 2) * np.sin(2 * theta)
+        return np.sqrt(6) * (normalization_radius ** 2) * np.sin(2 * theta)
     if term_number == 6:
-        return np.sqrt(6) * (radius ** 2) * np.cos(2 * theta)
+        return np.sqrt(6) * (normalization_radius ** 2) * np.cos(2 * theta)
     if term_number == 7:
-        return np.sqrt(8) * (3.0 * radius ** 3 - 2.0 * radius) * np.sin(theta)
+        return np.sqrt(8) * (3.0 * normalization_radius ** 3 - 2.0 * normalization_radius) * np.sin(theta)
     if term_number == 8:
-        return np.sqrt(8) * (3.0 * radius ** 3 - 2.0 * radius) * np.cos(theta)
+        return np.sqrt(8) * (3.0 * normalization_radius ** 3 - 2.0 * normalization_radius) * np.cos(theta)
     if term_number == 9:
-        return np.sqrt(8) * (radius ** 3) * np.sin(3 * theta)
+        return np.sqrt(8) * (normalization_radius ** 3) * np.sin(3 * theta)
     if term_number == 10:
-        return np.sqrt(8) * (radius ** 3) * np.cos(3 * theta)
+        return np.sqrt(8) * (normalization_radius ** 3) * np.cos(3 * theta)
     if term_number == 11:
-        return np.sqrt(5) * (6.0 * radius ** 4 - 6.0 * radius ** 2 + 1.0)
+        return np.sqrt(5) * (6.0 * normalization_radius ** 4 - 6.0 * normalization_radius ** 2 + 1.0)
     else:
         print("term_number must be 1~11")
         return
