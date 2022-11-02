@@ -1360,12 +1360,11 @@ class CirclePathZernikeFitting:
         self.optimize_result = zernike_fitting_result["optimize_result"]
         self.zernike_r_const_polynomial_array = zernike_fitting_result["zernike_r_const_polynomial_array"]
 
-        """
         zernike_removing_result = self.__zernike_removing(
             zernike_r_const_polynomial_array=self.zernike_r_const_polynomial_array)
-        self.removing_zernike = zernike_removing_result["removing_zernike"]
-        self.height_removed = zernike_removing_result["residual"]
-        """
+
+        self.removing_zernike_height_array = zernike_removing_result["removing_zernike_height"]
+        self.zernike_removed_height_array = zernike_removing_result["residual"]
 
     def h(self):
         mkhelp(self)
@@ -1384,7 +1383,8 @@ class CirclePathZernikeFitting:
         Parameters
         ----------
         coef_r_const : list[float]
-            radius固定値の時のzernike係数ベクトル
+            radius固定値の時のzernike係数ベクトル（z=11まででlen=7）
+            順番は [1+4+11, 2+8, 3+7, 5, 6, 9, 10]
         pupil_radius : float
             [m] 瞳の半径
         radius : float
@@ -1443,7 +1443,7 @@ class CirclePathZernikeFitting:
         params = [pupil_radius, radius, theta_array, height_array]
 
         optimize_result_sq = optimize.least_squares(fun=minimize_funciton_sq,
-                                                    x0=(np.ones(7) * 1e-9),
+                                                    x0=(np.ones(7) * 1e-8),
                                                     args=(params, ))
 
         result_dict = {
@@ -1466,24 +1466,101 @@ class CirclePathZernikeFitting:
         Returns
         -------
         dict
-            removing_zernike: 除去するzernike成分の計算結果のarray
+            removing_zernike_height: 除去するzernike成分の計算結果のarray
             residual: height - removing_zernike
         """
 
+        def make_removing_zernike_r_const_polynomial_array(
+                zernike_r_const_polynomial_array_: ndarray,
+                ignore_zernike_number_list: list[int]) -> list[int]:
+
+            removing_zernike_r_const_polynomial_tf = np.zeros(7)
+
+            # 半径一定だとzernike 1, 4, 11項を区別できない
+            if 1 in ignore_zernike_number_list or 4 in ignore_zernike_number_list or 11 in ignore_zernike_number_list:
+                # もし ignore_zernike_number_list に 1, 4, 11 のどれかが含まれる場合
+                # 1, 4, 11 は区別できないので、除くのであれば 1, 4, 11 全てをまとめて除く必要がある
+
+                if 1 in ignore_zernike_number_list and 4 in ignore_zernike_number_list and 11 in ignore_zernike_number_list:
+                    removing_zernike_r_const_polynomial_tf[0] = 1
+
+                else:
+                    print("Error!")
+                    print("When radius is const value,")
+                    print("if you input 1 or 4 or 11 for ignore_zernike_number_list,")
+                    print("you must input all of [1, 4, 11]")
+
+                    # Errorに気づくようにnp.nanを入れる
+                    removing_zernike_r_const_polynomial_tf[0] = np.nan
+
+            # 半径一定だとzernike 2, 8 項を区別できない
+            if 2 in ignore_zernike_number_list or 8 in ignore_zernike_number_list:
+                # もし ignore_zernike_number_list に 2, 8 のどれかが含まれる場合
+                # 2, 8 は区別できないので、除くのであれば 2, 8 両方をまとめて除く必要がある
+
+                if 2 in ignore_zernike_number_list and 8 in ignore_zernike_number_list:
+                    removing_zernike_r_const_polynomial_tf[1] = 1
+
+                else:
+                    print("Error!")
+                    print("When radius is const value,")
+                    print("if you input 2 or 8 for ignore_zernike_number_list,")
+                    print("you must input both of [2, 8]")
+
+                    # Errorに気づくようにnp.nanを入れる
+                    removing_zernike_r_const_polynomial_tf[1] = np.nan
+
+            # 半径一定だとzernike 2, 8 項を区別できない
+            if 3 in ignore_zernike_number_list or 7 in ignore_zernike_number_list:
+                # もし ignore_zernike_number_list に 3, 7 のどれかが含まれる場合
+                # 3, 7 は区別できないので、除くのであれば 3, 7 両方をまとめて除く必要がある
+
+                if 3 in ignore_zernike_number_list and 7 in ignore_zernike_number_list:
+                    removing_zernike_r_const_polynomial_tf[2] = 1
+
+                else:
+                    print("Error!")
+                    print("When radius is const value,")
+                    print("if you input 3 or 7 for ignore_zernike_number_list,")
+                    print("you must input both of [3, 7]")
+
+                    # Errorに気づくようにnp.nanを入れる
+                    removing_zernike_r_const_polynomial_tf[2] = np.nan
+
+            if 5 in ignore_zernike_number_list:
+                removing_zernike_r_const_polynomial_tf[3] = 1
+
+            if 6 in ignore_zernike_number_list:
+                removing_zernike_r_const_polynomial_tf[4] = 1
+
+            if 9 in ignore_zernike_number_list:
+                removing_zernike_r_const_polynomial_tf[5] = 1
+
+            if 10 in ignore_zernike_number_list:
+                removing_zernike_r_const_polynomial_tf[6] = 1
+
+            removing_zernike_r_const_polynomial_array_ = zernike_r_const_polynomial_array_ * removing_zernike_r_const_polynomial_tf
+
+            return removing_zernike_r_const_polynomial_array_
+
         radian_array = self.df_diff["radian"].values
         height_array = self.df_diff["height"].values
-        ignore_zernike_number_list = self.ignore_zernike_number_list
 
-        removing_zernike_array = self.__zernike_r_const_polynomial_calculation(
-            coef=remaining_zernike_polynomial_array,
+        removing_zernike_r_const_polynomial_array = make_removing_zernike_r_const_polynomial_array(
+            zernike_r_const_polynomial_array_=zernike_r_const_polynomial_array,
+            ignore_zernike_number_list=self.ignore_zernike_number_list
+        )
+
+        removing_zernike_height_array = self.__zernike_r_const_polynomial_calculation(
+            coef_r_const=removing_zernike_r_const_polynomial_array,
             pupil_radius=self.consts.varid_radius,
             radius=self.circle_path_radius,
             theta=radian_array)
 
-        residual_height_array = height_array - removing_zernike_array
+        residual_height_array = height_array - removing_zernike_height_array
 
         result_dict = {
-            "removing_zernike": removing_zernike_array,
+            "removing_zernike_height": removing_zernike_height_array,
             "residual": residual_height_array}
 
         return result_dict
