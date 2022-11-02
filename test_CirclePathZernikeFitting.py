@@ -49,7 +49,8 @@ if __name__ == "__main__":
     residual = pom.CirclePathZernikeFitting(
         Constants=CONSTS,
         circle_path_radius=870e-3,
-        df_diff=measurement_diff.df_diff,
+        degree_array=measurement_diff.df_diff["degree"].values,
+        unprocessed_height_array=measurement_diff.df_diff["height"].values,
         ignore_zernike_number_list=ignore_zernike_number_list
     )
 
@@ -64,7 +65,7 @@ if __name__ == "__main__":
         measurement_diff.df_diff["height"],
         label="raw")
     ax11.plot(
-        residual.df_diff["degree"],
+        residual.degree_array,
         residual.removing_zernike_height_array,
         label="zernike fit")
 
@@ -74,7 +75,7 @@ if __name__ == "__main__":
     ax11.legend()
 
     ax12 = fig1.add_subplot(gs1[1, 0])
-    ax12.plot(residual.df_diff["degree"], residual.zernike_removed_height_array)
+    ax12.plot(residual.degree_array, residual.zernike_removed_height_array)
     ax12.set_xlabel("degree")
     ax12.set_ylabel("zernike removed height [m]")
     ax12.grid()

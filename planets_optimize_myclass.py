@@ -1332,29 +1332,35 @@ class CirclePathMeasurementTxtReading:
 class CirclePathZernikeFitting:
     def __init__(
             self,
-            Constants,
+            Constants: Constants,
             circle_path_radius: float,
-            df_diff: pd.DataFrame,
+            degree_array: ndarray,
+            unprocessed_height_array: ndarray,
             ignore_zernike_number_list: list[int]) -> None:
         """CirclePathZernikeFitting
         zernike多項式を除去
 
         Parameters
         ----------
-        Constants : class
-
+        Constants : Constants
+            自作インスタンス
         circle_path_radius : float
-            円環パスの半径 [m]
-        df_diff : pd.DataFrame
-            CirclePathMeasurementCsvReading の df_diff
+            [m] 円環パスの半径
+        degree_array : ndarray
+            [deg] 角度の1次元array
+        unprocessed_height_array : ndarray
+            [m] WH駆動による高さの変形量の1次元array
         ignore_zernike_number_list : list[int]
             zernikeでfittingした後に除去する項（中身は1~11まで）
         """
 
         self.consts = Constants
         self.circle_path_radius = circle_path_radius
-        self.df_diff = df_diff
+        self.degree_array = degree_array
+        self.unprocessed_height_array = unprocessed_height_array
         self.ignore_zernike_number_list = ignore_zernike_number_list
+
+        self.radian_array = np.deg2rad(self.degree_array)
 
         zernike_fitting_result = self.__zernike_fitting()
         self.optimize_result = zernike_fitting_result["optimize_result"]
@@ -1437,8 +1443,8 @@ class CirclePathZernikeFitting:
 
         pupil_radius = self.consts.varid_radius
         radius = self.circle_path_radius
-        theta_array = self.df_diff["radian"].values
-        height_array = self.df_diff["height"].values
+        theta_array = self.radian_array
+        height_array = self.unprocessed_height_array
 
         params = [pupil_radius, radius, theta_array, height_array]
 
@@ -1543,8 +1549,8 @@ class CirclePathZernikeFitting:
 
             return removing_r_const_zernike_polynomial_array_
 
-        radian_array = self.df_diff["radian"].values
-        height_array = self.df_diff["height"].values
+        radian_array = self.radian_array
+        height_array = self.unprocessed_height_array
 
         removing_r_const_zernike_polynomial_array = make_removing_r_const_zernike_polynomial_array(
             r_const_zernike_polynomial_array_=r_const_zernike_polynomial_array,
