@@ -1311,18 +1311,23 @@ class CirclePathMeasurementTxtReading:
             txt_filepath, skiprows=1, names=["x", "y", "z", "beam"],
             delimiter=" ", index_col=None, skipfooter=2, engine="python")
 
-        angle_raw_array = np.rad2deg(
-            np.arcsin(
-                df_raw["x"].values / np.sqrt(df_raw["x"].values**2 + df_raw["y"].values**2)))
+        x_array = df_raw["x"].values
+        y_array = df_raw["y"].values
 
+        angle_raw_array = np.rad2deg(np.arcsin((x_array / np.sqrt(x_array**2 + y_array**2))))
+
+        """
         angle_array = angle_raw_array.copy()
         min_idx = angle_raw_array.argmin()
         max_idx = angle_raw_array.argmax()
         angle_array[max_idx:min_idx] = -angle_raw_array[max_idx:min_idx] + 2 * angle_raw_array.max()
         angle_array[min_idx:] = angle_raw_array[min_idx:] + (angle_array.max() - angle_array.min())
+        """
 
         df = pd.DataFrame({
-            "degree": angle_array,
+            "x": df_raw["x"].values * 1e-3,
+            "y": df_raw["y"].values * 1e-3,
+            "degree": angle_raw_array,
             "height": df_raw["z"].values * 1e-9
         })
 
