@@ -36,3 +36,18 @@ if __name__ == "__main__":
     ax11.grid()
 
     fig1.tight_layout()
+
+    fig2 = plt.figure(figsize=(10, 10))
+    gs2 = fig2.add_gridspec(2, 1)
+
+    ax21 = fig2.add_subplot(gs2[0, 0])
+    ax21.plot(diff.df_raw_original["degree"], diff.df_raw_original["height"])
+    ax21.plot(diff.df_raw_original["degree"] - 360, diff.df_raw_original["height"])
+    ax21.grid()
+    ax21.set_xlim(-50, 50)
+
+    ax21 = fig2.add_subplot(gs2[1, 0])
+    ax21.plot(diff.df_raw_deformed["degree"], diff.df_raw_deformed["height"])
+    ax21.plot(diff.df_raw_deformed["degree"] - 360, diff.df_raw_deformed["height"])
+    ax21.grid()
+    ax21.set_xlim(-50, 50)
