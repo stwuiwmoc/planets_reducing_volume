@@ -12,7 +12,7 @@ if __name__ == "__main__":
         physical_radius=925e-3,
         ignore_radius=25e-3,
         pixel_number=1024,
-        zernike_max_degree=10,
+        zernike_max_degree=11,
         offset_height_percent=2)
 
     original_fpath = "raw_data/220117xrmEAi.v5.60.hei.txt"
@@ -36,9 +36,19 @@ if __name__ == "__main__":
 
     fig1 = plt.figure(figsize=(10, 10))
     gs1 = fig1.add_gridspec(3, 1)
+    fig1.suptitle(deformed_fpath + "\n" + original_fpath)
+
+    ax13 = fig1.add_subplot(gs1[0, 0])
+    ax13.plot(
+        removed.r_const_zernike_number_meaning_list,
+        removed.r_const_zernike_polynomial_array
+    )
+    ax13.grid()
+    ax13.set_xlabel("zernike number in radius constant condition")
+    ax13.set_ylabel("zernike polynomial value [m]")
 
     # WH変形前後の差分と、そこに対するzernike fitting
-    ax11 = fig1.add_subplot(gs1[0, 0])
+    ax11 = fig1.add_subplot(gs1[1, 0])
     ax11.plot(
         measurement.df_diff["degree"],
         measurement.df_diff["height"],
@@ -46,13 +56,14 @@ if __name__ == "__main__":
     ax11.plot(
         removed.degree_array,
         removed.removing_zernike_height_array,
-        label="zernike fit"
+        label="removing zernike"
     )
     ax11.grid()
     ax11.set_ylabel("height [m]")
     ax11.legend()
+    ax11.set_title("zernike 1~11 fit and remove " + ",".join(map(str, removed.ignore_zernike_number_list)))
 
-    ax12 = fig1.add_subplot(gs1[1, 0])
+    ax12 = fig1.add_subplot(gs1[2, 0])
     ax12.plot(
         removed.degree_array,
         removed.zernike_removed_height_array
@@ -60,14 +71,6 @@ if __name__ == "__main__":
     ax12.grid()
     ax12.set_xlabel("angle [deg]")
     ax12.set_ylabel("height [m]")
-
-    ax13 = fig1.add_subplot(gs1[2, 0])
-    ax13.plot(
-        removed.r_const_zernike_number_meaning_list,
-        removed.r_const_zernike_polynomial_array
-    )
-    ax13.grid()
-    ax13.set_xlabel("zernike number in radius const")
-    ax13.set_ylabel("zernike polynomial value [m]")
+    ax12.set_title("zernike " + ",".join(map(str, removed.ignore_zernike_number_list)) + " removed")
 
     fig1.tight_layout()
