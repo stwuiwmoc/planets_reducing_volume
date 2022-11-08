@@ -53,7 +53,7 @@ if __name__ == "__main__":
         diff.df_raw_original["height"].iloc[-30:],
         color="red")
     ax21.grid()
-    ax21.set_xlim(-100, -50)
+    ax21.set_xlim(260, 310)
 
     ax21 = fig2.add_subplot(gs2[1, 0])
     ax21.plot(
@@ -65,7 +65,7 @@ if __name__ == "__main__":
         diff.df_raw_deformed["height"].iloc[-30:],
         color="red")
     ax21.grid()
-    ax21.set_xlim(-100, -50)
+    ax21.set_xlim(260, 310)
 
     # 変形前の円環パスx, y座標のプロット
     # 色はデータのインデックス小さい順（高さではない）

@@ -1322,18 +1322,17 @@ class CirclePathMeasurementTxtReading:
 
         angle_raw_array = np.rad2deg(np.arctan2(y_array, x_array))
 
-        """
-        angle_array = angle_raw_array.copy()
-        min_idx = angle_raw_array.argmin()
-        max_idx = angle_raw_array.argmax()
-        angle_array[max_idx:min_idx] = -angle_raw_array[max_idx:min_idx] + 2 * angle_raw_array.max()
-        angle_array[min_idx:] = angle_raw_array[min_idx:] + (angle_array.max() - angle_array.min())
-        """
+        # 角度を-180deg to +180degから0deg to +360deg へ変換
+        angle_array = np.where(
+            angle_raw_array >= 0,
+            angle_raw_array.copy(),
+            angle_raw_array.copy() + 360
+        )
 
         df = pd.DataFrame({
             "x": df_raw["x"].values * 1e-3,
             "y": df_raw["y"].values * 1e-3,
-            "degree": angle_raw_array,
+            "degree": angle_array,
             "height": df_raw["z"].values * 1e-9
         })
 
