@@ -1301,7 +1301,6 @@ class CirclePathMeasurementTxtReading:
 
         self.df_diff = pd.DataFrame({
             "degree": self.df_raw_original["degree"].values[:idx_max],
-            "radian": np.deg2rad(self.df_raw_original["degree"].values[:idx_max]),
             "height": height_diff,
         })
 
