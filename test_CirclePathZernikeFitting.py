@@ -35,7 +35,7 @@ if __name__ == "__main__":
     )
 
     fig1 = plt.figure(figsize=(10, 10))
-    gs1 = fig1.add_gridspec(2, 1)
+    gs1 = fig1.add_gridspec(3, 1)
 
     # WH変形前後の差分と、そこに対するzernike fitting
     ax11 = fig1.add_subplot(gs1[0, 0])
@@ -60,5 +60,14 @@ if __name__ == "__main__":
     ax12.grid()
     ax12.set_xlabel("angle [deg]")
     ax12.set_ylabel("height [m]")
+
+    ax13 = fig1.add_subplot(gs1[2, 0])
+    ax13.plot(
+        removed.r_const_zernike_number_meaning_list,
+        removed.r_const_zernike_polynomial_array
+    )
+    ax13.grid()
+    ax13.set_xlabel("zernike number in radius const")
+    ax13.set_ylabel("zernike polynomial value [m]")
 
     fig1.tight_layout()
