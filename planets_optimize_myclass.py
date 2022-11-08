@@ -1274,12 +1274,23 @@ class CirclePathMeasurementTxtReading:
 
         self.consts = Constants
 
+        # データの読み出し
         self.df_raw_original = self.__read_txt(
             txt_filepath=original_txt_fpath)
 
         self.df_raw_deformed = self.__read_txt(
             txt_filepath=deformed_txt_fpath)
 
+        # 円環パスの半径を計算
+        radius_original = np.mean(np.sqrt(
+            self.df_raw_original["x"]**2 + self.df_raw_original["y"]**2))
+
+        radius_deformed = np.mean(np.sqrt(
+            self.df_raw_deformed["x"]**2 + self.df_raw_deformed["y"]**2))
+
+        self.circle_path_radius = (radius_original + radius_deformed) / 2
+
+        # 高さの差分を出す
         # データ点数が合わない場合、少ない方に合わせてから高さ差分をとりたい
         if len(self.df_raw_original) <= len(self.df_raw_deformed):
             idx_max = len(self.df_raw_original)
