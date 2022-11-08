@@ -1320,7 +1320,7 @@ class CirclePathMeasurementTxtReading:
         x_array = df_raw["x"].values
         y_array = df_raw["y"].values
 
-        angle_raw_array = np.rad2deg(np.arcsin((x_array / np.sqrt(x_array**2 + y_array**2))))
+        angle_raw_array = np.rad2deg(np.arctan2(y_array, x_array))
 
         """
         angle_array = angle_raw_array.copy()

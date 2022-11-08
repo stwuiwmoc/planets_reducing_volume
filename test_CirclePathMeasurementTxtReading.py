@@ -44,16 +44,28 @@ if __name__ == "__main__":
     gs2 = fig2.add_gridspec(2, 1)
 
     ax21 = fig2.add_subplot(gs2[0, 0])
-    ax21.plot(diff.df_raw_original["degree"], diff.df_raw_original["height"])
-    ax21.plot(diff.df_raw_original["degree"] - 360, diff.df_raw_original["height"])
+    ax21.plot(
+        diff.df_raw_original["degree"].iloc[:30],
+        diff.df_raw_original["height"].iloc[:30],
+        color="blue")
+    ax21.plot(
+        diff.df_raw_original["degree"].iloc[-30:],
+        diff.df_raw_original["height"].iloc[-30:],
+        color="red")
     ax21.grid()
-    ax21.set_xlim(-50, 50)
+    ax21.set_xlim(-100, -50)
 
     ax21 = fig2.add_subplot(gs2[1, 0])
-    ax21.plot(diff.df_raw_deformed["degree"], diff.df_raw_deformed["height"])
-    ax21.plot(diff.df_raw_deformed["degree"] - 360, diff.df_raw_deformed["height"])
+    ax21.plot(
+        diff.df_raw_deformed["degree"].iloc[:30],
+        diff.df_raw_deformed["height"].iloc[:30],
+        color="blue")
+    ax21.plot(
+        diff.df_raw_deformed["degree"].iloc[-30:],
+        diff.df_raw_deformed["height"].iloc[-30:],
+        color="red")
     ax21.grid()
-    ax21.set_xlim(-50, 50)
+    ax21.set_xlim(-100, -50)
 
     # 変形前の円環パスx, y座標のプロット
     # 色はデータのインデックス小さい順（高さではない）
