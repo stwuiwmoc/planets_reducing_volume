@@ -120,3 +120,57 @@ if __name__ == "__main__":
     ax33.set_ylabel("z [m]")
 
     fig3.tight_layout()
+
+    # 変形後の円環パスx, y座標のプロット
+    # 色はデータのインデックス小さい順（高さではない）
+    fig4 = plt.figure(figsize=(10, 10))
+    fig4.suptitle(deformed_filepath)
+    gs4 = fig4.add_gridspec(2, 2)
+
+    ax41 = fig4.add_subplot(gs4[0, 0])
+    ax41.scatter(
+        diff.df_raw_deformed["x"],
+        diff.df_raw_deformed["y"],
+        c=np.arange(len(diff.df_raw_deformed["x"])))
+    ax41.set_xlabel("x [m]")
+    ax41.set_ylabel("y [m]")
+
+    # 円環パスの開始位置と終了位置が被っている所を拡大
+    ax42 = fig4.add_subplot(gs4[0, 1])
+    ax42.scatter(
+        diff.df_raw_deformed["x"],
+        diff.df_raw_deformed["y"],
+        c=np.arange(len(diff.df_raw_deformed["x"])))
+    ax42.set_xlim(0.15, 0.25)
+    ax42.set_ylim(-0.9, -0.8)
+    ax42.grid()
+    ax42.set_xlabel("x [m]")
+    ax42.set_ylabel("y [m]")
+
+    # ax42でプロットした測定点のx座標とz座標で棒グラフ作成
+    bar_width = 0.001
+    ax43 = fig4.add_subplot(gs4[1, 1])
+
+    # 円環パスの開始位置付近
+    # 座標がほぼ同じ点だと棒グラフが完全に被ってしまうので棒の太さ分だけずらす
+    ax43.bar(
+        x=diff.df_raw_deformed["x"].iloc[:5] + bar_width,
+        height=diff.df_raw_deformed["height"].iloc[:5],
+        width=bar_width,
+        color="purple",
+        label="start_side")
+
+    # 円環パスの終了位置付近
+    ax43.bar(
+        x=diff.df_raw_deformed["x"].iloc[-5:],
+        height=diff.df_raw_deformed["height"].iloc[-5:],
+        width=bar_width,
+        color="yellow",
+        label="end_side")
+
+    ax43.set_xlim(0.15, 0.25)
+    ax43.legend()
+    ax43.set_xlabel("x [m]")
+    ax43.set_ylabel("z [m]")
+
+    fig4.tight_layout()
