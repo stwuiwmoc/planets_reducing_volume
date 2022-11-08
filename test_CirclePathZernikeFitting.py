@@ -35,13 +35,14 @@ if __name__ == "__main__":
     )
 
     fig1 = plt.figure(figsize=(10, 10))
-    gs1 = fig1.add_gridspec(3, 1)
-    fig1.suptitle(deformed_fpath + "\n" + original_fpath)
+    gs1 = fig1.add_gridspec(4, 1)
+    fig1.suptitle(deformed_fpath + "  |  " + original_fpath)
 
-    ax13 = fig1.add_subplot(gs1[0, 0])
+    ax13 = fig1.add_subplot(gs1[3, 0])
     ax13.plot(
         removed.r_const_zernike_number_meaning_list,
-        removed.r_const_zernike_polynomial_array
+        removed.r_const_zernike_polynomial_array,
+        marker="s"
     )
     ax13.grid()
     ax13.set_xlabel("zernike number in radius constant condition")
@@ -61,7 +62,7 @@ if __name__ == "__main__":
     ax11.grid()
     ax11.set_ylabel("height [m]")
     ax11.legend()
-    ax11.set_title("zernike 1~11 fit and remove " + ",".join(map(str, removed.ignore_zernike_number_list)))
+    ax11.set_title("zernike 1~11 fit for WH deform, and plot " + ",".join(map(str, removed.ignore_zernike_number_list)))
 
     ax12 = fig1.add_subplot(gs1[2, 0])
     ax12.plot(
@@ -69,8 +70,25 @@ if __name__ == "__main__":
         removed.zernike_removed_height_array
     )
     ax12.grid()
-    ax12.set_xlabel("angle [deg]")
+    ax12.set_xlabel("angle [deg] (CCW and 0 deg means x-axis positive direction)")
     ax12.set_ylabel("height [m]")
-    ax12.set_title("zernike " + ",".join(map(str, removed.ignore_zernike_number_list)) + " removed")
+    ax12.set_title("zernike " + ",".join(map(str, removed.ignore_zernike_number_list)) + " removed residual")
+
+    ax14 = fig1.add_subplot(gs1[0, 0])
+    ax14.plot(
+        measurement.df_raw_original["degree"],
+        measurement.df_raw_original["height"],
+        label=original_fpath,
+        color="green"
+    )
+    ax14.plot(
+        measurement.df_raw_deformed["degree"],
+        measurement.df_raw_deformed["height"],
+        label=deformed_fpath,
+        color="red"
+    )
+    ax14.grid()
+    ax14.set_ylabel("z [m]")
+    ax14.legend()
 
     fig1.tight_layout()
