@@ -1274,17 +1274,33 @@ class CirclePathMeasurementTxtReading:
 
         self.consts = Constants
 
+        # データの読み出し
         self.df_raw_original = self.__read_txt(
             txt_filepath=original_txt_fpath)
 
         self.df_raw_deformed = self.__read_txt(
             txt_filepath=deformed_txt_fpath)
 
-        height_diff = self.df_raw_deformed["height"].values - self.df_raw_original["height"].values
+        # 円環パスの半径を計算
+        radius_original = np.mean(np.sqrt(
+            self.df_raw_original["x"]**2 + self.df_raw_original["y"]**2))
+
+        radius_deformed = np.mean(np.sqrt(
+            self.df_raw_deformed["x"]**2 + self.df_raw_deformed["y"]**2))
+
+        self.circle_path_radius = (radius_original + radius_deformed) / 2
+
+        # 高さの差分を出す
+        # データ点数が合わない場合、少ない方に合わせてから高さ差分をとりたい
+        if len(self.df_raw_original) <= len(self.df_raw_deformed):
+            idx_max = len(self.df_raw_original)
+        else:
+            idx_max = len(self.df_raw_deformed)
+
+        height_diff = self.df_raw_deformed["height"].values[:idx_max] - self.df_raw_original["height"].values[:idx_max]
 
         self.df_diff = pd.DataFrame({
-            "degree": self.df_raw_original["degree"].values,
-            "radian": np.deg2rad(self.df_raw_original["degree"].values),
+            "degree": self.df_raw_original["degree"].values[:idx_max],
             "height": height_diff,
         })
 
@@ -1311,17 +1327,21 @@ class CirclePathMeasurementTxtReading:
             txt_filepath, skiprows=1, names=["x", "y", "z", "beam"],
             delimiter=" ", index_col=None, skipfooter=2, engine="python")
 
-        angle_raw_array = np.rad2deg(
-            np.arcsin(
-                df_raw["x"].values / np.sqrt(df_raw["x"].values**2 + df_raw["y"].values**2)))
+        x_array = df_raw["x"].values
+        y_array = df_raw["y"].values
 
-        angle_array = angle_raw_array.copy()
-        min_idx = angle_raw_array.argmin()
-        max_idx = angle_raw_array.argmax()
-        angle_array[max_idx:min_idx] = -angle_raw_array[max_idx:min_idx] + 2 * angle_raw_array.max()
-        angle_array[min_idx:] = angle_raw_array[min_idx:] + (angle_array.max() - angle_array.min())
+        angle_raw_array = np.rad2deg(np.arctan2(y_array, x_array))
+
+        # 角度を-180deg to +180degから0deg to +360deg へ変換
+        angle_array = np.where(
+            angle_raw_array >= 0,
+            angle_raw_array.copy(),
+            angle_raw_array.copy() + 360
+        )
 
         df = pd.DataFrame({
+            "x": df_raw["x"].values * 1e-3,
+            "y": df_raw["y"].values * 1e-3,
             "degree": angle_array,
             "height": df_raw["z"].values * 1e-9
         })
