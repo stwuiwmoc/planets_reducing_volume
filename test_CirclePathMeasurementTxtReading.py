@@ -17,8 +17,8 @@ if __name__ == "__main__":
         zernike_max_degree=10,
         offset_height_percent=2)
 
-    original_filepath = "raw_data/220117xrmEAi.v5.41.hei.txt"
-    deformed_filepath = "raw_data/220117xrmFEi.v5.41.hei.txt"
+    original_filepath = "raw_data/220117xrmEAi.v5.60.hei.txt"
+    deformed_filepath = "raw_data/220117xrmFEi.v5.60.hei.txt"
 
     diff = pom.CirclePathMeasurementTxtReading(
         Constants=CONSTS,

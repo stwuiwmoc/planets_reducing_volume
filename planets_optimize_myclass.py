@@ -1280,11 +1280,17 @@ class CirclePathMeasurementTxtReading:
         self.df_raw_deformed = self.__read_txt(
             txt_filepath=deformed_txt_fpath)
 
-        height_diff = self.df_raw_deformed["height"].values - self.df_raw_original["height"].values
+        # データ点数が合わない場合、少ない方に合わせてから高さ差分をとりたい
+        if len(self.df_raw_original) <= len(self.df_raw_deformed):
+            idx_max = len(self.df_raw_original)
+        else:
+            idx_max = len(self.df_raw_deformed)
+
+        height_diff = self.df_raw_deformed["height"].values[:idx_max] - self.df_raw_original["height"].values[:idx_max]
 
         self.df_diff = pd.DataFrame({
-            "degree": self.df_raw_original["degree"].values,
-            "radian": np.deg2rad(self.df_raw_original["degree"].values),
+            "degree": self.df_raw_original["degree"].values[:idx_max],
+            "radian": np.deg2rad(self.df_raw_original["degree"].values[:idx_max]),
             "height": height_diff,
         })
 
