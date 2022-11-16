@@ -15,7 +15,6 @@ import proper as pr
 import scipy as sp
 from matplotlib import cm
 from matplotlib.colors import Normalize
-# %%
 from numpy import ndarray
 from scipy import interpolate, optimize
 
@@ -1385,6 +1384,7 @@ class CirclePathZernikeFitting:
         zernike_fitting_result = self.__zernike_fitting()
         self.optimize_result = zernike_fitting_result["optimize_result"]
         self.r_const_zernike_polynomial_array = zernike_fitting_result["r_const_zernike_polynomial_array"]
+        self.r_const_zernike_number_meaning_list = ["1+4+11", "2+8", "3+7", "5", "6", "9", "10"]
 
         zernike_removing_result = self.__zernike_removing(
             r_const_zernike_polynomial_array=self.r_const_zernike_polynomial_array)
@@ -1410,7 +1410,6 @@ class CirclePathZernikeFitting:
         ----------
         r_const_coef : list[float]
             radius固定値の時のzernike係数ベクトル（z=11まででlen=7）
-            順番は [1+4+11, 2+8, 3+7, 5, 6, 9, 10]
         pupil_radius : float
             [m] 瞳の半径
         radius : float
