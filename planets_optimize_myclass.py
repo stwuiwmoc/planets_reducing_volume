@@ -15,7 +15,6 @@ import proper as pr
 import scipy as sp
 from matplotlib import cm
 from matplotlib.colors import Normalize
-# %%
 from numpy import ndarray
 from scipy import interpolate, optimize
 
