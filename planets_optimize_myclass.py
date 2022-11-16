@@ -354,6 +354,46 @@ class Surface:
         masked_wfe = self.consts.mask * wfe
         return masked_wfe
 
+    def calc_circle_path_height(
+            self,
+            radius: float,
+            angle_division_number: int) -> list[np.ndarray, np.ndarray]:
+        """与えられた半径に対応した円環パスに沿った高さを計算する
+
+        Parameters
+        ----------
+        radius : float
+            [m] 円環パスの半径
+        angle_division_number : int
+            [無次元] 0deg～360degを何分割するか
+
+        Returns
+        -------
+        list[np.ndarray, np.ndarray]
+            list[0] : [deg] 円環パスの角度（CCW, x軸正方向を0degとする）\n
+            list[1] : [m] 半径に対応した円環パスの高さ
+        """
+        varid_radius_pixel_number = int(self.consts.varid_radius / self.consts.physical_radius * self.consts.pixel_number / 2)
+        measurement_radius_idx = int(radius * 1e3)
+
+        image = np.where(self.consts.tf, self.surface, 0)
+        flags = cv2.INTER_CUBIC + cv2.WARP_FILL_OUTLIERS + cv2.WARP_POLAR_LINEAR
+
+        linear_polar_image = cv2.warpPolar(
+            src=image,
+            dsize=(int(self.consts.varid_radius * 1e3), angle_division_number),
+            center=(self.consts.pixel_number / 2, self.consts.pixel_number / 2),
+            maxRadius=varid_radius_pixel_number,
+            flags=flags)
+
+        # 与えられた半径に対応する高さだけを取り出し
+        circle_path_line = linear_polar_image[:, measurement_radius_idx]
+
+        # 0degから一周するまでの角度の1次元arrayを作成
+        angle_array = np.linspace(0, 359, angle_division_number)
+
+        return angle_array, circle_path_line
+
     def make_image_plot(
             self, figure,
             position=111,
