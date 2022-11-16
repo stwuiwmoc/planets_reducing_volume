@@ -7,6 +7,7 @@ Created on Thu Dec  9 14:59:35 2021
 import time
 
 import cv2
+import matplotlib
 import mpl_toolkits.axes_grid1
 import numpy as np
 import pandas as pd
@@ -365,7 +366,7 @@ class Surface:
         radius : float
             [m] 円環パスの半径
         angle_division_number : int
-            [無次元] 0deg～360degを何分割するか
+            [無次元] 0deg～359degを何分割するか
 
         Returns
         -------
@@ -482,50 +483,56 @@ class Surface:
 
     def make_circle_path_plot(
             self,
-            figure,
-            position=111,
-            radius=0.870,
-            height_magn=1e9,
-            height_unit_str="[nm]",
-            line_label=""):
+            figure: matplotlib.figure.Figure,
+            position: matplotlib.gridspec.GridSpec = 111,
+            radius: float = 0.870,
+            angle_division_number: int = 360,
+            height_magn: float = 1e9,
+            height_unit_str: str = "[nm]",
+            line_label: str = "") -> matplotlib.axes._subplots.Axes:
+        """与えられた半径に対する円環パスの高さをプロット
+
+        Parameters
+        ----------
+        figure : matplotlib.figure.Figure
+            Figureインスタンス
+        position : matplotlib.gridspec.GridSpec, optional
+            GridSpecインスタンス, by default 111
+        radius : float, optional
+            [m] 円環パスの半径, by default 0.870
+        angle_division_number : int, optional
+            [無次元] 円環パスの角度0deg～359degを何分割するか, by default 360
+        height_magn : float, optional
+            [無次元] 高さ方向の倍率、デフォルトでは [m] 単位から [nm] 単位に換算してから出力される, by default 1e9
+        height_unit_str : str, optional
+            高さの軸ラベルで表記する単位, by default "[nm]"
+        line_label : str, optional
+            凡例のテキスト, by default ""
+
+        Returns
+        -------
+        matplotlib.axes._subplots.Axes
+            axインスタンス
+        """
 
         fontsize = 15
-        varid_radius_pixel_number = int(self.consts.varid_radius / self.consts.physical_radius * self.consts.pixel_number / 2)
-        measurement_radius_idx = int(radius * 1e3)
 
-        image = np.where(self.consts.tf, self.surface, 0)
-        flags = cv2.INTER_CUBIC + cv2.WARP_FILL_OUTLIERS + cv2.WARP_POLAR_LINEAR
+        angle_array, height_array = self.calc_circle_path_height(
+            radius=radius,
+            angle_division_number=angle_division_number
+        )
 
-        linear_polar_image = cv2.warpPolar(
-            src=image,
-            dsize=(int(self.consts.varid_radius * 1e3), 360),
-            center=(self.consts.pixel_number / 2, self.consts.pixel_number / 2),
-            maxRadius=varid_radius_pixel_number,
-            flags=flags)
-
-        circle_path_line = height_magn * linear_polar_image[:, measurement_radius_idx]
-
-        geometric_degree = np.arange(360)  # CCW、pomでのx軸+方向を0degとする角度
-        robot_degree = geometric_degree - 90 - 10.814
-        robot_degree = np.where(
-            robot_degree > 0,
-            robot_degree,
-            robot_degree + 360)
-
-        height_pv = np.nanmax(circle_path_line) - np.nanmin(circle_path_line)
-        height_pv_str = str(round(height_pv, 2))
+        circle_path_line = height_magn * height_array
 
         ax = figure.add_subplot(position)
-        ax.plot(robot_degree, circle_path_line, label=line_label)
+        ax.plot(angle_array, circle_path_line, label=line_label)
         ax.grid()
 
-        ax.set_title(
-            "circle_path ( pv = " + height_pv_str + " " + height_unit_str + " )",
-            fontsize=fontsize)
         ax.set_xlabel("degree", fontsize=fontsize)
         ax.set_ylabel(
-            "heignt " + height_unit_str + "\nat R=" + str(measurement_radius_idx),
+            "heignt " + height_unit_str + "\nat R=" + str(radius) + "m",
             fontsize=fontsize)
+
         return ax
 
     def make_torque_fulcrum_plot(

@@ -43,4 +43,14 @@ if __name__ == "__main__":
     )
     ax12.grid()
 
+    # メソッドを使って円環パスのプロット
+    ax13 = surface.make_circle_path_plot(
+        figure=fig1,
+        position=gs1[3, :],
+        radius=circle_path_radius,
+        angle_division_number=360,
+        height_magn=1,
+        height_unit_str="[m]"
+    )
+
     fig1.tight_layout()
