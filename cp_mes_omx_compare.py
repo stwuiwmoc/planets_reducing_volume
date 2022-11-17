@@ -106,5 +106,36 @@ if __name__ == "__main__":
     mes_n_serial = "F"  # F, G, H, I, J, K, L から選択
     ignore_zernike_number_list = [1, 2, 3, 4, 5, 6, 7, 8, 11]
 
+    # 測定結果の処理
     mes_0_filepath = "raw_data/220117xrmEAi.v5.60.hei.txt"
     mes_n_filepath = "raw_data/220117xrm" + mes_n_serial + "Ei.v5.60.hei.txt"
+
+    mes0n = pom.CirclePathMeasurementTxtReading(
+        Constants=CONSTS,
+        original_txt_fpath=mes_0_filepath,
+        deformed_txt_fpath=mes_n_filepath
+    )
+
+    mes0n_zerfit = pom.CirclePathZernikeFitting(
+        Constants=CONSTS,
+        circle_path_radius=mes0n.circle_path_radius,
+        degree_array=mes0n.df_diff["degree"],
+        unprocessed_height_array=mes0n.df_diff["height"],
+        ignore_zernike_number_list=ignore_zernike_number_list
+    )
+
+    # 作用行列による計算
+    full_torque_value_array = make_full_torque_value_array_for_mes(mes_n_serial_=mes_n_serial)
+
+    omx_deformed_zernike = pom.TorqueToZernike(
+        constants=CONSTS,
+        torque_value_array=full_torque_value_array)
+
+    omx_deformed_surface = pom.ZernikeToSurface(
+        constants=CONSTS,
+        zernike_value_array=omx_deformed_zernike.zernike_value_array)
+
+    omx_deformed_zernike_removed_surface = pom.ZernikeRemovedSurface(
+        constants=CONSTS,
+        inputed_surface=omx_deformed_surface.surface,
+        removing_zernike_number_list=ignore_zernike_number_list)
