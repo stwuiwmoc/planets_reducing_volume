@@ -126,6 +126,7 @@ if __name__ == "__main__":
 
     # 作用行列による計算
     full_torque_value_array = make_full_torque_value_array_for_mes(mes_n_serial_=mes_n_serial)
+    angle_division_number = 360
 
     omx_deformed_zernike = pom.TorqueToZernike(
         constants=CONSTS,
@@ -139,3 +140,149 @@ if __name__ == "__main__":
         constants=CONSTS,
         inputed_surface=omx_deformed_surface.surface,
         removing_zernike_number_list=ignore_zernike_number_list)
+
+    omx_angle_array = omx_deformed_surface.calc_circle_path_height(
+        radius=mes0n_zerfit.circle_path_radius,
+        angle_division_number=angle_division_number
+    )[0]
+
+    omx_deformed_height_array = omx_deformed_surface.calc_circle_path_height(
+        radius=mes0n_zerfit.circle_path_radius,
+        angle_division_number=angle_division_number
+    )[1]
+
+    omx_deformed_zernike_removed_height_array = omx_deformed_zernike_removed_surface.calc_circle_path_height(
+        radius=mes0n.circle_path_radius,
+        angle_division_number=angle_division_number
+    )[1]
+
+    # plot
+    fig1 = plt.figure(figsize=(10, 10))
+    gs1 = fig1.add_gridspec(4, 1)
+
+    ax11 = fig1.add_subplot(gs1[0, 0])
+    ax11.plot(
+        mes0n.df_raw_original["degree"],
+        mes0n.df_raw_original["height"],
+        label="original"
+    )
+    ax11.plot(
+        mes0n.df_raw_deformed["degree"],
+        mes0n.df_raw_deformed["height"],
+        label="deformed"
+    )
+    ax11.legend()
+    ax11.grid()
+    ax11.set_ylabel("height [m]")
+
+    ax12 = fig1.add_subplot(gs1[1, 0])
+    ax12.plot(
+        mes0n_zerfit.degree_array,
+        mes0n_zerfit.unprocessed_height_array,
+        label="deformed - original",
+        color="blue"
+    )
+    ax12.plot(
+        mes0n_zerfit.degree_array,
+        mes0n_zerfit.removing_zernike_height_array,
+        label="zernike fit",
+        color="blue",
+        linestyle=":"
+    )
+    ax12.legend()
+    ax12.grid()
+    ax12.set_ylabel("height_diff [m]")
+
+    ax13 = fig1.add_subplot(gs1[2, 0])
+    ax13.plot(
+        mes0n_zerfit.degree_array,
+        mes0n_zerfit.zernike_removed_height_array,
+        color="blue",
+        linestyle="--"
+    )
+    ax13.grid()
+    ax13.set_ylabel("zernike removed\nheight diff [m]")
+
+    ax14 = fig1.add_subplot(gs1[3, 0])
+    ax14.plot(
+        mes0n_zerfit.r_const_zernike_number_meaning_list,
+        mes0n_zerfit.r_const_zernike_polynomial_array,
+        marker="s"
+    )
+    ax14.grid()
+    ax14.set_xlabel("zernike number")
+    ax14.set_ylabel("zernike polynomial value\nfor r-const [m]")
+
+    fig1.tight_layout()
+
+    fig2 = plt.figure(figsize=(12, 10))
+    gs2 = fig2.add_gridspec(3, 4)
+
+    ax21 = omx_deformed_zernike.make_torque_plot(
+        figure=fig2,
+        position=gs2[0, 0:2]
+    )
+
+    ax22 = omx_deformed_surface.make_image_plot(
+        figure=fig2,
+        position=gs2[1:3, 0:2]
+    )
+
+    ax23 = fig2.add_subplot(gs2[0, 2:4])
+    ax23.set_title("operation matrix model")
+    ax23.plot(
+        omx_angle_array,
+        omx_deformed_height_array,
+        label="WH deforming",
+        color="red"
+    )
+    ax23.plot(
+        omx_angle_array,
+        omx_deformed_height_array - omx_deformed_zernike_removed_height_array,
+        label="zernike fit",
+        color="red",
+        linestyle=":"
+    )
+    ax23.legend()
+    ax23.grid()
+    ax23.set_ylabel("height_diff [m]")
+
+    ax24 = fig2.add_subplot(gs2[1, 2:4])
+    ax24.set_title("measurement")
+    ax24.plot(
+        mes0n_zerfit.degree_array,
+        mes0n_zerfit.unprocessed_height_array,
+        label="WH deforming\n(deformed - original)",
+        color="blue",
+    )
+    ax24.plot(
+        mes0n_zerfit.degree_array,
+        mes0n_zerfit.removing_zernike_height_array,
+        label="zernike fit",
+        color="blue",
+        linestyle=":"
+    )
+    ax24.legend()
+    ax24.grid()
+    ax24.set_ylabel("height_diff [m]")
+
+    ax25 = fig2.add_subplot(gs2[2, 2:4])
+    ax25.plot(
+        mes0n_zerfit.degree_array,
+        mes0n_zerfit.zernike_removed_height_array,
+        color="blue",
+        label="measurement",
+        linestyle="--"
+    )
+    ax25.plot(
+        omx_angle_array,
+        omx_deformed_zernike_removed_height_array,
+        label="operation matrix",
+        color="red",
+        linestyle="--"
+    )
+    ax25.grid()
+    ax25.set_ylabel("zernike removed\nheight diff [m]")
+    ax25.legend()
+
+    fig2.tight_layout()
