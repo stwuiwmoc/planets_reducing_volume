@@ -162,7 +162,7 @@ if __name__ == "__main__":
         zernike_max_degree=11,
         offset_height_percent=0)
 
-    mes_n_serial = "F"  # F, G, H, I, J, K, L から選択
+    mes_n_serial = "L"  # F, G, H, I, J, K, L から選択
     ignore_zernike_number_list = [1, 2, 3, 4, 5, 6, 7, 8, 11]
 
     # 測定結果の処理
@@ -229,14 +229,13 @@ if __name__ == "__main__":
         zernike_9=mes0n_zerfit.r_const_zernike_polynomial_array[5],
         zernike_10=mes0n_zerfit.r_const_zernike_polynomial_array[6]
     )
-    print("omx_declination = ", omx_declination, " [deg]")
-    print("mes_declination = ", mes_declination, " [deg]")
 
     # 作用行列を現実に一致させるための倍率の導出
     zernike_09_magnification = mes0n_zerfit.r_const_zernike_polynomial_array[5] / omx_r_const_zernike_value_array[5]
     zernike_10_magnification = mes0n_zerfit.r_const_zernike_polynomial_array[6] / omx_r_const_zernike_value_array[6]
-    print("Z09 mes / omx = ", zernike_09_magnification)
-    print("Z10 mes / omx = ", zernike_10_magnification)
+    total_magnification = \
+        np.sqrt(mes0n_zerfit.r_const_zernike_polynomial_array[5]**2 + mes0n_zerfit.r_const_zernike_polynomial_array[6]**2) \
+        / np.sqrt(omx_r_const_zernike_value_array[5]**2 + omx_r_const_zernike_value_array[6]**2)
 
     # plot
     # 測定結果のプロット
@@ -473,6 +472,7 @@ if __name__ == "__main__":
         ["omx_declination", round(omx_declination, 5), "deg"],
         ["Z09 : mes / omx", round(zernike_09_magnification, 5), ""],
         ["Z10 : mes / omx", round(zernike_10_magnification, 5), ""],
+        ["Z09 & Z10 : mes / omx", round(total_magnification, 5), ""]
     ]
 
     ax26 = pom.plot_parameter_table(
