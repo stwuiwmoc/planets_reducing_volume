@@ -93,6 +93,65 @@ def make_full_torque_value_array_for_mes(mes_n_serial_: str) -> np.ndarray:
     return original_torque_value_array_
 
 
+def convert_to_r_const_zernike_value_array(
+        zernike_value_array_: np.ndarray) -> np.ndarray:
+    """通常のzernike係数ベクトルを半径一定の場合のzernike係数ベクトルに変換する
+
+    Parameters
+    ----------
+    zernike_value_array_ : np.ndarray
+        通常のzernike係数ベクトル, len() = 11
+
+    Returns
+    -------
+    np.ndarray
+        半径一定のzernike係数ベクトル, len() = 7,
+        各項の意味は ["1+4+11", "2+8", "3+7", "5", "6", "9", "10"]
+    """
+
+    if len(zernike_value_array_) != 11:
+        print("Error! input array length must be 11")
+        r_const_zernike_value_array_ = None
+
+    else:
+        r_const_zernike_value_array_ = np.zeros(7)
+
+        r_const_zernike_value_array_[0] = zernike_value_array_[0] + zernike_value_array_[3] + zernike_value_array_[10]
+        r_const_zernike_value_array_[1] = zernike_value_array_[1] + zernike_value_array_[7]
+        r_const_zernike_value_array_[2] = zernike_value_array_[2] + zernike_value_array_[6]
+        r_const_zernike_value_array_[3] = zernike_value_array_[4]
+        r_const_zernike_value_array_[4] = zernike_value_array_[5]
+        r_const_zernike_value_array_[5] = zernike_value_array_[8]
+        r_const_zernike_value_array_[6] = zernike_value_array_[9]
+
+    return r_const_zernike_value_array_
+
+
+def calc_declination(
+        zernike_9: float,
+        zernike_10: float) -> float:
+    """sin(2θ)とcos(2θ)を合成した時の偏角αを計算
+
+    Parameters
+    ----------
+    zernike_9 : float
+        zernike第9項の係数（=sin2θの係数）
+    zernike_10 : float
+        zernike第10項の係数（=cos2θの係数）
+
+    Returns
+    -------
+    float
+        sin(2θ+α) の偏角α
+    """
+
+    a = zernike_9
+    b = zernike_10
+
+    alpha = np.rad2deg(np.arcsin(b / np.sqrt(a**2 + b**2)))
+    return alpha
+
+
 if __name__ == "__main__":
     importlib.reload(pom)
 
@@ -155,6 +214,29 @@ if __name__ == "__main__":
         radius=mes0n.circle_path_radius,
         angle_division_number=angle_division_number
     )[1]
+
+    # 半径一定のzernike係数ベクトルに変換
+    omx_r_const_zernike_value_array = convert_to_r_const_zernike_value_array(
+        zernike_value_array_=omx_deformed_surface.zernike_value_array
+    )
+
+    # 偏角の導出
+    omx_declination = calc_declination(
+        zernike_9=omx_r_const_zernike_value_array[5],
+        zernike_10=omx_r_const_zernike_value_array[6])
+
+    mes_declination = calc_declination(
+        zernike_9=mes0n_zerfit.r_const_zernike_polynomial_array[5],
+        zernike_10=mes0n_zerfit.r_const_zernike_polynomial_array[6]
+    )
+    print("omx_declination = ", omx_declination, " [deg]")
+    print("mes_declination = ", mes_declination, " [deg]")
+
+    # 作用行列を現実に一致させるための倍率の導出
+    zernike_09_magnification = mes0n_zerfit.r_const_zernike_polynomial_array[5] / omx_r_const_zernike_value_array[5]
+    zernike_10_magnification = mes0n_zerfit.r_const_zernike_polynomial_array[6] / omx_r_const_zernike_value_array[6]
+    print("Z09 mes / omx = ", zernike_09_magnification)
+    print("Z10 mes / omx = ", zernike_10_magnification)
 
     # plot
     fig1 = plt.figure(figsize=(10, 10))
