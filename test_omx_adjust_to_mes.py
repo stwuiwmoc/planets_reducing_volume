@@ -28,6 +28,63 @@ def mkfolder(suffix=""):
     return folder
 
 
+def make_adjusted_operation_matrix(
+        operation_matrix: np.ndarray,
+        magnification_for_remainder_1: float,
+        magnification_for_remainder_2: float,
+        magnification_for_remainder_3: float,
+        magnification_for_remainder_4: float,
+        magnification_for_remainder_5: float,
+        magnification_for_remainder_6: float) -> np.ndarray:
+    """モデルから作った作用行列に倍率をかけて測定結果を再現する作用行列にする
+
+    Parameters
+    ----------
+    operation_matrix : np.ndarray
+        Constants.operation_matrix
+    magnification_for_remainder_1 : float
+        act [ 1,  7, 13, 19, 25, 31] にかける倍率
+    magnification_for_remainder_2 : float
+        act [ 2,  8, 14, 20, 26, 32] にかける倍率
+    magnification_for_remainde_3 : float
+        act [ 3,  9, 15, 21, 27, 33] にかける倍率
+    magnification_for_remainder_4 : float
+        act [ 4, 10, 16, 22, 28, 34] にかける倍率
+    magnification_for_remainder_5 : float
+        act [ 5, 11, 17, 23, 29, 35] にかける倍率
+    magnification_for_remainder_6 : float
+        act [ 6, 12, 18, 24, 30, 36] にかける倍率
+
+    Returns
+    -------
+    np.ndarray
+        測定結果を再現する作用行列
+    """
+
+    adjusted_operation_matrix = operation_matrix.copy()
+
+    magnification_list = [
+        magnification_for_remainder_1,
+        magnification_for_remainder_2,
+        magnification_for_remainder_3,
+        magnification_for_remainder_4,
+        magnification_for_remainder_5,
+        magnification_for_remainder_6,
+    ]
+
+    for i in range(6):
+        magnification = magnification_list[i]
+
+        adjusted_operation_matrix[:, 0 + i] = magnification * adjusted_operation_matrix[:, 0 + i]
+        adjusted_operation_matrix[:, 6 + i] = magnification * adjusted_operation_matrix[:, 6 + i]
+        adjusted_operation_matrix[:, 12 + i] = magnification * adjusted_operation_matrix[:, 12 + i]
+        adjusted_operation_matrix[:, 18 + i] = magnification * adjusted_operation_matrix[:, 18 + i]
+        adjusted_operation_matrix[:, 24 + i] = magnification * adjusted_operation_matrix[:, 24 + i]
+        adjusted_operation_matrix[:, 30 + i] = magnification * adjusted_operation_matrix[:, 30 + i]
+
+    return adjusted_operation_matrix
+
+
 if __name__ == "__main__":
     importlib.reload(pom)
 
@@ -37,6 +94,16 @@ if __name__ == "__main__":
         pixel_number=256,
         zernike_max_degree=11,
         offset_height_percent=0)
+
+    CONSTS.operation_matrix = make_adjusted_operation_matrix(
+        operation_matrix=CONSTS.operation_matrix,
+        magnification_for_remainder_1=0.75955,
+        magnification_for_remainder_2=3.42924,
+        magnification_for_remainder_3=0.29211,
+        magnification_for_remainder_4=0.50750,
+        magnification_for_remainder_5=2.64606,
+        magnification_for_remainder_6=0.86704
+    )
 
     mes_n_serial = "F"  # F, G, H, I, J, K, L から選択
     ignore_zernike_number_list = [1, 2, 3, 4, 5, 6, 7, 8, 11]
@@ -95,6 +162,13 @@ if __name__ == "__main__":
     omx_r_const_zernike_value_array = cp.convert_to_r_const_zernike_value_array(
         zernike_value_array_=omx_deformed_surface.zernike_value_array
     )
+
+    # 作用行列を現実に一致させるための倍率の導出
+    zernike_09_magnification = mes0n_zerfit.r_const_zernike_polynomial_array[5] / omx_r_const_zernike_value_array[5]
+    zernike_10_magnification = mes0n_zerfit.r_const_zernike_polynomial_array[6] / omx_r_const_zernike_value_array[6]
+    total_magnification = \
+        np.sqrt(mes0n_zerfit.r_const_zernike_polynomial_array[5]**2 + mes0n_zerfit.r_const_zernike_polynomial_array[6]**2) \
+        / np.sqrt(omx_r_const_zernike_value_array[5]**2 + omx_r_const_zernike_value_array[6]**2)
 
     # plot
     # 測定と作用行列の比較プロット
@@ -203,6 +277,9 @@ if __name__ == "__main__":
         ["Have some change", "from above commit", pom.have_some_change_in_git_status()],
         ["original", "", mes_0_filepath],
         ["deformed", "", mes_n_filepath],
+        ["Z09 : mes / omx", round(zernike_09_magnification, 5), ""],
+        ["Z10 : mes / omx", round(zernike_10_magnification, 5), ""],
+        ["Z09 & Z10 : mes / omx", round(total_magnification, 5), ""]
     ]
 
     ax16 = pom.plot_parameter_table(
