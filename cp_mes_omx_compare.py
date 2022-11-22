@@ -239,8 +239,9 @@ if __name__ == "__main__":
     print("Z10 mes / omx = ", zernike_10_magnification)
 
     # plot
-    fig1 = plt.figure(figsize=(10, 10))
-    gs1 = fig1.add_gridspec(4, 1)
+    # 測定結果のプロット
+    fig1 = plt.figure(figsize=(10, 12))
+    gs1 = fig1.add_gridspec(5, 1)
 
     ax11 = fig1.add_subplot(gs1[0, 0])
     ax11.plot(
@@ -295,22 +296,104 @@ if __name__ == "__main__":
     ax14.set_xlabel("zernike number")
     ax14.set_ylabel("zernike polynomial value\nfor r-const [m]")
 
+    parameter_list_1 = [
+        ["original", "", mes_0_filepath],
+        ["deformed", "", mes_n_filepath],
+        pom.get_latest_commit_datetime(),
+        ["Have some change", "from above commit", pom.have_some_change_in_git_status()]
+    ]
+
+    ax15 = pom.plot_parameter_table(
+        fig=fig1,
+        position=gs1[4, 0],
+        parameter_table=parameter_list_1,
+        fontsize=10
+    )
+
     fig1.tight_layout()
 
+    # 作用行列を使った結果のプロット
+
+    fig3 = plt.figure(figsize=(12, 10))
+    gs3 = fig3.add_gridspec(3, 4)
+    fig3.suptitle(" ".join(pom.get_latest_commit_datetime()) + " and have some change is " + str(pom.have_some_change_in_git_status()))
+
+    ax31 = omx_deformed_zernike.make_torque_plot(
+        figure=fig3,
+        position=gs3[0, 0:2]
+    )
+
+    ax32 = omx_deformed_surface.make_image_plot(
+        figure=fig3,
+        position=gs3[1:3, 0:2]
+    )
+
+    ax33 = fig3.add_subplot(gs3[0, 2:4])
+    ax33.plot(
+        omx_angle_array,
+        omx_deformed_height_array,
+        label="WH deforming",
+        color="red"
+    )
+    ax33.plot(
+        omx_angle_array,
+        omx_deformed_height_array - omx_deformed_zernike_removed_height_array,
+        label="zernike fit",
+        color="red",
+        linestyle=":"
+    )
+    ax33.legend()
+    ax33.grid()
+    ax33.set_ylabel("height_diff [m]")
+
+    ax34 = fig3.add_subplot(gs3[1, 2:4])
+    ax34.plot(
+        omx_angle_array,
+        omx_deformed_zernike_removed_height_array,
+        color="red",
+        linestyle="--"
+    )
+    ax34.grid()
+    ax34.set_ylabel("zernike removed\nheight diff [m]")
+
+    ax35 = omx_deformed_surface.make_zernike_value_plot(
+        figure=fig3,
+        position=gs3[2, 2:4]
+    )
+
+    fig3.tight_layout()
+
+    # 測定と作用行列の比較プロット
+
     fig2 = plt.figure(figsize=(12, 10))
-    gs2 = fig2.add_gridspec(3, 4)
+    gs2 = fig2.add_gridspec(3, 2)
 
     ax21 = omx_deformed_zernike.make_torque_plot(
         figure=fig2,
-        position=gs2[0, 0:2]
+        position=gs2[0, 0]
     )
 
-    ax22 = omx_deformed_surface.make_image_plot(
-        figure=fig2,
-        position=gs2[1:3, 0:2]
+    ax22 = fig2.add_subplot(gs2[1, 0])
+    ax22.plot(
+        mes0n_zerfit.r_const_zernike_number_meaning_list,
+        mes0n_zerfit.r_const_zernike_polynomial_array,
+        marker="s",
+        label="measurement",
+        color="blue"
     )
+    ax22.plot(
+        mes0n_zerfit.r_const_zernike_number_meaning_list,
+        omx_r_const_zernike_value_array,
+        marker="s",
+        label="operation matrix",
+        color="red"
+    )
+    ax22.legend()
+    ax22.grid()
+    ax22.set_xlabel("zernike number")
+    ax22.set_ylabel("zernike polynomial value\nfor r-const [m]")
 
-    ax23 = fig2.add_subplot(gs2[0, 2:4])
+    ax23 = fig2.add_subplot(gs2[0, 1])
     ax23.set_title("operation matrix model")
     ax23.plot(
         omx_angle_array,
@@ -329,7 +412,7 @@ if __name__ == "__main__":
     ax23.grid()
     ax23.set_ylabel("height_diff [m]")
 
-    ax24 = fig2.add_subplot(gs2[1, 2:4])
+    ax24 = fig2.add_subplot(gs2[1, 1])
     ax24.set_title("measurement")
     ax24.plot(
         mes0n_zerfit.degree_array,
@@ -348,7 +431,7 @@ if __name__ == "__main__":
     ax24.grid()
     ax24.set_ylabel("height_diff [m]")
 
-    ax25 = fig2.add_subplot(gs2[2, 2:4])
+    ax25 = fig2.add_subplot(gs2[2, 1])
     ax25.plot(
         mes0n_zerfit.degree_array,
         mes0n_zerfit.zernike_removed_height_array,
@@ -366,5 +449,23 @@ if __name__ == "__main__":
     ax25.grid()
     ax25.set_ylabel("zernike removed\nheight diff [m]")
     ax25.legend()
+
+    parameter_list_2 = [
+        pom.get_latest_commit_datetime(),
+        ["Have some change", "from above commit", pom.have_some_change_in_git_status()],
+        ["original", "", mes_0_filepath],
+        ["deformed", "", mes_n_filepath],
+        ["mes_declination", round(mes_declination, 5), "deg"],
+        ["omx_declination", round(omx_declination, 5), "deg"],
+        ["Z09 : mes / omx", round(zernike_09_magnification, 5), ""],
+        ["Z10 : mes / omx", round(zernike_10_magnification, 5), ""],
+    ]
+
+    ax26 = pom.plot_parameter_table(
+        fig=fig2,
+        position=gs2[2, 0],
+        parameter_table=parameter_list_2,
+        fontsize=10
+    )
 
     fig2.tight_layout()
