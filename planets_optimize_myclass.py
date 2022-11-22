@@ -352,21 +352,9 @@ class Constants:
         self.zernike_max_degree = zernike_max_degree
         operation_matrix_fpath = "mkfolder/make_opration_matrix/WT06_zer" + str(self.zernike_max_degree) + "_opration_matrix[m].csv"
         self.operation_matrix = np.genfromtxt(operation_matrix_fpath, delimiter=",").T
-        self.act_tuning_array = self.__make_act_tuning_array()
 
     def h(self):
         mkhelp(self)
-
-    def __make_act_tuning_array(self):
-        act_tuning = np.array([
-            37., 37., 20., 20., -38., 38.,
-            37., 37., 20., 20., -38., 38.,
-            37., 37., 20., 20., -38., 38.,
-            37., 37., 20., 20., -38., 38.,
-            37., 37., 20., 20., -38., 38.,
-            37., 37., 20., 20., -38., 38.])
-
-        return act_tuning
 
 
 class Surface:
@@ -1000,6 +988,7 @@ class FemTxtToSurface(Surface):
         df_original = self.__read_file(self.fpath_original)
         df_deformed = self.__read_file(self.fpath_deformed)
 
+        self.act_tuning_array = self.__make_act_tuning_array()
         self.surface = self.__interpolation(df00=df_original, dfxx=df_deformed)
 
         self.pv = super()._pv_calculation()
@@ -1035,6 +1024,17 @@ class FemTxtToSurface(Surface):
         df.columns = ["x", "y", "z", "color", "dx", "dy", "dz"]
         return df
 
+    def __make_act_tuning_array(self):
+        act_tuning = np.array([
+            37., 37., 20., 20., -38., 38.,
+            37., 37., 20., 20., -38., 38.,
+            37., 37., 20., 20., -38., 38.,
+            37., 37., 20., 20., -38., 38.,
+            37., 37., 20., 20., -38., 38.,
+            37., 37., 20., 20., -38., 38.])
+
+        return act_tuning
+
     def __interpolation(
             self,
             df00: pd.DataFrame,
@@ -1068,7 +1068,7 @@ class FemTxtToSurface(Surface):
             method="linear",
             fill_value=0)
 
-        act_tuning_value = self.consts.act_tuning_array[self.wt_number - 1]
+        act_tuning_value = self.act_tuning_array[self.wt_number - 1]
         masked_surface = dw_mesh * self.consts.mask * act_tuning_value
 
         return masked_surface
