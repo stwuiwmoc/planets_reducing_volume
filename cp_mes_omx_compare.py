@@ -408,6 +408,13 @@ if __name__ == "__main__":
         color="red",
         linestyle=":"
     )
+    ax23.plot(
+        omx_angle_array,
+        omx_deformed_zernike_removed_height_array,
+        label="deforming - fit",
+        color="red",
+        linestyle="--"
+    )
     ax23.legend()
     ax23.grid()
     ax23.set_ylabel("height_diff [m]")
@@ -426,6 +433,13 @@ if __name__ == "__main__":
         label="zernike fit",
         color="blue",
         linestyle=":"
+    )
+    ax24.plot(
+        mes0n_zerfit.degree_array,
+        mes0n_zerfit.zernike_removed_height_array,
+        label="deforming - fit",
+        color="blue",
+        linestyle="--"
     )
     ax24.legend()
     ax24.grid()
