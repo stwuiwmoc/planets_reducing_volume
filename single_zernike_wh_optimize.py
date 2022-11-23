@@ -78,26 +78,52 @@ if __name__ == "__main__":
             constants=CONSTS,
             surface=target_surface.surface - wh_reproducted_surface.surface)
 
-        fig1 = plt.figure(figsize=(10, 10))
-        gs1 = fig1.add_gridspec(4, 2)
+        fig1 = plt.figure(figsize=(10, 14))
+        gs1 = fig1.add_gridspec(6, 2)
         fig1.suptitle("zernike " + str(zernike_num))
 
-        ax11 = wh_reproducted_surface.make_image_plot(fig1, gs1[0:2, 0])
+        ax15 = target_surface.make_image_plot(
+            figure=fig1,
+            position=gs1[0:2, 0],
+        )
+        ax15.set_title("target surface\n" + ax15.get_title())
 
-        ax12 = result_surface.make_image_plot(fig1, gs1[0:2, 1], pv_digits=5, rms_digits=5)
+        ax11 = wh_reproducted_surface.make_image_plot(
+            figure=fig1,
+            position=gs1[2:4, 0],
+        )
+        ax11.set_title("wh reproducted surface\n" + ax11.get_title())
+
+        ax12 = result_surface.make_image_plot(
+            figure=fig1,
+            position=gs1[2:4, 1],
+            cbar_surface=wh_reproducted_surface.surface,
+            pv_digits=5,
+            rms_digits=5,
+        )
+        ax12.set_title("residual\n" + ax12.get_title())
 
         ax13_xaxis = np.arange(CONSTS.zernike_max_degree) + 1
-        ax13 = fig1.add_subplot(gs1[2, :])
+        ax13 = fig1.add_subplot(gs1[4, :])
         ax13.plot(
-            ax13_xaxis, target_zernike_value_array,
-            label="target zernike", marker="s")
+            ax13_xaxis,
+            target_zernike_value_array,
+            label="target zernike",
+            marker="s",
+        )
         ax13.plot(
-            ax13_xaxis, wh_reproducted_zernike.zernike_value_array,
-            label="wh_reproducted", marker="s")
+            ax13_xaxis,
+            wh_reproducted_zernike.zernike_value_array,
+            label="wh_reproducted",
+            marker="s",
+        )
         ax13.grid()
         ax13.legend()
 
-        ax14 = wh_reproducted_zernike.make_torque_plot(fig1, gs1[3, :])
+        ax14 = wh_reproducted_zernike.make_torque_plot(
+            figure=fig1,
+            position=gs1[5, :],
+        )
 
         fig1.tight_layout()
 
