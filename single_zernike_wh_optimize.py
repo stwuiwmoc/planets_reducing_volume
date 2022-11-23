@@ -48,13 +48,14 @@ if __name__ == "__main__":
         magnification_for_remainder_6=0.86704
     )
 
-    torque_value_limit = np.inf  # [mm]
+    target_zernike_value = 1e-6
+    torque_value_limit = 5  # [mm]
 
     for i in range(CONSTS.zernike_max_degree):
         print(i)
         zernike_num = i + 1
         target_zernike_value_array = np.zeros(CONSTS.zernike_max_degree)
-        target_zernike_value_array[i] = 5e-7
+        target_zernike_value_array[i] = target_zernike_value
 
         target_surface = pom.ZernikeToSurface(
             constants=CONSTS,
@@ -78,6 +79,15 @@ if __name__ == "__main__":
             constants=CONSTS,
             surface=target_surface.surface - wh_reproducted_surface.surface)
 
+        # plot
+
+        cbar_reference_zernike_value_array = np.zeros(CONSTS.zernike_max_degree)
+        cbar_reference_zernike_value_array[2] = target_zernike_value
+        cbar_reference_surface = pom.ZernikeToSurface(
+            constants=CONSTS,
+            zernike_value_array=cbar_reference_zernike_value_array
+        )
+
         fig1 = plt.figure(figsize=(10, 14))
         gs1 = fig1.add_gridspec(6, 2)
         fig1.suptitle("zernike " + str(zernike_num))
@@ -85,19 +95,21 @@ if __name__ == "__main__":
         ax15 = target_surface.make_image_plot(
             figure=fig1,
             position=gs1[0:2, 0],
+            cbar_surface=cbar_reference_surface.surface,
         )
         ax15.set_title("target surface\n" + ax15.get_title())
 
         ax11 = wh_reproducted_surface.make_image_plot(
             figure=fig1,
             position=gs1[2:4, 0],
+            cbar_surface=cbar_reference_surface.surface,
         )
         ax11.set_title("wh reproducted surface\n" + ax11.get_title())
 
         ax12 = result_surface.make_image_plot(
             figure=fig1,
             position=gs1[2:4, 1],
-            cbar_surface=wh_reproducted_surface.surface,
+            cbar_surface=cbar_reference_surface.surface,
             pv_digits=5,
             rms_digits=5,
         )
