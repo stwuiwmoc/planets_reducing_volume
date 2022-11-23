@@ -5,6 +5,7 @@ import importlib
 import matplotlib.pyplot as plt
 import numpy as np
 
+import adjust_omx_for_mes
 import planets_optimize_myclass as pom
 
 
@@ -37,7 +38,17 @@ if __name__ == "__main__":
         zernike_max_degree=11,
         offset_height_percent=2)
 
-    torque_value_limit = np.inf
+    CONSTS.operation_matrix = adjust_omx_for_mes.make_adjusted_operation_matrix(
+        operation_matrix=CONSTS.operation_matrix,
+        magnification_for_remainder_1=0.75955,
+        magnification_for_remainder_2=3.42924,
+        magnification_for_remainder_3=0.29211,
+        magnification_for_remainder_4=0.50750,
+        magnification_for_remainder_5=2.64606,
+        magnification_for_remainder_6=0.86704
+    )
+
+    torque_value_limit = np.inf  # [mm]
 
     for i in range(CONSTS.zernike_max_degree):
         print(i)
