@@ -49,7 +49,7 @@ if __name__ == "__main__":
     )
 
     target_zernike_value = 1e-6
-    torque_value_limit = 5  # [mm]
+    torque_value_limit = 5  # [mm] 駆動量の制約なしの場合はnp.inf
 
     for i in range(CONSTS.zernike_max_degree):
         print(i)
@@ -88,27 +88,27 @@ if __name__ == "__main__":
             zernike_value_array=cbar_reference_zernike_value_array
         )
 
-        fig1 = plt.figure(figsize=(10, 14))
-        gs1 = fig1.add_gridspec(6, 2)
+        fig1 = plt.figure(figsize=(10, 15))
+        gs1 = fig1.add_gridspec(10, 2)
         fig1.suptitle("zernike " + str(zernike_num))
 
         ax15 = target_surface.make_image_plot(
             figure=fig1,
-            position=gs1[0:2, 0],
+            position=gs1[0:3, 0],
             cbar_surface=cbar_reference_surface.surface,
         )
         ax15.set_title("target surface\n" + ax15.get_title())
 
         ax11 = wh_reproducted_surface.make_image_plot(
             figure=fig1,
-            position=gs1[2:4, 0],
+            position=gs1[3:6, 0],
             cbar_surface=cbar_reference_surface.surface,
         )
         ax11.set_title("wh reproducted surface\n" + ax11.get_title())
 
         ax12 = result_surface.make_image_plot(
             figure=fig1,
-            position=gs1[2:4, 1],
+            position=gs1[3:6, 1],
             cbar_surface=cbar_reference_surface.surface,
             pv_digits=5,
             rms_digits=5,
@@ -116,7 +116,7 @@ if __name__ == "__main__":
         ax12.set_title("residual\n" + ax12.get_title())
 
         ax13_xaxis = np.arange(CONSTS.zernike_max_degree) + 1
-        ax13 = fig1.add_subplot(gs1[4, :])
+        ax13 = fig1.add_subplot(gs1[6:8, :])
         ax13.plot(
             ax13_xaxis,
             target_zernike_value_array,
@@ -134,8 +134,12 @@ if __name__ == "__main__":
 
         ax14 = wh_reproducted_zernike.make_torque_plot(
             figure=fig1,
-            position=gs1[5, :],
+            position=gs1[8:10, :],
         )
+
+        if torque_value_limit is not np.inf:
+            # set_ylim は np.inf には対応しないため
+            ax14.set_ylim(-1.1 * torque_value_limit, 1.1 * torque_value_limit)
 
         fig1.tight_layout()
 
