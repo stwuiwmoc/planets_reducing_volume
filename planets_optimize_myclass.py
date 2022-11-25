@@ -1180,7 +1180,9 @@ class ZernikeToTorque:
         optimize_result = optimize.lsq_linear(
             A=operation_matrix,
             b=zernike_value_array,
-            bounds=(-self.restructed_torque_value, self.restructed_torque_value))
+            bounds=(-self.restructed_torque_value, self.restructed_torque_value),
+            tol=1e-20,  # tolがデフォルト値だと収束しないことがある
+        )
 
         torque_value_array = optimize_result["x"]
 
