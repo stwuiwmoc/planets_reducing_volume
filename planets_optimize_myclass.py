@@ -314,10 +314,14 @@ def zernike_polynomial_calculation(
 class Constants:
 
     def __init__(
-            self, physical_radius, ignore_radius,
-            pixel_number, zernike_max_degree, offset_height_percent):
-        """
-        class : constants
+            self,
+            physical_radius: float,
+            ignore_radius: float,
+            pixel_number: int,
+            zernike_max_degree: int,
+            offset_height_percent: float,
+            alpha_array: np.ndarray):
+        """_summary_
 
         Parameters
         ----------
@@ -331,30 +335,165 @@ class Constants:
             max zernike number
         offset_height_percent : float
             ignore height in percent. if you set 2, the lower 2% is ignored in volume calculation
-
-        Returns
-        -------
-        None.
-
+        alpha_array : np.ndarray
+            [無次元] alpha
         """
         self.physical_radius = physical_radius
         self.ignore_radius = ignore_radius
         self.pixel_number = pixel_number
         self.offset_height_percent = offset_height_percent
+        self.alpha_array = alpha_array
 
         self.varid_radius = physical_radius - ignore_radius
         self.xx, self.yy = make_meshgrid(
             -physical_radius, physical_radius,
             -physical_radius, physical_radius,
             pixel_number)
+
         self.tf = np.where(self.xx ** 2 + self.yy ** 2 <= self.varid_radius**2, True, False)
         self.mask = np.where(self.tf, 1, np.nan)
         self.zernike_max_degree = zernike_max_degree
-        operation_matrix_fpath = "mkfolder/make_opration_matrix/WT06_zer" + str(self.zernike_max_degree) + "_opration_matrix[m].csv"
-        self.operation_matrix = np.genfromtxt(operation_matrix_fpath, delimiter=",").T
+
+        # 作用行列Dの作成
+        self.fem_xy_matrix = self.__make_fem_xy_matrix()
+        self.operation_matrix_D = self.__make_operation_matrix_D(
+            alpha_array_=self.alpha_array
+        )
+
+        # 近似作用行列Aの作成
+        self.operation_matrix_A = self.__make_operation_matrix_A()
 
     def h(self):
         mkhelp(self)
+
+    def fem_interpolate(
+            self,
+            fem_z_orient_array) -> np.ndarray:
+        """femの点群をmeshgridに補間
+
+        Parameters
+        ----------
+        fem_z_orient_array : _type_
+            fem のz方向の値なら何でも良い
+            fem の点群と同じ要素数である必要がある
+
+        Returns
+        -------
+        np.ndarray
+            meshgridに保管してConstants.tfを掛けた2d array
+        """
+
+        z_old = fem_z_orient_array
+        xy_old = self.fem_xy_matrix
+        xy_new = (self.xx, self.yy)
+        zz_new = interpolate.griddata(
+            xy_old, z_old, xy_new, method="linear", fill_value=0
+        )
+        zz_new_masked = zz_new * self.tf
+
+        return zz_new_masked
+
+    def __read(self, filename):
+        # skip行数の設定
+        skip = 0
+        with open(filename) as f:
+            while True:
+                line = f.readline()
+                if line[0] == '%':
+                    skip += 1
+                else:
+                    break
+                # エラーの処理
+                if len(line) == 0:
+                    break
+
+        # データの読み出し
+        df = pd.read_csv(
+            filename,
+            sep='\\s+',
+            skiprows=skip,
+            header=None)  # \s+...スペース数に関わらず区切る
+        df.columns = ["x", "y", "z", "color", "dx", "dy", "dz"]
+        df = df * 10**3  # [m] -> [mm]
+        return df
+
+    def __make_fem_xy_matrix(self) -> np.ndarray:
+        """fem の各点のxy座標を読み出し
+
+        Returns
+        -------
+        np.ndarray
+            x0, y0\n
+            x1, y1\n
+            ...\n
+            xm, ym\n
+        """
+        df0 = self.__read("raw_data/Fxx/PM3.5_36ptAxWT06_F00.smesh.txt")
+
+        fem_x_array = df0["x"].values * 1e-3  # [mm] -> [m] 換算
+        fem_y_array = df0["y"].values * 1e-3  # [mm] -> [m] 換算
+        fem_xy_matrix = np.stack([fem_x_array, fem_y_array], axis=1)
+        return fem_xy_matrix
+
+    def __make_operation_matrix_D(
+            self,
+            alpha_array_: np.ndarray) -> np.ndarray:
+        """femの結果をそのまま入れた作用行列Dを計算
+
+        Parameters
+        ----------
+        alpha_array_ : np.ndarray
+            倍率決定の係数α1, ..., α36
+
+        Returns
+        -------
+        np.ndarray
+            作用行列D
+        """
+        df0 = self.__read("raw_data/Fxx/PM3.5_36ptAxWT06_F00.smesh.txt")
+
+        h_0_array = df0["dz"].values * 1e-3  # [mm] -> [m] 換算
+
+        file_num = 36
+        data_length = len(df0)
+        operation_matrix_D = np.zeros((data_length, file_num))
+
+        for i in range(0, file_num):
+            alpha_n = self.alpha_array[i]
+
+            num = str(i + 1).zfill(2)
+            data_fname = "raw_data/Fxx/PM3.5_36ptAxWT06_F" + num + ".smesh.txt"
+            dfxx = self.__read(data_fname)
+
+            h_n_array = dfxx["dz"].values * 1e-3  # [mm] -> [m] 換算
+            operation_matrix_D[:, i] = alpha_n * (h_n_array - h_0_array)
+
+        return operation_matrix_D
+
+    def __make_operation_matrix_A(self) -> np.ndarray:
+        file_num = len(self.operation_matrix_D[0])
+        operation_matrix_A = np.zeros(
+            (self.zernike_max_degree, file_num)
+        )
+
+        for i in range(0, file_num):
+            d_n_array = self.operation_matrix_D[:, i]
+            d_n_mesh = self.fem_interpolate(
+                fem_z_orient_array=d_n_array
+            )
+
+            a_n = pr.prop_fit_zernikes(
+                wavefront0=d_n_mesh,
+                pupil0=self.tf,
+                pupilradius0=self.pixel_number // 2,
+                nzer=self.zernike_max_degree,
+                xc=self.pixel_number // 2,
+                yc=self.pixel_number // 2
+            )
+
+            operation_matrix_A[:, i] = a_n
+
+        return operation_matrix_A
 
 
 class Surface:
@@ -1131,7 +1270,7 @@ class ZernikeToTorque:
 
         if len(self.ignore_zernike_number_list) == 0:
             make_torque_value_array_result = self.__make_torque_value_array(
-                operation_matrix=self.consts.operation_matrix,
+                operation_matrix=self.consts.operation_matrix_A,
                 zernike_value_array=self.target_zernike_value_array)
 
             self.torque_value_array = make_torque_value_array_result["torque"]
@@ -1139,7 +1278,7 @@ class ZernikeToTorque:
 
         else:
             remaining_operation_matrix = make_remaining_matrix(
-                self.consts.operation_matrix,
+                self.consts.operation_matrix_A,
                 self.ignore_zernike_number_list)
 
             remaining_zernike_value_array = make_remaining_matrix(
@@ -1216,7 +1355,7 @@ class TorqueToZernike:
         self.torque_value_array = torque_value_array
 
         self.zernike_value_array = np.dot(
-            self.consts.operation_matrix,
+            self.consts.operation_matrix_A,
             self.torque_value_array)
 
     def h(self):
