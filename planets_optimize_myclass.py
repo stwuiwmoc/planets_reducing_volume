@@ -380,7 +380,7 @@ class Constants:
         Returns
         -------
         np.ndarray
-            meshgridに保管してConstants.tfを掛けた2d array
+            meshgridに補間した2d array
         """
 
         z_old = fem_z_orient_array
@@ -389,9 +389,8 @@ class Constants:
         zz_new = interpolate.griddata(
             xy_old, z_old, xy_new, method="linear", fill_value=0
         )
-        zz_new_masked = zz_new * self.tf
 
-        return zz_new_masked
+        return zz_new
 
     def __read(self, filename):
         # skip行数の設定
@@ -459,7 +458,7 @@ class Constants:
         operation_matrix_D = np.zeros((data_length, file_num))
 
         for i in range(0, file_num):
-            alpha_n = self.alpha_array[i]
+            alpha_n = alpha_array_[i]
 
             num = str(i + 1).zfill(2)
             data_fname = "raw_data/Fxx/PM3.5_36ptAxWT06_F" + num + ".smesh.txt"
@@ -1096,6 +1095,35 @@ class FilteredSurface(Surface):
 
         masked_filtered_surface = self.consts.mask * filtered_surface
         return masked_filtered_surface
+
+
+class TorqueToSurface(Surface):
+    def __init__(
+            self,
+            constants,
+            torque_value_array: np.ndarray):
+
+        self.consts = constants
+        self.torque_value_array = torque_value_array
+        self.surface = self.__make_surface_from_torque()
+        self.pv = super()._pv_calculation()
+        self.rms = super()._rms_calculation()
+        self.volume = super()._volume_calculation()[0]
+        self.offset_height_value = super()._volume_calculation()[1]
+        self.zernike_value_array = super()._zernike_value_array_calculation(self.surface)
+
+    def h(self):
+        mkhelp(self)
+
+    def __make_surface_from_torque(self):
+        f_array = np.dot(self.consts.operation_matrix_D, self.torque_value_array)
+
+        f_mesh = self.consts.fem_interpolate(
+            fem_z_orient_array=f_array
+        )
+
+        surface = self.consts.mask * f_mesh
+        return surface
 
 
 class FemTxtToSurface(Surface):

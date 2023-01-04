@@ -24,3 +24,24 @@ if __name__ == "__main__":
             37., -37., 20., 20., -38., 38.
         ])
     )
+
+    # %%
+    importlib.reload(pom)
+    for i in range(36):
+        torque_value_array = np.zeros(36)
+        torque_value_array[i] = 1
+
+        surface = pom.TorqueToSurface(
+            constants=CONSTS,
+            torque_value_array=torque_value_array
+        )
+
+        fig1 = plt.figure()
+        gs1 = fig1.add_gridspec(1, 1)
+
+        ax11 = surface.make_image_plot(
+            figure=fig1,
+            position=gs1[0, 0],
+            cbar_min_percent=5,
+            cbar_max_percent=95
+        )
