@@ -361,6 +361,7 @@ class Constants:
         )
 
         # 近似作用行列Aの作成
+        self.operation_matrix_A = self.__make_operation_matrix_A()
 
     def h(self):
         mkhelp(self)
@@ -437,6 +438,18 @@ class Constants:
     def __make_operation_matrix_D(
             self,
             alpha_array_: np.ndarray) -> np.ndarray:
+        """femの結果をそのまま入れた作用行列Dを計算
+
+        Parameters
+        ----------
+        alpha_array_ : np.ndarray
+            倍率決定の係数α1, ..., α36
+
+        Returns
+        -------
+        np.ndarray
+            作用行列D
+        """
         df0 = self.__read("raw_data/Fxx/PM3.5_36ptAxWT06_F00.smesh.txt")
 
         h_0_array = df0["dz"].values * 1e-3  # [mm] -> [m] 換算
@@ -456,6 +469,31 @@ class Constants:
         operation_matrix_D = h_n_minus_h_0_matrix * self.alpha_array
 
         return operation_matrix_D
+
+    def __make_operation_matrix_A(self) -> np.ndarray:
+        file_num = len(self.operation_matrix_D[0])
+        operation_matrix_A = np.zeros(
+            (self.zernike_max_degree, file_num)
+        )
+
+        for i in range(0, file_num):
+            d_n_array = self.operation_matrix_D[:, i]
+            d_n_mesh = self.fem_interpolate(
+                fem_z_orient_array=d_n_array
+            )
+
+            a_n = pr.prop_fit_zernikes(
+                wavefront0=d_n_mesh,
+                pupil0=self.tf,
+                pupilradius0=self.pixel_number // 2,
+                nzer=self.zernike_max_degree,
+                xc=self.pixel_number // 2,
+                yc=self.pixel_number // 2
+            )
+
+            operation_matrix_A[:, i] = a_n
+
+        return operation_matrix_A
 
 
 class Surface:
