@@ -456,17 +456,17 @@ class Constants:
 
         file_num = 36
         data_length = len(df0)
-        h_n_minus_h_0_matrix = np.zeros((data_length, file_num))
+        operation_matrix_D = np.zeros((data_length, file_num))
 
         for i in range(0, file_num):
-            num = str(i + 1).zfill(2)
+            alpha_n = self.alpha_array[i]
 
+            num = str(i + 1).zfill(2)
             data_fname = "raw_data/Fxx/PM3.5_36ptAxWT06_F" + num + ".smesh.txt"
             dfxx = self.__read(data_fname)
-            h_n_array = dfxx["dz"].values * 1e-3  # [mm] -> [m] 換算
-            h_n_minus_h_0_matrix[:, i] = h_n_array - h_0_array
 
-        operation_matrix_D = h_n_minus_h_0_matrix * self.alpha_array
+            h_n_array = dfxx["dz"].values * 1e-3  # [mm] -> [m] 換算
+            operation_matrix_D[:, i] = alpha_n * (h_n_array - h_0_array)
 
         return operation_matrix_D
 
