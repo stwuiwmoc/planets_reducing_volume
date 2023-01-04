@@ -1331,36 +1331,6 @@ class ZernikeToTorque:
 
         return result_dict
 
-
-class TorqueToZernike:
-
-    def __init__(
-            self,
-            constants,
-            torque_value_array: ndarray):
-
-        """
-        与えられたトルクに作用行列をかけてzernikeに変換
-        len(self.zernike_value_array) = Constants.zernike_max_degree
-
-        Parameters
-        ----------
-        constants : [type]
-            Constant クラス
-        torque_value_array : ndarray
-            トルクベクトル
-        """
-
-        self.consts = constants
-        self.torque_value_array = torque_value_array
-
-        self.zernike_value_array = np.dot(
-            self.consts.operation_matrix_A,
-            self.torque_value_array)
-
-    def h(self):
-        mkhelp(self)
-
     def make_torque_plot(self, figure, position=111):
         fontsize = 15
         ax_title = "WH (black : 1-12, green : 13-24, violet : 25-36)"
@@ -1391,6 +1361,36 @@ class TorqueToZernike:
         ax.hlines(0, xmin=1, xmax=12, color="darkgray")
 
         return ax
+
+
+class TorqueToZernike:
+
+    def __init__(
+            self,
+            constants,
+            torque_value_array: ndarray):
+
+        """
+        与えられたトルクに作用行列をかけてzernikeに変換
+        len(self.zernike_value_array) = Constants.zernike_max_degree
+
+        Parameters
+        ----------
+        constants : [type]
+            Constant クラス
+        torque_value_array : ndarray
+            トルクベクトル
+        """
+
+        self.consts = constants
+        self.torque_value_array = torque_value_array
+
+        self.zernike_value_array = np.dot(
+            self.consts.operation_matrix_A,
+            self.torque_value_array)
+
+    def h(self):
+        mkhelp(self)
 
 
 class OapConstants:

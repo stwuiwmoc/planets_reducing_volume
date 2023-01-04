@@ -130,7 +130,7 @@ if __name__ == "__main__":
         target_surface.zernike_value_array.min() * 1.3,
         target_surface.zernike_value_array.max() * 1.3)
 
-    ax13 = reproducted_zernike.make_torque_plot(fig1, gs1[8:, :])
+    ax13 = reproducted_torque.make_torque_plot(fig1, gs1[8:, :])
     ax13.set_title(ax13.get_title() + " Limit : " + str(torque_value_limit) + " [mm]")
 
     fig1.tight_layout()
