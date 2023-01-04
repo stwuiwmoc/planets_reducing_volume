@@ -314,10 +314,14 @@ def zernike_polynomial_calculation(
 class Constants:
 
     def __init__(
-            self, physical_radius, ignore_radius,
-            pixel_number, zernike_max_degree, offset_height_percent):
-        """
-        class : constants
+            self,
+            physical_radius: float,
+            ignore_radius: float,
+            pixel_number: int,
+            zernike_max_degree: int,
+            offset_height_percent: float,
+            alpha_array: np.ndarray):
+        """_summary_
 
         Parameters
         ----------
@@ -331,30 +335,98 @@ class Constants:
             max zernike number
         offset_height_percent : float
             ignore height in percent. if you set 2, the lower 2% is ignored in volume calculation
-
-        Returns
-        -------
-        None.
-
+        alpha_array : np.ndarray
+            [無次元] alpha
         """
         self.physical_radius = physical_radius
         self.ignore_radius = ignore_radius
         self.pixel_number = pixel_number
         self.offset_height_percent = offset_height_percent
+        self.alpha_array = alpha_array
 
         self.varid_radius = physical_radius - ignore_radius
         self.xx, self.yy = make_meshgrid(
             -physical_radius, physical_radius,
             -physical_radius, physical_radius,
             pixel_number)
+
         self.tf = np.where(self.xx ** 2 + self.yy ** 2 <= self.varid_radius**2, True, False)
         self.mask = np.where(self.tf, 1, np.nan)
         self.zernike_max_degree = zernike_max_degree
-        operation_matrix_fpath = "mkfolder/make_opration_matrix/WT06_zer" + str(self.zernike_max_degree) + "_opration_matrix[m].csv"
-        self.operation_matrix = np.genfromtxt(operation_matrix_fpath, delimiter=",").T
+
+        # WT作用行列の作成準備
+        self.fem_xy_matrix = self.__make_fem_xy_matrix()
+        self.operation_matrix_D = self.__make_operation_matrix_D(
+            alpha_array_=self.alpha_array
+        )
 
     def h(self):
         mkhelp(self)
+
+    def __read(self, filename):
+        # skip行数の設定
+        skip = 0
+        with open(filename) as f:
+            while True:
+                line = f.readline()
+                if line[0] == '%':
+                    skip += 1
+                else:
+                    break
+                # エラーの処理
+                if len(line) == 0:
+                    break
+
+        # データの読み出し
+        df = pd.read_csv(
+            filename,
+            sep='\\s+',
+            skiprows=skip,
+            header=None)  # \s+...スペース数に関わらず区切る
+        df.columns = ["x", "y", "z", "color", "dx", "dy", "dz"]
+        df = df * 10**3  # [m] -> [mm]
+        return df
+
+    def __make_fem_xy_matrix(self) -> np.ndarray:
+        """fem の各点のxy座標を読み出し
+
+        Returns
+        -------
+        np.ndarray
+            x0, y0\n
+            x1, y1\n
+            ...\n
+            xm, ym\n
+        """
+        df0 = self.__read("raw_data/Fxx/PM3.5_36ptAxWT06_F00.smesh.txt")
+
+        fem_x_array = df0["x"].values * 1e-3  # [mm] -> [m] 換算
+        fem_y_array = df0["y"].values * 1e-3  # [mm] -> [m] 換算
+        fem_xy_matrix = np.stack([fem_x_array, fem_y_array], axis=1)
+        return fem_xy_matrix
+
+    def __make_operation_matrix_D(
+            self,
+            alpha_array_: np.ndarray) -> np.ndarray:
+        df0 = self.__read("raw_data/Fxx/PM3.5_36ptAxWT06_F00.smesh.txt")
+
+        h_0_array = df0["dz"].values * 1e-3  # [mm] -> [m] 換算
+
+        file_num = 36
+        data_length = len(df0)
+        h_n_minus_h_0_matrix = np.zeros((data_length, file_num))
+
+        for i in range(0, file_num):
+            num = str(i + 1).zfill(2)
+
+            data_fname = "raw_data/Fxx/PM3.5_36ptAxWT06_F" + num + ".smesh.txt"
+            dfxx = self.__read(data_fname)
+            h_n_array = dfxx["dz"].values * 1e-3  # [mm] -> [m] 換算
+            h_n_minus_h_0_matrix[:, i] = h_n_array - h_0_array
+
+        operation_matrix_D = h_n_minus_h_0_matrix * self.alpha_array
+
+        return operation_matrix_D
 
 
 class Surface:
