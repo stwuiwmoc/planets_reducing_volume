@@ -1270,7 +1270,7 @@ class ZernikeToTorque:
 
         if len(self.ignore_zernike_number_list) == 0:
             make_torque_value_array_result = self.__make_torque_value_array(
-                operation_matrix=self.consts.operation_matrix,
+                operation_matrix=self.consts.operation_matrix_A,
                 zernike_value_array=self.target_zernike_value_array)
 
             self.torque_value_array = make_torque_value_array_result["torque"]
@@ -1278,7 +1278,7 @@ class ZernikeToTorque:
 
         else:
             remaining_operation_matrix = make_remaining_matrix(
-                self.consts.operation_matrix,
+                self.consts.operation_matrix_A,
                 self.ignore_zernike_number_list)
 
             remaining_zernike_value_array = make_remaining_matrix(
@@ -1355,7 +1355,7 @@ class TorqueToZernike:
         self.torque_value_array = torque_value_array
 
         self.zernike_value_array = np.dot(
-            self.consts.operation_matrix,
+            self.consts.operation_matrix_A,
             self.torque_value_array)
 
     def h(self):
