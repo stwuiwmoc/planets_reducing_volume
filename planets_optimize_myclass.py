@@ -354,14 +354,43 @@ class Constants:
         self.mask = np.where(self.tf, 1, np.nan)
         self.zernike_max_degree = zernike_max_degree
 
-        # WT作用行列の作成準備
+        # 作用行列Dの作成
         self.fem_xy_matrix = self.__make_fem_xy_matrix()
         self.operation_matrix_D = self.__make_operation_matrix_D(
             alpha_array_=self.alpha_array
         )
 
+        # 近似作用行列Aの作成
+
     def h(self):
         mkhelp(self)
+
+    def fem_interpolate(
+            self,
+            fem_z_orient_array) -> np.ndarray:
+        """femの点群をmeshgridに補間
+
+        Parameters
+        ----------
+        fem_z_orient_array : _type_
+            fem のz方向の値なら何でも良い
+            fem の点群と同じ要素数である必要がある
+
+        Returns
+        -------
+        np.ndarray
+            meshgridに保管してConstants.tfを掛けた2d array
+        """
+
+        z_old = fem_z_orient_array
+        xy_old = self.fem_xy_matrix
+        xy_new = (self.xx, self.yy)
+        zz_new = interpolate.griddata(
+            xy_old, z_old, xy_new, method="linear", fill_value=0
+        )
+        zz_new_masked = zz_new * self.tf
+
+        return zz_new_masked
 
     def __read(self, filename):
         # skip行数の設定
