@@ -36,10 +36,19 @@ if __name__ == "__main__":
         ignore_radius=0,
         pixel_number=1024,
         zernike_max_degree=11,
-        offset_height_percent=2)
+        offset_height_percent=2,
+        alpha_array=np.array([
+            37., -37., 20., 20., -38., 38.,
+            37., -37., 20., 20., -38., 38.,
+            37., -37., 20., 20., -38., 38.,
+            37., -37., 20., 20., -38., 38.,
+            37., -37., 20., 20., -38., 38.,
+            37., -37., 20., 20., -38., 38.
+        ])
+    )
 
-    CONSTS.operation_matrix = adjust_omx_for_mes.make_adjusted_operation_matrix(
-        operation_matrix=CONSTS.operation_matrix,
+    CONSTS.operation_matrix_A = adjust_omx_for_mes.make_adjusted_operation_matrix(
+        operation_matrix=CONSTS.operation_matrix_A,
         magnification_for_remainder_1=0.75955,
         magnification_for_remainder_2=3.42924,
         magnification_for_remainder_3=0.29211,
@@ -132,7 +141,7 @@ if __name__ == "__main__":
         ax13.grid()
         ax13.legend()
 
-        ax14 = wh_reproducted_zernike.make_torque_plot(
+        ax14 = wh_torque.make_torque_plot(
             figure=fig1,
             position=gs1[8:10, :],
         )
