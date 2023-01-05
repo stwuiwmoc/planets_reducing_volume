@@ -160,7 +160,16 @@ if __name__ == "__main__":
         ignore_radius=25e-3,
         pixel_number=256,
         zernike_max_degree=11,
-        offset_height_percent=0)
+        offset_height_percent=0,
+        alpha_array=np.array([
+            37., -37., 20., 20., -38., 38.,
+            37., -37., 20., 20., -38., 38.,
+            37., -37., 20., 20., -38., 38.,
+            37., -37., 20., 20., -38., 38.,
+            37., -37., 20., 20., -38., 38.,
+            37., -37., 20., 20., -38., 38.
+        ])
+    )
 
     mes_n_serial = "L"  # F, G, H, I, J, K, L から選択
     ignore_zernike_number_list = [1, 2, 3, 4, 5, 6, 7, 8, 11]
@@ -187,13 +196,10 @@ if __name__ == "__main__":
     full_torque_value_array = make_full_torque_value_array_for_mes(mes_n_serial_=mes_n_serial)
     angle_division_number = 360
 
-    omx_deformed_zernike = pom.TorqueToZernike(
+    omx_deformed_surface = pom.TorqueToSurface(
         constants=CONSTS,
-        torque_value_array=full_torque_value_array)
-
-    omx_deformed_surface = pom.ZernikeToSurface(
-        constants=CONSTS,
-        zernike_value_array=omx_deformed_zernike.zernike_value_array)
+        torque_value_array=full_torque_value_array
+    )
 
     omx_deformed_zernike_removed_surface = pom.ZernikeRemovedSurface(
         constants=CONSTS,
@@ -317,11 +323,6 @@ if __name__ == "__main__":
     gs3 = fig3.add_gridspec(3, 4)
     fig3.suptitle(" ".join(pom.get_latest_commit_datetime()) + " and have some change is " + str(pom.have_some_change_in_git_status()))
 
-    ax31 = omx_deformed_zernike.make_torque_plot(
-        figure=fig3,
-        position=gs3[0, 0:2]
-    )
-
     ax32 = omx_deformed_surface.make_image_plot(
         figure=fig3,
         position=gs3[1:3, 0:2]
@@ -366,11 +367,6 @@ if __name__ == "__main__":
 
     fig2 = plt.figure(figsize=(12, 10))
     gs2 = fig2.add_gridspec(3, 2)
-
-    ax21 = omx_deformed_zernike.make_torque_plot(
-        figure=fig2,
-        position=gs2[0, 0]
-    )
 
     ax22 = fig2.add_subplot(gs2[1, 0])
     ax22.plot(
