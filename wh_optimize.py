@@ -73,13 +73,10 @@ if __name__ == "__main__":
         ignore_zernike_number_list=[1, 2, 3, 4, 5, 6],
         restructed_torque_value=torque_value_limit)
 
-    reproducted_zernike = pom.TorqueToZernike(
+    reproducted_surface = pom.TorqueToSurface(
         constants=CONSTS,
-        torque_value_array=reproducted_torque.torque_value_array)
-
-    reproducted_surface = pom.ZernikeToSurface(
-        constants=CONSTS,
-        zernike_value_array=reproducted_zernike.zernike_value_array)
+        torque_value_array=reproducted_torque.torque_value_array
+    )
 
     reproducted_zernike_removed_surface = pom.ZernikeRemovedSurface(
         constants=CONSTS,
@@ -122,7 +119,7 @@ if __name__ == "__main__":
         ax14_xaxis, zernike_removed_surface.zernike_value_array,
         marker="s", label="target_zernike (Z ≦ 6 is removed)")
     ax14.plot(
-        ax14_xaxis, reproducted_zernike.zernike_value_array,
+        ax14_xaxis, np.dot(CONSTS.operation_matrix_A, reproducted_torque.torque_value_array),
         marker="s", label="WH_reproducted_zernike")
 
     ax14.legend()

@@ -5,7 +5,6 @@ import importlib
 import matplotlib.pyplot as plt
 import numpy as np
 
-import adjust_omx_for_mes
 import planets_optimize_myclass as pom
 
 
@@ -33,7 +32,7 @@ if __name__ == "__main__":
 
     CONSTS = pom.Constants(
         physical_radius=925e-3,
-        ignore_radius=0,
+        ignore_radius=5e-3,
         pixel_number=1024,
         zernike_max_degree=11,
         offset_height_percent=2,
@@ -45,16 +44,6 @@ if __name__ == "__main__":
             37., -37., 20., 20., -38., 38.,
             37., -37., 20., 20., -38., 38.
         ])
-    )
-
-    CONSTS.operation_matrix_A = adjust_omx_for_mes.make_adjusted_operation_matrix(
-        operation_matrix=CONSTS.operation_matrix_A,
-        magnification_for_remainder_1=0.75955,
-        magnification_for_remainder_2=3.42924,
-        magnification_for_remainder_3=0.29211,
-        magnification_for_remainder_4=0.50750,
-        magnification_for_remainder_5=2.64606,
-        magnification_for_remainder_6=0.86704
     )
 
     target_zernike_value = 1e-6
@@ -76,13 +65,10 @@ if __name__ == "__main__":
             ignore_zernike_number_list=[],
             restructed_torque_value=torque_value_limit)
 
-        wh_reproducted_zernike = pom.TorqueToZernike(
+        wh_reproducted_surface = pom.TorqueToSurface(
             constants=CONSTS,
-            torque_value_array=wh_torque.torque_value_array)
-
-        wh_reproducted_surface = pom.ZernikeToSurface(
-            constants=CONSTS,
-            zernike_value_array=wh_reproducted_zernike.zernike_value_array)
+            torque_value_array=wh_torque.torque_value_array
+        )
 
         result_surface = pom.Surface(
             constants=CONSTS,
@@ -110,19 +96,27 @@ if __name__ == "__main__":
 
         ax11 = wh_reproducted_surface.make_image_plot(
             figure=fig1,
-            position=gs1[3:6, 0],
+            position=gs1[0:3, 1],
             cbar_surface=cbar_reference_surface.surface,
         )
         ax11.set_title("wh reproducted surface\n" + ax11.get_title())
 
         ax12 = result_surface.make_image_plot(
             figure=fig1,
-            position=gs1[3:6, 1],
+            position=gs1[3:6, 0],
             cbar_surface=cbar_reference_surface.surface,
             pv_digits=5,
             rms_digits=5,
         )
-        ax12.set_title("residual\n" + ax12.get_title())
+        ax12.set_title("residual (colorbar is same for above)\n" + ax12.get_title())
+
+        ax16 = result_surface.make_image_plot(
+            figure=fig1,
+            position=gs1[3:6, 1],
+            pv_digits=5,
+            rms_digits=5,
+        )
+        ax16.set_title("residual (colorbar is fitted to pv)\n" + ax16.get_title())
 
         ax13_xaxis = np.arange(CONSTS.zernike_max_degree) + 1
         ax13 = fig1.add_subplot(gs1[6:8, :])
@@ -134,7 +128,7 @@ if __name__ == "__main__":
         )
         ax13.plot(
             ax13_xaxis,
-            wh_reproducted_zernike.zernike_value_array,
+            np.dot(CONSTS.operation_matrix_A, wh_torque.torque_value_array),
             label="wh_reproducted",
             marker="s",
         )

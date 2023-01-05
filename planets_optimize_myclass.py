@@ -380,7 +380,7 @@ class Constants:
         Returns
         -------
         np.ndarray
-            meshgridに保管してConstants.tfを掛けた2d array
+            meshgridに補間した2d array
         """
 
         z_old = fem_z_orient_array
@@ -389,9 +389,8 @@ class Constants:
         zz_new = interpolate.griddata(
             xy_old, z_old, xy_new, method="linear", fill_value=0
         )
-        zz_new_masked = zz_new * self.tf
 
-        return zz_new_masked
+        return zz_new
 
     def __read(self, filename):
         # skip行数の設定
@@ -459,7 +458,7 @@ class Constants:
         operation_matrix_D = np.zeros((data_length, file_num))
 
         for i in range(0, file_num):
-            alpha_n = self.alpha_array[i]
+            alpha_n = alpha_array_[i]
 
             num = str(i + 1).zfill(2)
             data_fname = "raw_data/Fxx/PM3.5_36ptAxWT06_F" + num + ".smesh.txt"
@@ -1098,38 +1097,15 @@ class FilteredSurface(Surface):
         return masked_filtered_surface
 
 
-class FemTxtToSurface(Surface):
-
+class TorqueToSurface(Surface):
     def __init__(
             self,
             constants,
-            wt_version: int,
-            wt_number: int):
-        """__init__
-        鍵谷先生のFEMモデル計算結果のtxtファイルからsurfaceを作る
-        surfaceの値は (Fxx - F00) * (Constants.act_tuning_array のwt_numberに対応した値)
-
-        Parameters
-        ----------
-        constants : Constants
-            Constantsクラス
-        wt_version : int
-            鍵谷先生の出力ファイルのWTのバージョン
-        wt_number : int
-            計算したWTのact番号 1~36
-        """
+            torque_value_array: np.ndarray):
 
         self.consts = constants
-        self.wt_number = wt_number
-
-        self.fpath_original = "raw_data/Fxx/PM3.5_36ptAxWT" + str(wt_version).zfill(2) + "_F00.smesh.txt"
-        self.fpath_deformed = "raw_data/Fxx/PM3.5_36ptAxWT" + str(wt_version).zfill(2) + "_F" + str(wt_number).zfill(2) + ".smesh.txt"
-        df_original = self.__read_file(self.fpath_original)
-        df_deformed = self.__read_file(self.fpath_deformed)
-
-        self.act_tuning_array = self.__make_act_tuning_array()
-        self.surface = self.__interpolation(df00=df_original, dfxx=df_deformed)
-
+        self.torque_value_array = torque_value_array
+        self.surface = self.__make_surface_from_torque()
         self.pv = super()._pv_calculation()
         self.rms = super()._rms_calculation()
         self.volume = super()._volume_calculation()[0]
@@ -1139,78 +1115,15 @@ class FemTxtToSurface(Surface):
     def h(self):
         mkhelp(self)
 
-    def __read_file(self, fpath: str) -> pd.DataFrame:
-        """__read_file
-        鍵谷先生のFEM出力データを読み出してdataframeとして出力
+    def __make_surface_from_torque(self):
+        f_array = np.dot(self.consts.operation_matrix_D, self.torque_value_array)
 
-        Parameters
-        ----------
-        fpath : str
-            読み込むfilepath
+        f_mesh = self.consts.fem_interpolate(
+            fem_z_orient_array=f_array
+        )
 
-        Returns
-        -------
-        pd.DataFrame
-            主に使うのはx, y, dz
-        """
-
-        df = pd.read_csv(
-            fpath,
-            sep="\\s+",
-            skiprows=7,
-            header=None)
-
-        df.columns = ["x", "y", "z", "color", "dx", "dy", "dz"]
-        return df
-
-    def __make_act_tuning_array(self):
-        act_tuning = np.array([
-            37., 37., 20., 20., -38., 38.,
-            37., 37., 20., 20., -38., 38.,
-            37., 37., 20., 20., -38., 38.,
-            37., 37., 20., 20., -38., 38.,
-            37., 37., 20., 20., -38., 38.,
-            37., 37., 20., 20., -38., 38.])
-
-        return act_tuning
-
-    def __interpolation(
-            self,
-            df00: pd.DataFrame,
-            dfxx: pd.DataFrame) -> ndarray:
-        """__interpolation
-        FEM出力の点群をメッシュとして補間
-
-        Parameters
-        ----------
-        df00 : pd.DataFrame
-            変形前のFEM出力のDataFrame
-        dfxx : pd.DataFrame
-            変形後のFEM出力のDataFrame
-
-        Returns
-        -------
-        ndarray
-            変形前後でのz方向変位の2次元array (size = pixel_number * pixel_number)
-        """
-
-        x_1d = df00["x"]
-        y_1d = df00["y"]
-        dw_1d = dfxx["dz"] - df00["dz"]
-
-        xy_old = np.stack([x_1d, y_1d], axis=1)
-
-        dw_mesh = interpolate.griddata(
-            points=xy_old,
-            values=dw_1d,
-            xi=(self.consts.xx, self.consts.yy),
-            method="linear",
-            fill_value=0)
-
-        act_tuning_value = self.act_tuning_array[self.wt_number - 1]
-        masked_surface = dw_mesh * self.consts.mask * act_tuning_value
-
-        return masked_surface
+        surface = self.consts.mask * f_mesh
+        return surface
 
 
 class OapSurface(Surface):
@@ -1361,36 +1274,6 @@ class ZernikeToTorque:
         ax.hlines(0, xmin=1, xmax=12, color="darkgray")
 
         return ax
-
-
-class TorqueToZernike:
-
-    def __init__(
-            self,
-            constants,
-            torque_value_array: ndarray):
-
-        """
-        与えられたトルクに作用行列をかけてzernikeに変換
-        len(self.zernike_value_array) = Constants.zernike_max_degree
-
-        Parameters
-        ----------
-        constants : [type]
-            Constant クラス
-        torque_value_array : ndarray
-            トルクベクトル
-        """
-
-        self.consts = constants
-        self.torque_value_array = torque_value_array
-
-        self.zernike_value_array = np.dot(
-            self.consts.operation_matrix_A,
-            self.torque_value_array)
-
-    def h(self):
-        mkhelp(self)
 
 
 class OapConstants:
