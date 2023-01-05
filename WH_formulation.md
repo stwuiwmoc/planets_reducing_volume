@@ -164,7 +164,7 @@ $$
 という問題がある。このため、より適切に $\vec{x_r}$ を計算するために近似作用行列を導入する。
 
 $\vec{d_n}$ の zernike fittingで得られたzernike係数ベクトルを $\vec{a_n} ^T \equiv (a _{1, n} , \cdots, a _{11, n})$ とする。
-同様に、$\vec{f}$ の zernike fittingで得られたzernike係数ベクトルを $\vec{b} ^T \equiv (b _1, \cdots, b _{11})$ とする。
+同様に、 $\vec{f}$ の zernike fittingで得られたzernike係数ベクトルを $\vec{b} ^T \equiv (b _1, \cdots, b _{11})$ とする。
 
 任意のWH駆動量ベクトル $\vec{x}$ を与えた時の鏡面の変形のzernike係数ベクトル $\vec{b}$ を計算するための近似作用行列 $A$ を以下の式を満たすように定義する。
 
@@ -221,10 +221,10 @@ $$
 \vec{f_r} = D \vec{x_r}
 $$
 
-を計算する。鈴木M論ではこの疑似逆行列を用いる方法でWH駆動を求めた。
+を計算する。鈴木M論ではこの疑似逆行列を用いる方法で最適WH駆動量ベクトルを求めた。
 
 # 制約付き
 
 実際の能動支持機構では、WH駆動量ベクトル $\vec{x}$ の各要素 $x_n$ の範囲には制約がある。
 よって、 $x _{min} \leq x_n \leq x _{max}$ で $\| A \vec{x} - \vec{b} \|$ を最小化する $\vec{x_r}$ を探す必要がある。
-本研究ではこの制約付き最小化の手段として `scipy.optimize.lsq_linear` を用いた
+この制約付き最小化を解析的に解くことはできないため、本研究では数値解を得るために `scipy.optimize.lsq_linear` を用いた
