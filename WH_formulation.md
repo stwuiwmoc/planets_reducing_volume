@@ -163,7 +163,7 @@ $$
 
 という問題がある。このため、より適切に $\vec{x_r}$ を計算するために近似作用行列を導入する。
 
-$\vec{d_1}$ の zernike fittingで得られたzernike係数ベクトルを $\vec{a_1} ^T \equiv (a _{1, 1} , \cdots, a _{11, 1})$ とする。
+$\vec{d_n}$ の zernike fittingで得られたzernike係数ベクトルを $\vec{a_n} ^T \equiv (a _{1, n} , \cdots, a _{11, n})$ とする。
 同様に、$\vec{f}$ の zernike fittingで得られたzernike係数ベクトルを $\vec{b} ^T \equiv (b _1, \cdots, b _{11})$ とする。
 
 任意のWH駆動量ベクトル $\vec{x}$ を与えた時の鏡面の変形のzernike係数ベクトル $\vec{b}$ を計算するための近似作用行列 $A$ を以下の式を満たすように定義する。
@@ -189,7 +189,7 @@ $$
 \end{bmatrix}
 $$
 
-この時 $D, \vec{d}, \vec{x}$ の間での議論と同様の議論から、
+この時 $D, \vec{d}, \vec{x}$ の間での議論と同様に考えると、
 
 $$
 A =
@@ -201,7 +201,9 @@ A =
 = \left [ \vec{a _1}, \cdots, \vec{a _{36}} \right ]
 $$
 
-である。ここで、既知の $\vec{b}$ を最小二乗的に再現するような $\vec{x_r}$ は
+である。ここで $\vec{a _1}, \cdots, \vec{a _{36}}$ は $\vec{d _1}, \cdots, \vec{d _{36}}$ をzernike fittingしたものである。よって、任意のWH駆動量ベクトル $\vec{x}$ に対して変形量ベクトルのzernike fitting結果 $\vec{b}$ を計算するには、やはり係数 $\alpha _1, \cdots, \alpha _{36}$ とFEMの結果があればよい。
+
+ここで、既知の $\vec{b}$ を最小二乗的に再現するような $\vec{x_r}$ は
 
 $$
 \| A \vec{x} - \vec{b} \|
