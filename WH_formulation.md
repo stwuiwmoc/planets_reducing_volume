@@ -36,7 +36,9 @@ $$
 任意のWH駆動量ベクトル $\vec{x}$ を与えた時の鏡面の変形量ベクトル $\vec{f}$ を計算するためのWH駆動量変換行列 $D$ （以後、作用行列と呼ぶ）を以下の式を満たすように定義する。
 
 $$
-\vec{f} = D \vec{x} \\
+\vec{f} = D \vec{x}
+$$
+$$
 \begin{bmatrix}
     f _1 \\
     \vdots \\
@@ -167,7 +169,9 @@ $\vec{d_1}$ の zernike fittingで得られたzernike係数ベクトルを $\vec
 任意のWH駆動量ベクトル $\vec{x}$ を与えた時の鏡面の変形のzernike係数ベクトル $\vec{b}$ を計算するための近似作用行列 $A$ を以下の式を満たすように定義する。
 
 $$
-\vec{b} = A \vec{x} \\
+\vec{b} = A \vec{x}
+$$
+$$
 \begin{bmatrix}
     b _1 \\
     \vdots \\
