@@ -164,7 +164,7 @@ $$
 という問題がある。このため、より適切に $\vec{x_r}$ を計算するために近似作用行列を導入する。
 
 $\vec{d_n}$ の zernike fittingで得られたzernike係数ベクトルを $\vec{a_n} ^T \equiv (a _{1, n} , \cdots, a _{11, n})$ とする。
-同様に、$\vec{f}$ の zernike fittingで得られたzernike係数ベクトルを $\vec{b} ^T \equiv (b _1, \cdots, b _{11})$ とする。
+同様に、 $\vec{f}$ の zernike fittingで得られたzernike係数ベクトルを $\vec{b} ^T \equiv (b _1, \cdots, b _{11})$ とする。
 
 任意のWH駆動量ベクトル $\vec{x}$ を与えた時の鏡面の変形のzernike係数ベクトル $\vec{b}$ を計算するための近似作用行列 $A$ を以下の式を満たすように定義する。
 
