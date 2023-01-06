@@ -31,7 +31,7 @@ def mkfolder(suffix=""):
 if __name__ == "__main__":
     importlib.reload(pom)
 
-    ignore_zernike_number_list = [1, 2, 3, 4, 5, 6, 7, 8, 11]
+    ignore_zernike_number_list = [1, 2, 3, 4, 7, 8, 11]
     angle_division_number = 360
 
     CONSTS = pom.Constants(
