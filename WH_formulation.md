@@ -8,15 +8,60 @@
  });
 </script>
 
+- [zernike多項式](#zernike多項式)
 - [前提](#前提)
 - [作用行列の導入](#作用行列の導入)
 - [最適WH駆動量ベクトルの導出](#最適wh駆動量ベクトルの導出)
 - [近似作用行列の導入](#近似作用行列の導入)
 - [制約付き](#制約付き)
 
+# zernike多項式
+
+$$
+W(\rho , \theta) = \sum _j a _j Z _j (\rho , \theta)
+$$
+
+ここで、 $a _j$ はzernike 係数と呼ばれる。 Zernike多項式の各項 $Z _j (\rho , \theta)$ は
+
+$$
+Z _j (\rho , \theta) =
+\left\{
+    \begin{array}{ll}
+        \sqrt{2 (n + 1)} R _n ^m (\rho) \cos{(m \theta )} & (m \neq 0 \: \& \: j = even) \\
+        \sqrt{2 (n + 1)} R _n ^m (\rho) \sin{(m \theta )} & (m \neq 0 \: \& \: j = odd) \\
+        \sqrt{(n + 1)} R _n ^0 (\rho) & (m = 0)
+    \end{array}
+\right.
+$$
+
+$$
+R _n ^m (\rho) =
+\sum _{s = 0} ^{(n - m) / 2}
+\cfrac
+    {(-1) ^s (n - s) !}
+    {s ! \left (  \cfrac{n + m}{2} - s \right ) ! \left (  \cfrac{n - m}{2} - s \right ) !}
+\rho ^{n - 2s}
+$$
+
+$() _{int}$ はカッコ内の整数部分を表す
+
+$$
+n = [(2j - 1) ^{1/2} + 0.5] _{int} - 1
+$$
+
+$$
+m =
+\left\{
+    \begin{array}{ll}
+        2 \{ [2j + 1 - n(n + 1)] / 4 \} _{int} & (n = even) \\
+        2 \{ [2(j + 1) - n(n + 1)] / 4 \} _{int} - 1 & (n = odd)
+    \end{array}
+\right.
+$$
+
 # 前提
 
-ここではスカラーを小文字 $a$ 、ベクトルを矢印記法 $\vec{a}$ 、行列を大文字 $A$ で表記する。ベクトルは全て縦ベクトルであるが、幅をとるので文中では転置して $\vec{a} ^T = (a_1, \cdots , a_n)$ のように表記する。
+以下ではスカラーを小文字 $a$ 、ベクトルを矢印記法 $\vec{a}$ 、行列を大文字 $A$ で表記する。ベクトルは全て縦ベクトルであるが、幅をとるので文中では転置して $\vec{a} ^T = (a_1, \cdots , a_n)$ のように表記する。
 
 $$
 \vec{a} =
