@@ -1439,7 +1439,7 @@ class CirclePathMeasurementTxtReading:
             self,
             Constants: Constants,
             original_txt_fpath: str,
-            deformed_txt_fpath: str) -> None:
+            deformed_txt_fpath: str = None) -> None:
         """鍵谷先生の円環パス逐次積分結果を読み込んで、
         CirclePathMeasurementCsvReadingで使っているものと同じ形式のdataframeを作る
 
@@ -1455,35 +1455,44 @@ class CirclePathMeasurementTxtReading:
 
         self.consts = Constants
 
-        # データの読み出し
+        # データの読み出しと円環パスの半径計算
         self.df_raw_original = self.__read_txt(
             txt_filepath=original_txt_fpath)
 
-        self.df_raw_deformed = self.__read_txt(
-            txt_filepath=deformed_txt_fpath)
-
-        # 円環パスの半径を計算
         radius_original = np.mean(np.sqrt(
             self.df_raw_original["x"]**2 + self.df_raw_original["y"]**2))
 
-        radius_deformed = np.mean(np.sqrt(
-            self.df_raw_deformed["x"]**2 + self.df_raw_deformed["y"]**2))
+        if deformed_txt_fpath is None:
+            self.circle_path_radius = radius_original
 
-        self.circle_path_radius = (radius_original + radius_deformed) / 2
+            self.df_diff = pd.DataFrame({
+                "degree": self.df_raw_original["degree"].values,
+                "height": self.df_raw_original["height"].values
+            })
 
-        # 高さの差分を出す
-        # データ点数が合わない場合、少ない方に合わせてから高さ差分をとりたい
-        if len(self.df_raw_original) <= len(self.df_raw_deformed):
-            idx_max = len(self.df_raw_original)
         else:
-            idx_max = len(self.df_raw_deformed)
+            # データの読み出しと円環パスの半径計算
+            self.df_raw_deformed = self.__read_txt(
+                txt_filepath=deformed_txt_fpath)
 
-        height_diff = self.df_raw_deformed["height"].values[:idx_max] - self.df_raw_original["height"].values[:idx_max]
+            radius_deformed = np.mean(np.sqrt(
+                self.df_raw_deformed["x"]**2 + self.df_raw_deformed["y"]**2))
 
-        self.df_diff = pd.DataFrame({
-            "degree": self.df_raw_original["degree"].values[:idx_max],
-            "height": height_diff,
-        })
+            self.circle_path_radius = (radius_original + radius_deformed) / 2
+
+            # 高さの差分を出す
+            # データ点数が合わない場合、少ない方に合わせてから高さ差分をとりたい
+            if len(self.df_raw_original) <= len(self.df_raw_deformed):
+                idx_max = len(self.df_raw_original)
+            else:
+                idx_max = len(self.df_raw_deformed)
+
+            height_diff = self.df_raw_deformed["height"].values[:idx_max] - self.df_raw_original["height"].values[:idx_max]
+
+            self.df_diff = pd.DataFrame({
+                "degree": self.df_raw_original["degree"].values[:idx_max],
+                "height": height_diff,
+            })
 
     def h(self):
         mkhelp(self)
