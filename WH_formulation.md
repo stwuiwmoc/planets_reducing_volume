@@ -282,3 +282,76 @@ $$
 実際の能動支持機構では、WH駆動量ベクトル $\vec{x}$ の各要素 $x_n$ の範囲には制約がある。
 よって、 $x _{min} \leq x_n \leq x _{max}$ で $\| A \vec{x} - \vec{b} \|$ を最小化する $\vec{x_r}$ を探す必要がある。
 この制約付き最小化を解析的に解くことはできないため、本研究では数値解を得るために `scipy.optimize.lsq_linear` を用いた
+
+$$
+A^T =
+\begin{bmatrix}
+    A _{4, 1} & \cdots & A _{11, 1} \\
+    \vdots & & \vdots \\
+    A _{4, 5} & \cdots & A _{11, 5} \\
+    A _{4, 6} & \cdots & A _{11, 6} \\
+    A _{4, 7} & \cdots & A _{11, 7} \\
+    \vdots & & \vdots \\
+    A _{4, 11} & \cdots & A _{11, 11} \\
+    A _{4, 12} & \cdots & A _{11, 12} \\
+    \vdots & & \vdots \\
+    A _{4, 16} & \cdots & A _{11, 16} \\
+    A _{4, 17} & \cdots & A _{11, 17} \\
+    A _{4, 18} & \cdots & A _{11, 18} \\
+    \vdots & & \vdots \\
+    A _{4, 22} & \cdots & A _{11, 22} \\
+    A _{4, 23} & \cdots & A _{11, 23} \\
+    \vdots & & \vdots \\
+    A _{4, 27} & \cdots & A _{11, 27} \\
+    A _{4, 28} & \cdots & A _{11, 28} \\
+    A _{4, 29} & \cdots & A _{11, 29} \\
+    \vdots & & \vdots \\
+A _{4, 33} & \cdots & A _{11, 33} \\
+\end{bmatrix} =
+\begin{bmatrix}
+    a _{4, 1} & \cdots & a _{11, 1} \\
+    \vdots & & \vdots \\
+    a _{4, 5} & \cdots & a _{11, 5} \\
+    a _{4, 6} - a _{4, 12} & \cdots & a _{11, 6} - a _{11, 12} \\
+    a _{4, 7} & \cdots & a _{11, 7} \\
+    \vdots & & \vdots \\
+    a _{4, 11} & \cdots & a _{11, 11} \\
+    a _{4, 13} & \cdots & a _{11, 13} \\
+    \vdots & & \vdots \\
+    a _{4, 17} & \cdots & a _{11, 17} \\
+    a _{4, 18} - a _{4, 24} & \cdots & a _{11, 18} - a _{11, 24} \\
+    a _{4, 19} & \cdots & a _{11, 19} \\
+    \vdots & & \vdots \\
+    a _{4, 23} & \cdots & a _{11, 23} \\
+    a _{4, 25} & \cdots & a _{11, 25} \\
+    \vdots & & \vdots \\
+    a _{4, 29} & \cdots & a _{11, 29} \\
+    a _{4, 30} - a _{4, 36} & \cdots & a _{11, 30} - a _{11, 36} \\
+    a _{4, 31} & \cdots & a _{11, 31} \\
+    \vdots & & \vdots \\
+    a _{4, 35} & \cdots & a _{11, 35} \\
+\end{bmatrix} =
+\begin{bmatrix}
+    \overrightarrow{a _{4 \sim 11, 1}} \, ^T \\
+    : \\
+    \overrightarrow{a _{4 \sim 11, 5}} \, ^T \\
+    \overrightarrow{a _{4 \sim 11, 6}} \, ^T - \overrightarrow{a _{4 \sim 11, 12}} \, ^T \\
+    \overrightarrow{a _{4 \sim 11, 7}} \, ^T \\
+    : \\
+    \overrightarrow{a _{4 \sim 11, 11}} \, ^T \\
+    \overrightarrow{a _{4 \sim 11, 13}} \, ^T \\
+    : \\
+    \overrightarrow{a _{4 \sim 11, 17}} \, ^T \\
+    \overrightarrow{a _{4 \sim 11, 18}} \, ^T - \overrightarrow{a _{4 \sim 11, 24}} \, ^T \\
+    \overrightarrow{a _{4 \sim 11, 19}} \, ^T \\
+    : \\
+    \overrightarrow{a _{4 \sim 11, 23}} \, ^T \\
+    \overrightarrow{a _{4 \sim 11, 25}} \, ^T \\
+    : \\
+    \overrightarrow{a _{4 \sim 11, 29}} \, ^T \\
+    \overrightarrow{a _{4 \sim 11, 30}} \, ^T - \overrightarrow{a _{4 \sim 11, 36}} \, ^T \\
+    \overrightarrow{a _{4 \sim 11, 31}} \, ^T \\
+    : \\
+    \overrightarrow{a _{4 \sim 11, 35}} \, ^T \\
+\end{bmatrix}
+$$
