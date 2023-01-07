@@ -286,72 +286,72 @@ $$
 $$
 A^T =
 \begin{bmatrix}
-    A _{4, 1} & \cdots & A _{11, 1} \\
+    A _{1, 1} & \cdots & A _{11, 1} \\
     \vdots & & \vdots \\
-    A _{4, 5} & \cdots & A _{11, 5} \\
-    A _{4, 6} & \cdots & A _{11, 6} \\
-    A _{4, 7} & \cdots & A _{11, 7} \\
+    A _{1, 5} & \cdots & A _{11, 5} \\
+    A _{1, 6} & \cdots & A _{11, 6} \\
+    A _{1, 7} & \cdots & A _{11, 7} \\
     \vdots & & \vdots \\
-    A _{4, 11} & \cdots & A _{11, 11} \\
-    A _{4, 12} & \cdots & A _{11, 12} \\
+    A _{1, 11} & \cdots & A _{11, 11} \\
+    A _{1, 12} & \cdots & A _{11, 12} \\
     \vdots & & \vdots \\
-    A _{4, 16} & \cdots & A _{11, 16} \\
-    A _{4, 17} & \cdots & A _{11, 17} \\
-    A _{4, 18} & \cdots & A _{11, 18} \\
+    A _{1, 16} & \cdots & A _{11, 16} \\
+    A _{1, 17} & \cdots & A _{11, 17} \\
+    A _{1, 18} & \cdots & A _{11, 18} \\
     \vdots & & \vdots \\
-    A _{4, 22} & \cdots & A _{11, 22} \\
-    A _{4, 23} & \cdots & A _{11, 23} \\
+    A _{1, 22} & \cdots & A _{11, 22} \\
+    A _{1, 23} & \cdots & A _{11, 23} \\
     \vdots & & \vdots \\
-    A _{4, 27} & \cdots & A _{11, 27} \\
-    A _{4, 28} & \cdots & A _{11, 28} \\
-    A _{4, 29} & \cdots & A _{11, 29} \\
+    A _{1, 27} & \cdots & A _{11, 27} \\
+    A _{1, 28} & \cdots & A _{11, 28} \\
+    A _{1, 29} & \cdots & A _{11, 29} \\
     \vdots & & \vdots \\
-A _{4, 33} & \cdots & A _{11, 33} \\
+    A _{1, 33} & \cdots & A _{11, 33} \\
 \end{bmatrix} =
 \begin{bmatrix}
-    a _{4, 1} & \cdots & a _{11, 1} \\
+    a _{1, 1} & \cdots & a _{11, 1} \\
     \vdots & & \vdots \\
-    a _{4, 5} & \cdots & a _{11, 5} \\
-    a _{4, 6} - a _{4, 12} & \cdots & a _{11, 6} - a _{11, 12} \\
-    a _{4, 7} & \cdots & a _{11, 7} \\
+    a _{1, 5} & \cdots & a _{11, 5} \\
+    a _{1, 6} - a _{1, 12} & \cdots & a _{11, 6} - a _{11, 12} \\
+    a _{1, 7} & \cdots & a _{11, 7} \\
     \vdots & & \vdots \\
-    a _{4, 11} & \cdots & a _{11, 11} \\
-    a _{4, 13} & \cdots & a _{11, 13} \\
+    a _{1, 11} & \cdots & a _{11, 11} \\
+    a _{1, 13} & \cdots & a _{11, 13} \\
     \vdots & & \vdots \\
-    a _{4, 17} & \cdots & a _{11, 17} \\
-    a _{4, 18} - a _{4, 24} & \cdots & a _{11, 18} - a _{11, 24} \\
-    a _{4, 19} & \cdots & a _{11, 19} \\
+    a _{1, 17} & \cdots & a _{11, 17} \\
+    a _{1, 18} - a _{1, 24} & \cdots & a _{11, 18} - a _{11, 24} \\
+    a _{1, 19} & \cdots & a _{11, 19} \\
     \vdots & & \vdots \\
-    a _{4, 23} & \cdots & a _{11, 23} \\
-    a _{4, 25} & \cdots & a _{11, 25} \\
+    a _{1, 23} & \cdots & a _{11, 23} \\
+    a _{1, 25} & \cdots & a _{11, 25} \\
     \vdots & & \vdots \\
-    a _{4, 29} & \cdots & a _{11, 29} \\
-    a _{4, 30} - a _{4, 36} & \cdots & a _{11, 30} - a _{11, 36} \\
-    a _{4, 31} & \cdots & a _{11, 31} \\
+    a _{1, 29} & \cdots & a _{11, 29} \\
+    a _{1, 30} - a _{1, 36} & \cdots & a _{11, 30} - a _{11, 36} \\
+    a _{1, 31} & \cdots & a _{11, 31} \\
     \vdots & & \vdots \\
-    a _{4, 35} & \cdots & a _{11, 35} \\
+    a _{1, 35} & \cdots & a _{11, 35} \\
 \end{bmatrix} =
 \begin{bmatrix}
-    \overrightarrow{a _{4 \sim 11, 1}} \, ^T \\
+    \vec{a _{1}} \, ^T \\
     : \\
-    \overrightarrow{a _{4 \sim 11, 5}} \, ^T \\
-    \overrightarrow{a _{4 \sim 11, 6}} \, ^T - \overrightarrow{a _{4 \sim 11, 12}} \, ^T \\
-    \overrightarrow{a _{4 \sim 11, 7}} \, ^T \\
+    \vec{a _{5}} \, ^T \\
+    \vec{a _{6}} \, ^T - \vec{a _{12}} \, ^T \\
+    \vec{a _{7}} \, ^T \\
     : \\
-    \overrightarrow{a _{4 \sim 11, 11}} \, ^T \\
-    \overrightarrow{a _{4 \sim 11, 13}} \, ^T \\
+    \vec{a _{11}} \, ^T \\
+    \vec{a _{13}} \, ^T \\
     : \\
-    \overrightarrow{a _{4 \sim 11, 17}} \, ^T \\
-    \overrightarrow{a _{4 \sim 11, 18}} \, ^T - \overrightarrow{a _{4 \sim 11, 24}} \, ^T \\
-    \overrightarrow{a _{4 \sim 11, 19}} \, ^T \\
+    \vec{a _{17}} \, ^T \\
+    \vec{a _{18}} \, ^T - \vec{a _{24}} \, ^T \\
+    \vec{a _{19}} \, ^T \\
     : \\
-    \overrightarrow{a _{4 \sim 11, 23}} \, ^T \\
-    \overrightarrow{a _{4 \sim 11, 25}} \, ^T \\
+    \vec{a _{23}} \, ^T \\
+    \vec{a _{25}} \, ^T \\
     : \\
-    \overrightarrow{a _{4 \sim 11, 29}} \, ^T \\
-    \overrightarrow{a _{4 \sim 11, 30}} \, ^T - \overrightarrow{a _{4 \sim 11, 36}} \, ^T \\
-    \overrightarrow{a _{4 \sim 11, 31}} \, ^T \\
+    \vec{a _{29}} \, ^T \\
+    \vec{a _{30}} \, ^T - \vec{a _{36}} \, ^T \\
+    \vec{a _{31}} \, ^T \\
     : \\
-    \overrightarrow{a _{4 \sim 11, 35}} \, ^T \\
+    \vec{a _{35}} \, ^T \\
 \end{bmatrix}
 $$

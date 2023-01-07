@@ -9,13 +9,15 @@ if __name__ == "__main__":
 
     for i in A_index_list:
         if i is None:
+            print(r"    ", end="")
             print(r"\vdots", end="")
             print(r" & & ", end="")
             print(r"\vdots", end="")
             print(r" \\", end="\n")
 
         else:
-            print(r"A _{4, " + str(i) + r"}", end="")
+            print(r"    ", end="")
+            print(r"A _{1, " + str(i) + r"}", end="")
             print(r" & ", end="")
             print(r"\cdots", end="")
             print(r" & ", end="")
@@ -31,13 +33,15 @@ if __name__ == "__main__":
 
     for i in a_scalar_index_list:
         if i is None:
+            print(r"    ", end="")
             print(r"\vdots", end="")
             print(r" & & ", end="")
             print(r"\vdots", end="")
             print(r" \\", end="\n")
 
         elif i in [6, 18, 30]:
-            print(r"a _{4, " + str(i) + r"} - a _{4, " + str(i + 6) + r"}", end="")
+            print(r"    ", end="")
+            print(r"a _{1, " + str(i) + r"} - a _{1, " + str(i + 6) + r"}", end="")
             print(r" & ", end="")
             print(r"\cdots", end="")
             print(r" & ", end="")
@@ -45,7 +49,8 @@ if __name__ == "__main__":
             print(r" \\", end="\n")
 
         else:
-            print(r"a _{4, " + str(i) + r"}", end="")
+            print(r"    ", end="")
+            print(r"a _{1, " + str(i) + r"}", end="")
             print(r" & ", end="")
             print(r"\cdots", end="")
             print(r" & ", end="")
@@ -61,13 +66,16 @@ if __name__ == "__main__":
 
     for i in a_vector_index_list:
         if i is None:
+            print(r"    ", end="")
             print(r":", end="")
             print(r" \\", end="\n")
 
         elif i in [6, 18, 30]:
-            print(r"\overrightarrow{a _{4 \sim 11, " + str(i) + r"}} \, ^T - \overrightarrow{a _{4 \sim 11, " + str(i + 6) + r"}} \, ^T", end="")
+            print(r"    ", end="")
+            print(r"\vec{a _{" + str(i) + r"}} \, ^T - \vec{a _{" + str(i + 6) + r"}} \, ^T", end="")
             print(r" \\", end="\n")
 
         else:
-            print(r"\overrightarrow{a _{4 \sim 11, " + str(i) + r"}} \, ^T", end="")
+            print(r"    ", end="")
+            print(r"\vec{a _{" + str(i) + r"}} \, ^T", end="")
             print(r" \\", end="\n")
