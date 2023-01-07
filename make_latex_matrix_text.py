@@ -113,7 +113,7 @@ if __name__ == "__main__":
 
         elif i in [6, 18, 30]:
             print(r"    ", end="")
-            print(r"y _{" + str(i) + r"} + y _{" + str(i + 6) + r"}", end="")
+            print(r"(y _{" + str(i) + r"} + y _{" + str(i + 6) + r"}) / 2", end="")
             print(r" \\", end="\n")
 
         else:
@@ -150,8 +150,52 @@ if __name__ == "__main__":
             print(r"| $\cdots$ ", end="")
 
         elif i in [6, 18, 30]:
-            print(r"| $y _{" + str(i) + r"} + y _{" + str(i + 6) + r"}$ ", end="")
+            print(r"| $(y _{" + str(i) + r"} + y _{" + str(i + 6) + r"}) / 2$ ", end="")
 
         else:
             print(r"| $y _{" + str(i) + r"}$ ", end="")
+    print("|")
+
+    # %%
+    for i in range(11):
+        num = i + 1
+        print(r"    ", end="")
+        print(r"x _{" + str(num) + r"}", end="")
+        print(r" \\", end="\n")
+
+    print(r"    \vdots \\", end="\n")
+
+    print()
+
+    for i in range(11):
+        num = i + 1
+        if num == 6:
+            print(r"    ", end="")
+            print(r"(y _{" + str(num) + r"} + y _{" + str(num + 6) + r"}) / 2", end="")
+            print(r" \\", end="\n")
+
+        else:
+            print(r"    ", end="")
+            print(r"y _{" + str(num) + r"}", end="")
+            print(r" \\", end="\n")
+
+    print(r"    \vdots \\", end="\n")
+
+    # %%
+    for i in range(11):
+        num = i + 1
+        print(r"| $x _{" + str(num) + r"}$ ", end="")
+    print("|")
+
+    for i in range(11):
+        print(r"| - ", end="")
+    print("|")
+
+    for i in range(11):
+        num = i + 1
+        if num == 6:
+            print(r"| $y _{" + str(num) + r"} + y _{" + str(num + 6) + r"}$ ", end="")
+
+        else:
+            print(r"| $y _{" + str(num) + r"}$ ", end="")
     print("|")
