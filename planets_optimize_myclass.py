@@ -465,7 +465,11 @@ class Constants:
             dfxx = self.__read(data_fname)
 
             h_n_array = dfxx["dz"].values * 1e-3  # [mm] -> [m] 換算
-            operation_matrix_D[:, i] = alpha_n * (h_n_array - h_0_array)
+            # raw_data/Fxx/PM3.5_36ptAxWT06_Fxx.smesh.txt は
+            # actに 0.05 [Nm] 加えた時の変形量
+            # 単位駆動 1 [Nm] にしたいので、変形量を20倍する
+
+            operation_matrix_D[:, i] = alpha_n * 20 * (h_n_array - h_0_array)
 
         return operation_matrix_D
 
