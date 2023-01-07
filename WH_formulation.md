@@ -355,3 +355,53 @@ A^T =
     \vec{a _{35}} \, ^T \\
 \end{bmatrix}
 $$
+
+$$
+\vec{x} =
+\begin{bmatrix}
+    x _{1} \\
+    \vdots \\
+    x _{5} \\
+    x _{6} \\
+    x _{7} \\
+    \vdots \\
+    x _{11} \\
+    x _{12} \\
+    \vdots \\
+    x _{16} \\
+    x _{17} \\
+    x _{18} \\
+    \vdots \\
+    x _{22} \\
+    x _{23} \\
+    \vdots \\
+    x _{27} \\
+    x _{28} \\
+    x _{29} \\
+    \vdots \\
+    x _{33} \\
+\end{bmatrix} =
+\begin{bmatrix}
+    y _{1} \\
+    \vdots \\
+    y _{5} \\
+    y _{6} + y _{12} \\
+    y _{7} \\
+    \vdots \\
+    y _{11} \\
+    y _{13} \\
+    \vdots \\
+    y _{17} \\
+    y _{18} + y _{24} \\
+    y _{19} \\
+    \vdots \\
+    y _{23} \\
+    y _{25} \\
+    \vdots \\
+    y _{29} \\
+    y _{30} + y _{36} \\
+    y _{31} \\
+    \vdots \\
+    y _{35} \\
+\end{bmatrix}
+$$
