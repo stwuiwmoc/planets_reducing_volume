@@ -114,21 +114,21 @@ $$
     y _{1} \\
     \vdots \\
     y _{5} \\
-    (y _{6} + y _{12}) / 2 \\
+    (y _{6} - y _{12}) / 2 \\
     y _{7} \\
     \vdots \\
     y _{11} \\
     y _{13} \\
     \vdots \\
     y _{17} \\
-    (y _{18} + y _{24}) / 2 \\
+    (y _{18} - y _{24}) / 2 \\
     y _{19} \\
     \vdots \\
     y _{23} \\
     y _{25} \\
     \vdots \\
     y _{29} \\
-    (y _{30} + y _{36}) / 2 \\
+    (y _{30} - y _{36}) / 2 \\
     y _{31} \\
     \vdots \\
     y _{35} \\
@@ -157,7 +157,7 @@ $$
     y _{3} \\
     y _{4} \\
     y _{5} \\
-    (y _{6} + y _{12}) / 2 \\
+    (y _{6} - y _{12}) / 2 \\
     y _{7} \\
     y _{8} \\
     y _{9} \\
@@ -171,11 +171,7 @@ cell 6
 
 | $x _{1}$ | $\cdots$ | $x _{5}$ | $x _{6}$ | $x _{7}$ | $\cdots$ | $x _{11}$ | $x _{12}$ | $\cdots$ | $x _{16}$ | $x _{17}$ | $x _{18}$ | $\cdots$ | $x _{22}$ | $x _{23}$ | $\cdots$ | $x _{27}$ | $x _{28}$ | $x _{29}$ | $\cdots$ | $x _{33}$ |
 | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - |
-| $y _{1}$ | $\cdots$ | $y _{5}$ | $(y _{6} + y _{12}) / 2$ | $y _{7}$ | $\cdots$ | $y _{11}$ | $y _{13}$ | $\cdots$ | $y _{17}$ | $(y _{18} + y _{24}) / 2$ | $y _{19}$ | $\cdots$ | $y _{23}$ | $y _{25}$ | $\cdots$ | $y _{29}$ | $(y _{30} + y _{36}) / 2$ | $y _{31}$ | $\cdots$ | $y _{35}$ |
-
-| $x _{1}$ | $x _{2}$ | $x _{3}$ | $x _{4}$ | $x _{5}$ | $x _{6}$ | $x _{7}$ | $x _{8}$ | $x _{9}$ | $x _{10}$ | $x _{11}$ |
-| - | - | - | - | - | - | - | - | - | - | - |
-| $y _{1}$ | $y _{2}$ | $y _{3}$ | $y _{4}$ | $y _{5}$ | $y _{6} + y _{12}$ | $y _{7}$ | $y _{8}$ | $y _{9}$ | $y _{10}$ | $y _{11}$ |
+| $y _{1}$ | $\cdots$ | $y _{5}$ | $(y _{6} - y _{12}) / 2$ | $y _{7}$ | $\cdots$ | $y _{11}$ | $y _{13}$ | $\cdots$ | $y _{17}$ | $(y _{18} - y _{24}) / 2$ | $y _{19}$ | $\cdots$ | $y _{23}$ | $y _{25}$ | $\cdots$ | $y _{29}$ | $(y _{30} - y _{36}) / 2$ | $y _{31}$ | $\cdots$ | $y _{35}$ |
 
 cell 8
 $$
@@ -224,7 +220,7 @@ cell 10
 | $x _{3}$ = $y _{3}$ | $x _{14}$ = $y _{15}$ | $x _{25}$ = $y _{27}$ |
 | $x _{4}$ = $y _{4}$ | $x _{15}$ = $y _{16}$ | $x _{26}$ = $y _{28}$ |
 | $x _{5}$ = $y _{5}$ | $x _{16}$ = $y _{17}$ | $x _{27}$ = $y _{29}$ |
-| $x _{6}$ = $(y _{6} + y _{12}) / 2$ | $x _{17}$ = $(y _{18} + y _{24}) / 2$ | $x _{28}$ = $(y _{30} + y _{36}) / 2$ |
+| $x _{6}$ = $(y _{6} - y _{12}) / 2$ | $x _{17}$ = $(y _{18} - y _{24}) / 2$ | $x _{28}$ = $(y _{30} - y _{36}) / 2$ |
 | $x _{7}$ = $y _{7}$ | $x _{18}$ = $y _{19}$ | $x _{29}$ = $y _{31}$ |
 | $x _{8}$ = $y _{8}$ | $x _{19}$ = $y _{20}$ | $x _{30}$ = $y _{32}$ |
 | $x _{9}$ = $y _{9}$ | $x _{20}$ = $y _{21}$ | $x _{31}$ = $y _{33}$ |
@@ -269,7 +265,7 @@ cell 13
 | $x _{3} \left ( = y _{3}\right ) = 1 \dashrightarrow \vec{a _{3}} = \mathcal{Z}(\vec{d _{3}})$ | $x _{14} \left ( = y _{15}\right ) = 1 \dashrightarrow \vec{a _{14}} = \mathcal{Z}(\vec{d _{15}})$ | $x _{25} \left ( = y _{27}\right ) = 1 \dashrightarrow \vec{a _{25}} = \mathcal{Z}(\vec{d _{27}})$ |
 | $x _{4} \left ( = y _{4}\right ) = 1 \dashrightarrow \vec{a _{4}} = \mathcal{Z}(\vec{d _{4}})$ | $x _{15} \left ( = y _{16}\right ) = 1 \dashrightarrow \vec{a _{15}} = \mathcal{Z}(\vec{d _{16}})$ | $x _{26} \left ( = y _{28}\right ) = 1 \dashrightarrow \vec{a _{26}} = \mathcal{Z}(\vec{d _{28}})$ |
 | $x _{5} \left ( = y _{5}\right ) = 1 \dashrightarrow \vec{a _{5}} = \mathcal{Z}(\vec{d _{5}})$ | $x _{16} \left ( = y _{17}\right ) = 1 \dashrightarrow \vec{a _{16}} = \mathcal{Z}(\vec{d _{17}})$ | $x _{27} \left ( = y _{29}\right ) = 1 \dashrightarrow \vec{a _{27}} = \mathcal{Z}(\vec{d _{29}})$ |
-| $x _{6} \left ( = (y _{6} + y _{12}) / 2\right ) = 1 \dashrightarrow \vec{a _{6}} = \mathcal{Z}(\vec{d _{6}} - \vec{d _{12}})$ | $x _{17} \left ( = (y _{18} + y _{24}) / 2\right ) = 1 \dashrightarrow \vec{a _{17}} = \mathcal{Z}(\vec{d _{18}} - \vec{d _{24}})$ | $x _{28} \left ( = (y _{30} + y _{36}) / 2\right ) = 1 \dashrightarrow \vec{a _{28}} = \mathcal{Z}(\vec{d _{30}} - \vec{d _{36}})$ |
+| $x _{6} \left ( = (y _{6} - y _{12}) / 2\right ) = 1 \dashrightarrow \vec{a _{6}} = \mathcal{Z}(\vec{d _{6}} - \vec{d _{12}})$ | $x _{17} \left ( = (y _{18} - y _{24}) / 2\right ) = 1 \dashrightarrow \vec{a _{17}} = \mathcal{Z}(\vec{d _{18}} - \vec{d _{24}})$ | $x _{28} \left ( = (y _{30} - y _{36}) / 2\right ) = 1 \dashrightarrow \vec{a _{28}} = \mathcal{Z}(\vec{d _{30}} - \vec{d _{36}})$ |
 | $x _{7} \left ( = y _{7}\right ) = 1 \dashrightarrow \vec{a _{7}} = \mathcal{Z}(\vec{d _{7}})$ | $x _{18} \left ( = y _{19}\right ) = 1 \dashrightarrow \vec{a _{18}} = \mathcal{Z}(\vec{d _{19}})$ | $x _{29} \left ( = y _{31}\right ) = 1 \dashrightarrow \vec{a _{29}} = \mathcal{Z}(\vec{d _{31}})$ |
 | $x _{8} \left ( = y _{8}\right ) = 1 \dashrightarrow \vec{a _{8}} = \mathcal{Z}(\vec{d _{8}})$ | $x _{19} \left ( = y _{20}\right ) = 1 \dashrightarrow \vec{a _{19}} = \mathcal{Z}(\vec{d _{20}})$ | $x _{30} \left ( = y _{32}\right ) = 1 \dashrightarrow \vec{a _{30}} = \mathcal{Z}(\vec{d _{32}})$ |
 | $x _{9} \left ( = y _{9}\right ) = 1 \dashrightarrow \vec{a _{9}} = \mathcal{Z}(\vec{d _{9}})$ | $x _{20} \left ( = y _{21}\right ) = 1 \dashrightarrow \vec{a _{20}} = \mathcal{Z}(\vec{d _{21}})$ | $x _{31} \left ( = y _{33}\right ) = 1 \dashrightarrow \vec{a _{31}} = \mathcal{Z}(\vec{d _{33}})$ |

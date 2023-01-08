@@ -1261,10 +1261,10 @@ class ZernikeToTorque:
 
             if y_num in [12, 24, 36]:
                 # 縮退しているところをばらす
-                # y6 = y12 = x6
-                # y18 = y24 = x17
-                # y30 = y36 = x28
-                y_value_array[y_idx] = wh_x_value_array_[x_idx - 6]
+                # y6  = +x6,  y12 = -x6
+                # y18 = +x17, y24 = -x17
+                # y30 = +x28, y36 = -x28
+                y_value_array[y_idx] = -wh_x_value_array_[x_idx - 6]
 
                 # y12, y24, y36 に対応するx_nは無いので、 x_idxは増やさない
 
