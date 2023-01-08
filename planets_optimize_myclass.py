@@ -475,17 +475,18 @@ class Constants:
 
     def __make_operation_matrix_A(self) -> np.ndarray:
         file_num = len(self.operation_matrix_D[0])
-        operation_matrix_A = np.zeros(
+        zernike_fitted_matrix = np.zeros(
             (self.zernike_max_degree, file_num)
         )
 
+        # 作用行列Dの各要素をzernike fitting
         for i in range(0, file_num):
             d_n_array = self.operation_matrix_D[:, i]
             d_n_mesh = self.fem_interpolate(
                 fem_z_orient_array=d_n_array
             )
 
-            a_n = pr.prop_fit_zernikes(
+            d_n_zernike_array = pr.prop_fit_zernikes(
                 wavefront0=d_n_mesh,
                 pupil0=self.tf,
                 pupilradius0=self.pixel_number // 2,
@@ -494,7 +495,27 @@ class Constants:
                 yc=self.pixel_number // 2
             )
 
-            operation_matrix_A[:, i] = a_n
+            zernike_fitted_matrix[:, i] = d_n_zernike_array
+
+        operation_matrix_A = np.zeros(
+            (self.zernike_max_degree, file_num - 3)
+        )
+
+        a_idx = 0
+        for d_idx in range(file_num):
+            d_num = d_idx + 1
+
+            if d_num in [6, 18, 30]:
+                operation_matrix_A[:, a_idx] = zernike_fitted_matrix[:, d_idx] - zernike_fitted_matrix[:, d_idx + 6]
+                a_idx += 1
+
+            elif d_num in [12, 24, 36]:
+                # 何もしない
+                pass
+
+            else:
+                operation_matrix_A[:, a_idx] = zernike_fitted_matrix[:, d_idx]
+                a_idx += 1
 
         return operation_matrix_A
 
