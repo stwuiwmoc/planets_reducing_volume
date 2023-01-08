@@ -534,14 +534,44 @@ cell 10
 cell 11
 ||||
 | - | - | - |
-| $\vec{a _{1}}$ = $\mathcal{Z}(\vec{d _{1}})$ | $\vec{a _{12}}$ = $\mathcal{Z}(\vec{d _{13}})$ | $\vec{a _{23}}$ = $\mathcal{Z}(\vec{d _{25}})$ |
-| $\vec{a _{2}}$ = $\mathcal{Z}(\vec{d _{2}})$ | $\vec{a _{13}}$ = $\mathcal{Z}(\vec{d _{14}})$ | $\vec{a _{24}}$ = $\mathcal{Z}(\vec{d _{26}})$ |
-| $\vec{a _{3}}$ = $\mathcal{Z}(\vec{d _{3}})$ | $\vec{a _{14}}$ = $\mathcal{Z}(\vec{d _{15}})$ | $\vec{a _{25}}$ = $\mathcal{Z}(\vec{d _{27}})$ |
-| $\vec{a _{4}}$ = $\mathcal{Z}(\vec{d _{4}})$ | $\vec{a _{15}}$ = $\mathcal{Z}(\vec{d _{16}})$ | $\vec{a _{26}}$ = $\mathcal{Z}(\vec{d _{28}})$ |
-| $\vec{a _{5}}$ = $\mathcal{Z}(\vec{d _{5}})$ | $\vec{a _{16}}$ = $\mathcal{Z}(\vec{d _{17}})$ | $\vec{a _{27}}$ = $\mathcal{Z}(\vec{d _{29}})$ |
-| $\vec{a _{6}}$ = $\mathcal{Z}(\vec{d _{6}} - \vec{d _{12}})$ | $\vec{a _{17}}$ = $\mathcal{Z}(\vec{d _{18}} - \vec{d _{24}})$ | $\vec{a _{28}}$ = $\mathcal{Z}(\vec{d _{30}} - \vec{d _{36}})$ |
-| $\vec{a _{7}}$ = $\mathcal{Z}(\vec{d _{7}})$ | $\vec{a _{18}}$ = $\mathcal{Z}(\vec{d _{19}})$ | $\vec{a _{29}}$ = $\mathcal{Z}(\vec{d _{31}})$ |
-| $\vec{a _{8}}$ = $\mathcal{Z}(\vec{d _{8}})$ | $\vec{a _{19}}$ = $\mathcal{Z}(\vec{d _{20}})$ | $\vec{a _{30}}$ = $\mathcal{Z}(\vec{d _{32}})$ |
-| $\vec{a _{9}}$ = $\mathcal{Z}(\vec{d _{9}})$ | $\vec{a _{20}}$ = $\mathcal{Z}(\vec{d _{21}})$ | $\vec{a _{31}}$ = $\mathcal{Z}(\vec{d _{33}})$ |
-| $\vec{a _{10}}$ = $\mathcal{Z}(\vec{d _{10}})$ | $\vec{a _{21}}$ = $\mathcal{Z}(\vec{d _{22}})$ | $\vec{a _{32}}$ = $\mathcal{Z}(\vec{d _{34}})$ |
-| $\vec{a _{11}}$ = $\mathcal{Z}(\vec{d _{11}})$ | $\vec{a _{22}}$ = $\mathcal{Z}(\vec{d _{23}})$ | $\vec{a _{33}}$ = $\mathcal{Z}(\vec{d _{35}})$ |
+| $\vec{a _{1}} = \mathcal{Z}(\vec{d _{1}})$ | $\vec{a _{12}} = \mathcal{Z}(\vec{d _{13}})$ | $\vec{a _{23}} = \mathcal{Z}(\vec{d _{25}})$ |
+| $\vec{a _{2}} = \mathcal{Z}(\vec{d _{2}})$ | $\vec{a _{13}} = \mathcal{Z}(\vec{d _{14}})$ | $\vec{a _{24}} = \mathcal{Z}(\vec{d _{26}})$ |
+| $\vec{a _{3}} = \mathcal{Z}(\vec{d _{3}})$ | $\vec{a _{14}} = \mathcal{Z}(\vec{d _{15}})$ | $\vec{a _{25}} = \mathcal{Z}(\vec{d _{27}})$ |
+| $\vec{a _{4}} = \mathcal{Z}(\vec{d _{4}})$ | $\vec{a _{15}} = \mathcal{Z}(\vec{d _{16}})$ | $\vec{a _{26}} = \mathcal{Z}(\vec{d _{28}})$ |
+| $\vec{a _{5}} = \mathcal{Z}(\vec{d _{5}})$ | $\vec{a _{16}} = \mathcal{Z}(\vec{d _{17}})$ | $\vec{a _{27}} = \mathcal{Z}(\vec{d _{29}})$ |
+| $\vec{a _{6}} = \mathcal{Z}(\vec{d _{6}} - \vec{d _{12}})$ | $\vec{a _{17}} = \mathcal{Z}(\vec{d _{18}} - \vec{d _{24}})$ | $\vec{a _{28}} = \mathcal{Z}(\vec{d _{30}} - \vec{d _{36}})$ |
+| $\vec{a _{7}} = \mathcal{Z}(\vec{d _{7}})$ | $\vec{a _{18}} = \mathcal{Z}(\vec{d _{19}})$ | $\vec{a _{29}} = \mathcal{Z}(\vec{d _{31}})$ |
+| $\vec{a _{8}} = \mathcal{Z}(\vec{d _{8}})$ | $\vec{a _{19}} = \mathcal{Z}(\vec{d _{20}})$ | $\vec{a _{30}} = \mathcal{Z}(\vec{d _{32}})$ |
+| $\vec{a _{9}} = \mathcal{Z}(\vec{d _{9}})$ | $\vec{a _{20}} = \mathcal{Z}(\vec{d _{21}})$ | $\vec{a _{31}} = \mathcal{Z}(\vec{d _{33}})$ |
+| $\vec{a _{10}} = \mathcal{Z}(\vec{d _{10}})$ | $\vec{a _{21}} = \mathcal{Z}(\vec{d _{22}})$ | $\vec{a _{32}} = \mathcal{Z}(\vec{d _{34}})$ |
+| $\vec{a _{11}} = \mathcal{Z}(\vec{d _{11}})$ | $\vec{a _{22}} = \mathcal{Z}(\vec{d _{23}})$ | $\vec{a _{33}} = \mathcal{Z}(\vec{d _{35}})$ |
+
+cel 12
+||||
+| - | - | - |
+| $x _{1} = 1 \dashrightarrow \vec{a _{1}} = \mathcal{Z}(\vec{d _{1}})$ | $x _{12} = 1 \dashrightarrow \vec{a _{12}} = \mathcal{Z}(\vec{d _{13}})$ | $x _{23} = 1 \dashrightarrow \vec{a _{23}} = \mathcal{Z}(\vec{d _{25}})$ |
+| $x _{2} = 1 \dashrightarrow \vec{a _{2}} = \mathcal{Z}(\vec{d _{2}})$ | $x _{13} = 1 \dashrightarrow \vec{a _{13}} = \mathcal{Z}(\vec{d _{14}})$ | $x _{24} = 1 \dashrightarrow \vec{a _{24}} = \mathcal{Z}(\vec{d _{26}})$ |
+| $x _{3} = 1 \dashrightarrow \vec{a _{3}} = \mathcal{Z}(\vec{d _{3}})$ | $x _{14} = 1 \dashrightarrow \vec{a _{14}} = \mathcal{Z}(\vec{d _{15}})$ | $x _{25} = 1 \dashrightarrow \vec{a _{25}} = \mathcal{Z}(\vec{d _{27}})$ |
+| $x _{4} = 1 \dashrightarrow \vec{a _{4}} = \mathcal{Z}(\vec{d _{4}})$ | $x _{15} = 1 \dashrightarrow \vec{a _{15}} = \mathcal{Z}(\vec{d _{16}})$ | $x _{26} = 1 \dashrightarrow \vec{a _{26}} = \mathcal{Z}(\vec{d _{28}})$ |
+| $x _{5} = 1 \dashrightarrow \vec{a _{5}} = \mathcal{Z}(\vec{d _{5}})$ | $x _{16} = 1 \dashrightarrow \vec{a _{16}} = \mathcal{Z}(\vec{d _{17}})$ | $x _{27} = 1 \dashrightarrow \vec{a _{27}} = \mathcal{Z}(\vec{d _{29}})$ |
+| $x _{6} = 1 \dashrightarrow \vec{a _{6}} = \mathcal{Z}(\vec{d _{6}} - \vec{d _{12}})$ | $x _{17} = 1 \dashrightarrow \vec{a _{17}} = \mathcal{Z}(\vec{d _{18}} - \vec{d _{24}})$ | $x _{28} = 1 \dashrightarrow \vec{a _{28}} = \mathcal{Z}(\vec{d _{30}} - \vec{d _{36}})$ |
+| $x _{7} = 1 \dashrightarrow \vec{a _{7}} = \mathcal{Z}(\vec{d _{7}})$ | $x _{18} = 1 \dashrightarrow \vec{a _{18}} = \mathcal{Z}(\vec{d _{19}})$ | $x _{29} = 1 \dashrightarrow \vec{a _{29}} = \mathcal{Z}(\vec{d _{31}})$ |
+| $x _{8} = 1 \dashrightarrow \vec{a _{8}} = \mathcal{Z}(\vec{d _{8}})$ | $x _{19} = 1 \dashrightarrow \vec{a _{19}} = \mathcal{Z}(\vec{d _{20}})$ | $x _{30} = 1 \dashrightarrow \vec{a _{30}} = \mathcal{Z}(\vec{d _{32}})$ |
+| $x _{9} = 1 \dashrightarrow \vec{a _{9}} = \mathcal{Z}(\vec{d _{9}})$ | $x _{20} = 1 \dashrightarrow \vec{a _{20}} = \mathcal{Z}(\vec{d _{21}})$ | $x _{31} = 1 \dashrightarrow \vec{a _{31}} = \mathcal{Z}(\vec{d _{33}})$ |
+| $x _{10} = 1 \dashrightarrow \vec{a _{10}} = \mathcal{Z}(\vec{d _{10}})$ | $x _{21} = 1 \dashrightarrow \vec{a _{21}} = \mathcal{Z}(\vec{d _{22}})$ | $x _{32} = 1 \dashrightarrow \vec{a _{32}} = \mathcal{Z}(\vec{d _{34}})$ |
+| $x _{11} = 1 \dashrightarrow \vec{a _{11}} = \mathcal{Z}(\vec{d _{11}})$ | $x _{22} = 1 \dashrightarrow \vec{a _{22}} = \mathcal{Z}(\vec{d _{23}})$ | $x _{33} = 1 \dashrightarrow \vec{a _{33}} = \mathcal{Z}(\vec{d _{35}})$ |
+
+cell 13
+||||
+| - | - | - |
+| $x _{1} \left ( = y _{1}\right ) = 1 \dashrightarrow \vec{a _{1}} = \mathcal{Z}(\vec{d _{1}})$ | $x _{12} \left ( = y _{13}\right ) = 1 \dashrightarrow \vec{a _{12}} = \mathcal{Z}(\vec{d _{13}})$ | $x _{23} \left ( = y _{25}\right ) = 1 \dashrightarrow \vec{a _{23}} = \mathcal{Z}(\vec{d _{25}})$ |
+| $x _{2} \left ( = y _{2}\right ) = 1 \dashrightarrow \vec{a _{2}} = \mathcal{Z}(\vec{d _{2}})$ | $x _{13} \left ( = y _{14}\right ) = 1 \dashrightarrow \vec{a _{13}} = \mathcal{Z}(\vec{d _{14}})$ | $x _{24} \left ( = y _{26}\right ) = 1 \dashrightarrow \vec{a _{24}} = \mathcal{Z}(\vec{d _{26}})$ |
+| $x _{3} \left ( = y _{3}\right ) = 1 \dashrightarrow \vec{a _{3}} = \mathcal{Z}(\vec{d _{3}})$ | $x _{14} \left ( = y _{15}\right ) = 1 \dashrightarrow \vec{a _{14}} = \mathcal{Z}(\vec{d _{15}})$ | $x _{25} \left ( = y _{27}\right ) = 1 \dashrightarrow \vec{a _{25}} = \mathcal{Z}(\vec{d _{27}})$ |
+| $x _{4} \left ( = y _{4}\right ) = 1 \dashrightarrow \vec{a _{4}} = \mathcal{Z}(\vec{d _{4}})$ | $x _{15} \left ( = y _{16}\right ) = 1 \dashrightarrow \vec{a _{15}} = \mathcal{Z}(\vec{d _{16}})$ | $x _{26} \left ( = y _{28}\right ) = 1 \dashrightarrow \vec{a _{26}} = \mathcal{Z}(\vec{d _{28}})$ |
+| $x _{5} \left ( = y _{5}\right ) = 1 \dashrightarrow \vec{a _{5}} = \mathcal{Z}(\vec{d _{5}})$ | $x _{16} \left ( = y _{17}\right ) = 1 \dashrightarrow \vec{a _{16}} = \mathcal{Z}(\vec{d _{17}})$ | $x _{27} \left ( = y _{29}\right ) = 1 \dashrightarrow \vec{a _{27}} = \mathcal{Z}(\vec{d _{29}})$ |
+| $x _{6} \left ( = (y _{6} + y _{12}) / 2\right ) = 1 \dashrightarrow \vec{a _{6}} = \mathcal{Z}(\vec{d _{6}} - \vec{d _{12}})$ | $x _{17} \left ( = (y _{18} + y _{24}) / 2\right ) = 1 \dashrightarrow \vec{a _{17}} = \mathcal{Z}(\vec{d _{18}} - \vec{d _{24}})$ | $x _{28} \left ( = (y _{30} + y _{36}) / 2\right ) = 1 \dashrightarrow \vec{a _{28}} = \mathcal{Z}(\vec{d _{30}} - \vec{d _{36}})$ |
+| $x _{7} \left ( = y _{7}\right ) = 1 \dashrightarrow \vec{a _{7}} = \mathcal{Z}(\vec{d _{7}})$ | $x _{18} \left ( = y _{19}\right ) = 1 \dashrightarrow \vec{a _{18}} = \mathcal{Z}(\vec{d _{19}})$ | $x _{29} \left ( = y _{31}\right ) = 1 \dashrightarrow \vec{a _{29}} = \mathcal{Z}(\vec{d _{31}})$ |
+| $x _{8} \left ( = y _{8}\right ) = 1 \dashrightarrow \vec{a _{8}} = \mathcal{Z}(\vec{d _{8}})$ | $x _{19} \left ( = y _{20}\right ) = 1 \dashrightarrow \vec{a _{19}} = \mathcal{Z}(\vec{d _{20}})$ | $x _{30} \left ( = y _{32}\right ) = 1 \dashrightarrow \vec{a _{30}} = \mathcal{Z}(\vec{d _{32}})$ |
+| $x _{9} \left ( = y _{9}\right ) = 1 \dashrightarrow \vec{a _{9}} = \mathcal{Z}(\vec{d _{9}})$ | $x _{20} \left ( = y _{21}\right ) = 1 \dashrightarrow \vec{a _{20}} = \mathcal{Z}(\vec{d _{21}})$ | $x _{31} \left ( = y _{33}\right ) = 1 \dashrightarrow \vec{a _{31}} = \mathcal{Z}(\vec{d _{33}})$ |
+| $x _{10} \left ( = y _{10}\right ) = 1 \dashrightarrow \vec{a _{10}} = \mathcal{Z}(\vec{d _{10}})$ | $x _{21} \left ( = y _{22}\right ) = 1 \dashrightarrow \vec{a _{21}} = \mathcal{Z}(\vec{d _{22}})$ | $x _{32} \left ( = y _{34}\right ) = 1 \dashrightarrow \vec{a _{32}} = \mathcal{Z}(\vec{d _{34}})$ |
+| $x _{11} \left ( = y _{11}\right ) = 1 \dashrightarrow \vec{a _{11}} = \mathcal{Z}(\vec{d _{11}})$ | $x _{22} \left ( = y _{23}\right ) = 1 \dashrightarrow \vec{a _{22}} = \mathcal{Z}(\vec{d _{23}})$ | $x _{33} \left ( = y _{35}\right ) = 1 \dashrightarrow \vec{a _{33}} = \mathcal{Z}(\vec{d _{35}})$ |

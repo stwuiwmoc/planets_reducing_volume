@@ -281,14 +281,72 @@ if __name__ == "__main__":
             a_num = (i + 1) + 11 * j
             d_num = (i + 1) + 12 * j
 
+            print(r"| $", end="")
+            print(r"\vec{a _{" + str(a_num) + r"}}", end="")
+            print(r" = ", end="")
+
             if d_num in [6, 18, 30]:
-                print(r"| ", end="")
-                print(r"$\vec{a _{" + str(a_num) + r"}}$", end="")
-                print(r" = ", end="")
-                print(r"$\mathcal{Z}(\vec{d _{" + str(d_num) + r"}} - \vec{d _{" + str(d_num + 6) + r"}})$ ", end="")
+                print(r"\mathcal{Z}(\vec{d _{" + str(d_num) + r"}} - \vec{d _{" + str(d_num + 6) + r"}})", end="")
             else:
-                print(r"| ", end="")
-                print(r"$\vec{a _{" + str(a_num) + r"}}$", end="")
-                print(r" = ", end="")
-                print(r"$\mathcal{Z}(\vec{d _{" + str(d_num) + r"}})$ ", end="")
+                print(r"\mathcal{Z}(\vec{d _{" + str(d_num) + r"}})", end="")
+
+            print(r"$ ", end="")
+        print("|")
+
+    # %%
+    # cell 12
+    print(r"||||")
+    print(r"| - | - | - |")
+
+    for i in range(11):
+        for j in range(3):
+            a_num = (i + 1) + 11 * j
+            d_num = (i + 1) + 12 * j
+
+            print(r"| $", end="")
+            print(r"x _{" + str(a_num) + r"} = 1", end="")
+            print(r" \dashrightarrow ", end="")
+            print(r"\vec{a _{" + str(a_num) + r"}}", end="")
+            print(r" = ", end="")
+
+            if d_num in [6, 18, 30]:
+                print(r"\mathcal{Z}(\vec{d _{" + str(d_num) + r"}} - \vec{d _{" + str(d_num + 6) + r"}})", end="")
+            else:
+                print(r"\mathcal{Z}(\vec{d _{" + str(d_num) + r"}})", end="")
+
+            print(r"$ ", end="")
+        print("|")
+
+    # %%
+    # cell 13
+    print(r"||||")
+    print(r"| - | - | - |")
+
+    for i in range(11):
+        for j in range(3):
+            a_num = (i + 1) + 11 * j
+            d_num = (i + 1) + 12 * j
+
+            print(r"| $", end="")
+            print(r"x _{" + str(a_num) + r"}", end="")
+            print(r" \left ( = ", end="")
+
+            if d_num in [6, 18, 30]:
+                print(r"(y _{" + str(d_num) + r"} + y _{" + str(d_num + 6) + r"}) / 2", end="")
+            else:
+                print(r"y _{" + str(d_num) + r"}", end="")
+
+            print(r"\right ) = 1", end="")
+
+            print(r" \dashrightarrow ", end="")
+
+            print(r"\vec{a _{" + str(a_num) + r"}}", end="")
+            print(r" = ", end="")
+
+            if d_num in [6, 18, 30]:
+                print(r"\mathcal{Z}(\vec{d _{" + str(d_num) + r"}} - \vec{d _{" + str(d_num + 6) + r"}})", end="")
+            else:
+                print(r"\mathcal{Z}(\vec{d _{" + str(d_num) + r"}})", end="")
+
+            print(r"$ ", end="")
         print("|")
