@@ -475,17 +475,18 @@ class Constants:
 
     def __make_operation_matrix_A(self) -> np.ndarray:
         file_num = len(self.operation_matrix_D[0])
-        operation_matrix_A = np.zeros(
+        zernike_fitted_matrix = np.zeros(
             (self.zernike_max_degree, file_num)
         )
 
+        # 作用行列Dの各要素をzernike fitting
         for i in range(0, file_num):
             d_n_array = self.operation_matrix_D[:, i]
             d_n_mesh = self.fem_interpolate(
                 fem_z_orient_array=d_n_array
             )
 
-            a_n = pr.prop_fit_zernikes(
+            d_n_zernike_array = pr.prop_fit_zernikes(
                 wavefront0=d_n_mesh,
                 pupil0=self.tf,
                 pupilradius0=self.pixel_number // 2,
@@ -494,7 +495,33 @@ class Constants:
                 yc=self.pixel_number // 2
             )
 
-            operation_matrix_A[:, i] = a_n
+            zernike_fitted_matrix[:, i] = d_n_zernike_array
+
+        operation_matrix_A = np.zeros(
+            (self.zernike_max_degree, file_num - 3)
+        )
+
+        # 作用行列からzernike近似作用行列でインデックスが36から33にズレるので
+        # インデックスずれも考慮して代入
+
+        a_idx = 0  # zernike近似作用行列のインデックス
+        for d_idx in range(file_num):
+            d_num = d_idx + 1
+
+            if d_num in [6, 18, 30]:
+                # 縮退しているところはまとめる
+                operation_matrix_A[:, a_idx] = zernike_fitted_matrix[:, d_idx] - zernike_fitted_matrix[:, d_idx + 6]
+                a_idx += 1
+
+            elif d_num in [12, 24, 36]:
+                # 何もしない
+                # d12, d24, d36 に対応するa_n は無いので、a_idxは増やさない
+                pass
+
+            else:
+                # それ以外の所は普通に代入
+                operation_matrix_A[:, a_idx] = zernike_fitted_matrix[:, d_idx]
+                a_idx += 1
 
         return operation_matrix_A
 
@@ -1186,12 +1213,17 @@ class ZernikeToTorque:
         self.restructed_torque_value = abs(restructed_torque_value)
 
         if len(self.ignore_zernike_number_list) == 0:
-            make_torque_value_array_result = self.__make_torque_value_array(
+            make_wh_x_value_array_result = self.__make_wh_x_value_array(
                 operation_matrix=self.consts.operation_matrix_A,
                 zernike_value_array=self.target_zernike_value_array)
 
-            self.torque_value_array = make_torque_value_array_result["torque"]
-            self.optimize_result = make_torque_value_array_result["optimize_result"]
+            self.wh_x_value_array = make_wh_x_value_array_result["x_value"]
+            self.optimize_result = make_wh_x_value_array_result["optimize_result"]
+
+            # 33要素のWH駆動量ベクトルxから36要素のモーター駆動量ベクトルに変換
+            self.torque_value_array = self.__convert_wh_x_value_array_to_torque_value_array(
+                wh_x_value_array_=self.wh_x_value_array
+            )
 
         else:
             remaining_operation_matrix = make_remaining_matrix(
@@ -1202,21 +1234,52 @@ class ZernikeToTorque:
                 self.target_zernike_value_array,
                 self.ignore_zernike_number_list)
 
-            make_torque_value_array_result = self.__make_torque_value_array(
+            make_wh_x_value_array_result = self.__make_wh_x_value_array(
                 operation_matrix=remaining_operation_matrix,
                 zernike_value_array=remaining_zernike_value_array)
 
-            self.torque_value_array = make_torque_value_array_result["torque"]
-            self.optimize_result = make_torque_value_array_result["optimize_result"]
+            self.wh_x_value_array = make_wh_x_value_array_result["x_value"]
+            self.optimize_result = make_wh_x_value_array_result["optimize_result"]
+
+            # 33要素のWH駆動量ベクトルxから36要素のモーター駆動量ベクトルに変換
+            self.torque_value_array = self.__convert_wh_x_value_array_to_torque_value_array(
+                wh_x_value_array_=self.wh_x_value_array
+            )
 
     def h(self):
         mkhelp(self)
 
-    def __make_torque_value_array(
+    def __convert_wh_x_value_array_to_torque_value_array(
+            self,
+            wh_x_value_array_: np.ndarray) -> np.ndarray:
+
+        y_value_array = np.zeros(len(self.consts.operation_matrix_D[0]))
+
+        x_idx = 0
+        for y_idx in range(len(y_value_array)):
+            y_num = y_idx + 1
+
+            if y_num in [12, 24, 36]:
+                # 縮退しているところをばらす
+                # y6  = +x6,  y12 = -x6
+                # y18 = +x17, y24 = -x17
+                # y30 = +x28, y36 = -x28
+                y_value_array[y_idx] = -wh_x_value_array_[x_idx - 6]
+
+                # y12, y24, y36 に対応するx_nは無いので、 x_idxは増やさない
+
+            else:
+                # それ以外の所は普通に代入
+                y_value_array[y_idx] = wh_x_value_array_[x_idx]
+                x_idx += 1
+
+        return y_value_array
+
+    def __make_wh_x_value_array(
             self,
             operation_matrix: ndarray,
             zernike_value_array: ndarray) -> dict:
-        """__make_torque_value_array
+        """__make_wh_x_value_array
         線形モデルb = Axの行列形式に対して制約付き最小二乗フィッティング
 
         Parameters
@@ -1229,7 +1292,7 @@ class ZernikeToTorque:
         Returns
         -------
         dict
-            "torque" : fittingに必要なtorque（線形モデルのxに該当）
+            "x_value" : fittingに必要なx（線形モデルのxに該当）
             "optimize_result" : fittingの詳細結果
         """
 
@@ -1240,10 +1303,10 @@ class ZernikeToTorque:
             tol=1e-20,  # tolがデフォルト値だと収束しないことがある
         )
 
-        torque_value_array = optimize_result["x"]
+        wh_x_value_array = optimize_result["x"]
 
         result_dict = {
-            "torque": torque_value_array,
+            "x_value": wh_x_value_array,
             "optimize_result": optimize_result}
 
         return result_dict

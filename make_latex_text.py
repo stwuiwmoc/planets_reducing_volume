@@ -119,7 +119,7 @@ if __name__ == "__main__":
 
         elif i in [6, 18, 30]:
             print(r"    ", end="")
-            print(r"(y _{" + str(i) + r"} + y _{" + str(i + 6) + r"}) / 2", end="")
+            print(r"(y _{" + str(i) + r"} - y _{" + str(i + 6) + r"}) / 2", end="")
             print(r" \\", end="\n")
 
         else:
@@ -157,7 +157,7 @@ if __name__ == "__main__":
             print(r"| $\cdots$ ", end="")
 
         elif i in [6, 18, 30]:
-            print(r"| $(y _{" + str(i) + r"} + y _{" + str(i + 6) + r"}) / 2$ ", end="")
+            print(r"| $(y _{" + str(i) + r"} - y _{" + str(i + 6) + r"}) / 2$ ", end="")
 
         else:
             print(r"| $y _{" + str(i) + r"}$ ", end="")
@@ -179,7 +179,7 @@ if __name__ == "__main__":
         num = i + 1
         if num == 6:
             print(r"    ", end="")
-            print(r"(y _{" + str(num) + r"} + y _{" + str(num + 6) + r"}) / 2", end="")
+            print(r"(y _{" + str(num) + r"} - y _{" + str(num + 6) + r"}) / 2", end="")
             print(r" \\", end="\n")
 
         else:
@@ -265,7 +265,7 @@ if __name__ == "__main__":
                 print(r"| ", end="")
                 print(r"$x _{" + str(x_num) + r"}$", end="")
                 print(r" = ", end="")
-                print(r"$(y _{" + str(y_num) + r"} + y _{" + str(y_num + 6) + r"}) / 2$ ", end="")
+                print(r"$(y _{" + str(y_num) + r"} - y _{" + str(y_num + 6) + r"}) / 2$ ", end="")
             else:
                 print(r"| ", end="")
                 print(r"$x _{" + str(x_num) + r"}$", end="")
@@ -334,7 +334,7 @@ if __name__ == "__main__":
             print(r" \left ( = ", end="")
 
             if d_num in [6, 18, 30]:
-                print(r"(y _{" + str(d_num) + r"} + y _{" + str(d_num + 6) + r"}) / 2", end="")
+                print(r"(y _{" + str(d_num) + r"} - y _{" + str(d_num + 6) + r"}) / 2", end="")
             else:
                 print(r"y _{" + str(d_num) + r"}", end="")
 

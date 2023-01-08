@@ -128,7 +128,7 @@ if __name__ == "__main__":
         )
         ax13.plot(
             ax13_xaxis,
-            np.dot(CONSTS.operation_matrix_A, wh_torque.torque_value_array),
+            np.dot(CONSTS.operation_matrix_A, wh_torque.wh_x_value_array),
             label="wh_reproducted",
             marker="s",
         )

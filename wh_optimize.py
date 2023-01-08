@@ -119,7 +119,7 @@ if __name__ == "__main__":
         ax14_xaxis, zernike_removed_surface.zernike_value_array,
         marker="s", label="target_zernike (Z ≦ 6 is removed)")
     ax14.plot(
-        ax14_xaxis, np.dot(CONSTS.operation_matrix_A, reproducted_torque.torque_value_array),
+        ax14_xaxis, np.dot(CONSTS.operation_matrix_A, reproducted_torque.wh_x_value_array),
         marker="s", label="WH_reproducted_zernike")
 
     ax14.legend()
