@@ -310,7 +310,7 @@ $$
 この制約付き最小化を解析的に解くことはできないため、本研究では数値解を得るために `scipy.optimize.lsq_linear` を用いた
 
 # 行列置き場
-
+cell 1, 2, 3
 $$
 A^T =
 \begin{bmatrix}
@@ -384,6 +384,7 @@ A^T =
 \end{bmatrix}
 $$
 
+cell 4, 5
 $$
 \vec{x} =
 \begin{bmatrix}
@@ -434,6 +435,7 @@ $$
 \end{bmatrix}
 $$
 
+cell 7
 $$
 \begin{bmatrix}
     x _{1} \\
@@ -465,6 +467,8 @@ $$
 \end{bmatrix}
 $$
 
+cell 6
+
 | $x _{1}$ | $\cdots$ | $x _{5}$ | $x _{6}$ | $x _{7}$ | $\cdots$ | $x _{11}$ | $x _{12}$ | $\cdots$ | $x _{16}$ | $x _{17}$ | $x _{18}$ | $\cdots$ | $x _{22}$ | $x _{23}$ | $\cdots$ | $x _{27}$ | $x _{28}$ | $x _{29}$ | $\cdots$ | $x _{33}$ |
 | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - |
 | $y _{1}$ | $\cdots$ | $y _{5}$ | $(y _{6} + y _{12}) / 2$ | $y _{7}$ | $\cdots$ | $y _{11}$ | $y _{13}$ | $\cdots$ | $y _{17}$ | $(y _{18} + y _{24}) / 2$ | $y _{19}$ | $\cdots$ | $y _{23}$ | $y _{25}$ | $\cdots$ | $y _{29}$ | $(y _{30} + y _{36}) / 2$ | $y _{31}$ | $\cdots$ | $y _{35}$ |
@@ -472,3 +476,41 @@ $$
 | $x _{1}$ | $x _{2}$ | $x _{3}$ | $x _{4}$ | $x _{5}$ | $x _{6}$ | $x _{7}$ | $x _{8}$ | $x _{9}$ | $x _{10}$ | $x _{11}$ |
 | - | - | - | - | - | - | - | - | - | - | - |
 | $y _{1}$ | $y _{2}$ | $y _{3}$ | $y _{4}$ | $y _{5}$ | $y _{6} + y _{12}$ | $y _{7}$ | $y _{8}$ | $y _{9}$ | $y _{10}$ | $y _{11}$ |
+
+cell 8
+$$
+\begin{bmatrix}
+    \vec{\vphantom{d} a _{1}} \\
+    \vec{\vphantom{d} a _{2}} \\
+    \vec{\vphantom{d} a _{3}} \\
+    \vec{\vphantom{d} a _{4}} \\
+    \vec{\vphantom{d} a _{5}} \\
+    \vec{\vphantom{d} a _{6}} \\
+    \vec{\vphantom{d} a _{7}} \\
+    \vec{\vphantom{d} a _{8}} \\
+    \vec{\vphantom{d} a _{9}} \\
+    \vec{\vphantom{d} a _{10}} \\
+    \vec{\vphantom{d} a _{11}} \\
+    \vdots \\
+\end{bmatrix} =
+\begin{bmatrix}
+    \mathcal{Z}(\vec{d _{1}}) \\
+    \mathcal{Z}(\vec{d _{2}}) \\
+    \mathcal{Z}(\vec{d _{3}}) \\
+    \mathcal{Z}(\vec{d _{4}}) \\
+    \mathcal{Z}(\vec{d _{5}}) \\
+    \mathcal{Z}(\vec{d _{6}} - \vec{d _{12}}) \\
+    \mathcal{Z}(\vec{d _{7}}) \\
+    \mathcal{Z}(\vec{d _{8}}) \\
+    \mathcal{Z}(\vec{d _{9}}) \\
+    \mathcal{Z}(\vec{d _{10}}) \\
+    \mathcal{Z}(\vec{d _{11}}) \\
+    \vdots \\
+\end{bmatrix}
+$$
+
+cell 9
+
+| $\vec{a _{1}}$ | $\cdots$ | $\vec{a _{5}}$ | $\vec{a _{6}}$ | $\vec{a _{7}}$ | $\cdots$ | $\vec{a _{11}}$ | $\vec{a _{12}}$ | $\cdots$ | $\vec{a _{16}}$ | $\vec{a _{17}}$ | $\vec{a _{18}}$ | $\cdots$ | $\vec{a _{22}}$ | $\vec{a _{23}}$ | $\cdots$ | $\vec{a _{27}}$ | $\vec{a _{28}}$ | $\vec{a _{29}}$ | $\cdots$ | $\vec{a _{33}}$ |
+| - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - |
+| $\mathcal{Z}( \vec{d _{1}})$ | $\cdots$ | $\mathcal{Z}( \vec{d _{5}})$ | $\mathcal{Z}( \vec{d _{6}} - \vec{d _{12}})$ | $\mathcal{Z}( \vec{d _{7}})$ | $\cdots$ | $\mathcal{Z}( \vec{d _{11}})$ | $\mathcal{Z}( \vec{d _{13}})$ | $\cdots$ | $\mathcal{Z}( \vec{d _{17}})$ | $\mathcal{Z}( \vec{d _{18}} - \vec{d _{24}})$ | $\mathcal{Z}( \vec{d _{19}})$ | $\cdots$ | $\mathcal{Z}( \vec{d _{23}})$ | $\mathcal{Z}( \vec{d _{25}})$ | $\cdots$ | $\mathcal{Z}( \vec{d _{29}})$ | $\mathcal{Z}( \vec{d _{30}} - \vec{d _{36}})$ | $\mathcal{Z}( \vec{d _{31}})$ | $\cdots$ | $\mathcal{Z}( \vec{d _{35}})$ |
