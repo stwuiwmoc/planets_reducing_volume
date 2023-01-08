@@ -13,6 +13,8 @@
 - [モーター駆動量ベクトル](#モーター駆動量ベクトル)
 - [最適モーター駆動量ベクトルの導出](#最適モーター駆動量ベクトルの導出)
 - [WH駆動量ベクトルの導入](#wh駆動量ベクトルの導入)
+- [zernike近似作用行列の導入](#zernike近似作用行列の導入)
+- [最適WH駆動量ベクトルの導出](#最適wh駆動量ベクトルの導出)
 - [制約付き](#制約付き)
 - [行列置き場](#行列置き場)
 
@@ -104,7 +106,7 @@ $$
 
 よって、$D$ の各要素の値が事前に分かっていれば、任意の駆動量 $\vec{y}$ に対して変形量 $\vec{f}$ を得ることができる。
 
-ここで、 $\vec{y} ^T = (1, 0, \cdots, 0)$ のときの変形量 $\vec{d _1}$ を考える。 $\vec{d _1}$ は $D$ を用いて
+ここで、モーターの単位駆動 $\vec{y} ^T = (1, 0, \cdots, 0)$ に対する変形量 $\vec{d _1}$ を考える。 $\vec{d _1}$ は $D$ を用いて
 
 $$
 \vec{d _1} =
@@ -154,7 +156,7 @@ $$
 \vec{d _1} = \alpha _1 \left( \vec{h _1} - \vec{h _0} \right)
 $$
 
-ここで $\alpha _1$ は、act1 に 0.05 [Nm] のトルクがかかったときの変形量を、M01が 1 [mm] 動いたときの変形量に換算するための係数（倍率）である。
+ここで $\alpha _1$ は、act1 に 1 [Nm] のトルクがかかったときの変形量を、M01が 1 [mm] 動いたときの変形量に換算するための係数（倍率）である。
 
 $D$ を改めて書き下すと
 
@@ -202,51 +204,35 @@ PLANETSのWTとWHでは、M06とM12はどちらも同じ回転軸に沿ったト
 
 # WH駆動量ベクトルの導入
 
-新たにWH駆動量ベクトル $\vec{x} ^T \equiv (x _1, \cdots, x _{33})$ を定義する。これは、 $\vec{y}$ のうち縮退が生じているモーターの駆動量である $y_{6}$ と $y_{12}$ 、  $y_{18}$ と $y_{24}$ 、 $y_{30}$ と $y_{36}$ をそれぞれまとめたものである。以下に $x_1 \sim x_{11}$ と $y_1 \sim y_{12}$ の対応関係を示す。
+新たにWH駆動量ベクトル $\vec{x} ^T \equiv (x _1, \cdots, x _{33})$ を定義する。これは、 $\vec{y}$ のうち縮退が生じているモーターの駆動量である $y_{6}$ と $y_{12}$ 、  $y_{18}$ と $y_{24}$ 、 $y_{30}$ と $y_{36}$ をそれぞれまとめたものである。以下に $\vec{x} ^T \equiv (x _1, \cdots, x _{33})$ と $\vec{y} ^T \equiv (y _1, \cdots, y _{36})$ の対応関係を示す。
+
+||||
+| - | - | - |
+| $x _{1}$ = $y _{1}$ | $x _{12}$ = $y _{13}$ | $x _{23}$ = $y _{25}$ |
+| $x _{2}$ = $y _{2}$ | $x _{13}$ = $y _{14}$ | $x _{24}$ = $y _{26}$ |
+| $x _{3}$ = $y _{3}$ | $x _{14}$ = $y _{15}$ | $x _{25}$ = $y _{27}$ |
+| $x _{4}$ = $y _{4}$ | $x _{15}$ = $y _{16}$ | $x _{26}$ = $y _{28}$ |
+| $x _{5}$ = $y _{5}$ | $x _{16}$ = $y _{17}$ | $x _{27}$ = $y _{29}$ |
+| $x _{6}$ = $(y _{6} + y _{12}) / 2$ | $x _{17}$ = $(y _{18} + y _{24}) / 2$ | $x _{28}$ = $(y _{30} + y _{36}) / 2$ |
+| $x _{7}$ = $y _{7}$ | $x _{18}$ = $y _{19}$ | $x _{29}$ = $y _{31}$ |
+| $x _{8}$ = $y _{8}$ | $x _{19}$ = $y _{20}$ | $x _{30}$ = $y _{32}$ |
+| $x _{9}$ = $y _{9}$ | $x _{20}$ = $y _{21}$ | $x _{31}$ = $y _{33}$ |
+| $x _{10}$ = $y _{10}$ | $x _{21}$ = $y _{22}$ | $x _{32}$ = $y _{34}$ |
+| $x _{11}$ = $y _{11}$ | $x _{22}$ = $y _{23}$ | $x _{33}$ = $y _{35}$ |
+
+# zernike近似作用行列の導入
+以下では
 
 $$
-\begin{bmatrix}
-    x _{1} \\
-    x _{2} \\
-    x _{3} \\
-    x _{4} \\
-    x _{5} \\
-    x _{6} \\
-    x _{7} \\
-    x _{8} \\
-    x _{9} \\
-    x _{10} \\
-    x _{11} \\
-    \vdots \\
-\end{bmatrix} =
-\begin{bmatrix}
-    y _{1} \\
-    y _{2} \\
-    y _{3} \\
-    y _{4} \\
-    y _{5} \\
-    (y _{6} + y _{12}) / 2 \\
-    y _{7} \\
-    y _{8} \\
-    y _{9} \\
-    y _{10} \\
-    y _{11} \\
-    \vdots \\
-\end{bmatrix}
+\vec{a} = \mathcal{Z}(\vec{d})
 $$
 
-$x_{12} \sim x_{22}$ と $y_{13} \sim y_{24}$ 、 $x_{23} \sim x_{33}$ と $y_{25} \sim y_{36}$ においても同様の対応関係がある。
+という表記を用いる。これは、ある形状ベクトル $\vec{d} ^T \equiv (d _1, \cdots, d _m)$ を Zernike多項式 $(j \leqq 11)$ に最小二乗フィットして得られたzernike係数ベクトルが $\vec{a} ^T \equiv (a _{1} , \cdots, a _{11})$ であることを意味する。
 
-| $x _{1}$ | $\cdots$ | $x _{5}$ | $x _{6}$ | $x _{7}$ | $\cdots$ | $x _{11}$ | $x _{12}$ | $\cdots$ | $x _{16}$ | $x _{17}$ | $x _{18}$ | $\cdots$ | $x _{22}$ | $x _{23}$ | $\cdots$ | $x _{27}$ | $x _{28}$ | $x _{29}$ | $\cdots$ | $x _{33}$ |
-| - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - |
-| $y _{1}$ | $\cdots$ | $y _{5}$ | $(y _{6} + y _{12}) / 2$ | $y _{7}$ | $\cdots$ | $y _{11}$ | $y _{13}$ | $\cdots$ | $y _{17}$ | $(y _{18} + y _{24}) / 2$ | $y _{19}$ | $\cdots$ | $y _{23}$ | $y _{25}$ | $\cdots$ | $y _{29}$ | $(y _{30} + y _{36}) / 2$ | $y _{31}$ | $\cdots$ | $y _{35}$ |
+この表記を用いて、変形量ベクトル $\vec{f}$ のZernike係数ベクトル $\vec{b} ^T \equiv (b _1, b _2, \cdots, b _{11})$ を $\vec{b} = \mathcal{Z}(\vec{f})$ とする。
 
-CAD図を用いた説明
-
-よって、 $Z_1, Z_2, Z_3$ を無視する場合、 $\vec{a _{6}}$ と $\vec{a _{12}}$ は縮退することが分かる。これは $\vec{a _{18}}$ と $\vec{a _{24}}$ 、 $\vec{a _{30}}$ と $\vec{a _{36}}$ でも同様である。
-上で述べた通り、作用行列を構成する各ベクトルが縮退している場合、解が一意に定まらない可能性がある。
-
-任意のWH駆動量ベクトル $\vec{x}$ を与えた時の鏡面の変形のzernike係数ベクトル $\vec{b}$ を計算するための近似作用行列 $A$ を以下の式を満たすように定義する。
+上では、任意のモーター駆動量ベクトル $\vec{y}$ を与えた時の鏡面の変形量ベクトル $\vec{f}$ を計算するための作用行列 $D$ を $\vec{f} = D \vec{y}$ となるように定義した。
+ここでは上と同様に、任意のWH駆動量ベクトル $\vec{x}$ を与えた時の鏡面の変形量のzernike係数ベクトル $\vec{b}$ を計算するためのzernike近似作用行列 $A$ を以下の式を満たすように定義する。
 
 $$
 \vec{b} = A \vec{x}
@@ -258,47 +244,72 @@ $$
     b _{11}
 \end{bmatrix} =
 \begin{bmatrix}
-    A _{1, 1} & \cdots & A _{1, 36} \\
+    A _{1, 1} & \cdots & A _{1, 33} \\
     \vdots & \ddots & \vdots \\
-    A _{11, 1} & \cdots & A _{11, 36}
+    A _{11, 1} & \cdots & A _{11, 33}
 \end{bmatrix}
 \begin{bmatrix}
     x _1 \\
     \vdots \\
-    x _{36}
+    x _{33}
 \end{bmatrix}
 $$
 
-この時 $D, \vec{d}, \vec{x}$ の間での議論と同様に考えると、
+また、 $D$ の要素は $\vec{y} ^T = (y _1, y _2, \cdots, y _{36})$ が単位駆動した時の形状ベクトル $\vec{d _{1}}, \vec{d _{2}}, \cdots, \vec{d _{36}}$ であった。
+
+同様に考えると、 $A$ の要素は $\vec{x} ^T = (x _1, x _2, \cdots, x _{33})$ が単位駆動した時のZernike係数ベクトル $\vec{a _{1}}, \vec{a _{2}}, \cdots, \vec{a _{33}}$ であり、以下のように表される。
 
 $$
 A =
 \begin{bmatrix}
-    A _{1, 1} & \cdots & A _{1, 36} \\
+    A _{1, 1} & \cdots & A _{1, 33} \\
     \vdots & \ddots & \vdots \\
-    A _{11, 1} & \cdots & A _{11, 36}
+    A _{11, 1} & \cdots & A _{11, 33}
 \end{bmatrix}
-= \left [ \vec{a _1}, \cdots, \vec{a _{36}} \right ]
+= \left [ \vec{a _1}, \cdots, \vec{a _{33}} \right ]
 $$
 
-である。ここで $\vec{a _1}, \cdots, \vec{a _{36}}$ は $\vec{d _1}, \cdots, \vec{d _{36}}$ をzernike fittingしたものである。よって、任意のWH駆動量ベクトル $\vec{x}$ に対して変形量ベクトルのzernike fitting結果 $\vec{b}$ を計算するには、やはり係数 $\alpha _1, \cdots, \alpha _{36}$ とFEMの結果があればよい。
+ここで、 $\vec{a _1}$ はWH駆動量ベクトル $\vec{x}$ の $x_1$ のみ 1 [mm] でその他の要素が 0 [mm] 、つまり単位駆動 $\vec{x} ^T = (1, 0, \cdots, 0)$ に対する変形量ベクトル $\vec{d _1}$ を Zernike fittingして得られたZernike係数ベクトルであり、 $\vec{a _1} = \mathcal{Z}(\vec{d _1})$ と計算される。
 
-ここで、既知の $\vec{b}$ を最小二乗的に再現するような $\vec{x_r}$ は
+$x _n$ と $\vec{a _n}$ 、 $\vec{d _n}$ の対応関係は以下に示すとおりである。
+
+||||
+| - | - | - |
+| $x _{1} = 1 \dashrightarrow \vec{a _{1}} = \mathcal{Z}(\vec{d _{1}})$ | $x _{12} = 1 \dashrightarrow \vec{a _{12}} = \mathcal{Z}(\vec{d _{13}})$ | $x _{23} = 1 \dashrightarrow \vec{a _{23}} = \mathcal{Z}(\vec{d _{25}})$ |
+| $x _{2} = 1 \dashrightarrow \vec{a _{2}} = \mathcal{Z}(\vec{d _{2}})$ | $x _{13} = 1 \dashrightarrow \vec{a _{13}} = \mathcal{Z}(\vec{d _{14}})$ | $x _{24} = 1 \dashrightarrow \vec{a _{24}} = \mathcal{Z}(\vec{d _{26}})$ |
+| $x _{3} = 1 \dashrightarrow \vec{a _{3}} = \mathcal{Z}(\vec{d _{3}})$ | $x _{14} = 1 \dashrightarrow \vec{a _{14}} = \mathcal{Z}(\vec{d _{15}})$ | $x _{25} = 1 \dashrightarrow \vec{a _{25}} = \mathcal{Z}(\vec{d _{27}})$ |
+| $x _{4} = 1 \dashrightarrow \vec{a _{4}} = \mathcal{Z}(\vec{d _{4}})$ | $x _{15} = 1 \dashrightarrow \vec{a _{15}} = \mathcal{Z}(\vec{d _{16}})$ | $x _{26} = 1 \dashrightarrow \vec{a _{26}} = \mathcal{Z}(\vec{d _{28}})$ |
+| $x _{5} = 1 \dashrightarrow \vec{a _{5}} = \mathcal{Z}(\vec{d _{5}})$ | $x _{16} = 1 \dashrightarrow \vec{a _{16}} = \mathcal{Z}(\vec{d _{17}})$ | $x _{27} = 1 \dashrightarrow \vec{a _{27}} = \mathcal{Z}(\vec{d _{29}})$ |
+| $x _{6} = 1 \dashrightarrow \vec{a _{6}} = \mathcal{Z}(\vec{d _{6}} - \vec{d _{12}})$ | $x _{17} = 1 \dashrightarrow \vec{a _{17}} = \mathcal{Z}(\vec{d _{18}} - \vec{d _{24}})$ | $x _{28} = 1 \dashrightarrow \vec{a _{28}} = \mathcal{Z}(\vec{d _{30}} - \vec{d _{36}})$ |
+| $x _{7} = 1 \dashrightarrow \vec{a _{7}} = \mathcal{Z}(\vec{d _{7}})$ | $x _{18} = 1 \dashrightarrow \vec{a _{18}} = \mathcal{Z}(\vec{d _{19}})$ | $x _{29} = 1 \dashrightarrow \vec{a _{29}} = \mathcal{Z}(\vec{d _{31}})$ |
+| $x _{8} = 1 \dashrightarrow \vec{a _{8}} = \mathcal{Z}(\vec{d _{8}})$ | $x _{19} = 1 \dashrightarrow \vec{a _{19}} = \mathcal{Z}(\vec{d _{20}})$ | $x _{30} = 1 \dashrightarrow \vec{a _{30}} = \mathcal{Z}(\vec{d _{32}})$ |
+| $x _{9} = 1 \dashrightarrow \vec{a _{9}} = \mathcal{Z}(\vec{d _{9}})$ | $x _{20} = 1 \dashrightarrow \vec{a _{20}} = \mathcal{Z}(\vec{d _{21}})$ | $x _{31} = 1 \dashrightarrow \vec{a _{31}} = \mathcal{Z}(\vec{d _{33}})$ |
+| $x _{10} = 1 \dashrightarrow \vec{a _{10}} = \mathcal{Z}(\vec{d _{10}})$ | $x _{21} = 1 \dashrightarrow \vec{a _{21}} = \mathcal{Z}(\vec{d _{22}})$ | $x _{32} = 1 \dashrightarrow \vec{a _{32}} = \mathcal{Z}(\vec{d _{34}})$ |
+| $x _{11} = 1 \dashrightarrow \vec{a _{11}} = \mathcal{Z}(\vec{d _{11}})$ | $x _{22} = 1 \dashrightarrow \vec{a _{22}} = \mathcal{Z}(\vec{d _{23}})$ | $x _{33} = 1 \dashrightarrow \vec{a _{33}} = \mathcal{Z}(\vec{d _{35}})$ |
+
+ここで、 $x _{6} = (y _{6} + y _{12}) / 2$ は縮退している $y _{6}$ と $y _{12}$ をまとめたものなので、$\vec{a _{6}}$ は $\vec{d _{6}}$ と $\vec{d _{12}}$ をまとめてからZernike fittingしている。 $x _{17}$ と $x _{28}$ についても同様である。
+
+である。以上より、任意のWH駆動量ベクトル $\vec{x}$ に対して変形量ベクトルのzernike fitting結果 $\vec{b}$ を計算するには、やはり係数 $\alpha _1, \cdots, \alpha _{36}$ とFEMの結果があればよい。
+
+# 最適WH駆動量ベクトルの導出
+
+ここで、既知の鏡面形状誤差 $\vec{b}$ を最小二乗的に再現するような $\vec{x_r}$ は
 
 $$
 \| A \vec{x} - \vec{b} \|
 $$
 
-を最小化する $\vec{x_r}$ である。よって、 $A$ の疑似逆行列 $A^+ = A^T (A A^T)^{-1}$ を用いれば
+を最小化する $\vec{x_r}$ である。 $A$ の要素 $\vec{a _n}$ は互いに独立であるため、このような $\vec{x _r}$ は正規方程式の解としてただ一つに定まる。
+$\vec{x _r}$ は $A$ の疑似逆行列 $A^+ = A^T (A A^T)^{-1}$ を用いて
 
 $$
-\vec{x_r} = A^+ \vec{b} \\
+\vec{x _r} = A^+ \vec{b} \\
 $$
 
-となる。ここで求めた $\vec{x_r}$ を用いて
+となる。ここで求めた $\vec{x _r}$ を $\vec{y _r}$ に変換して用いることで
 
 $$
-\vec{f_r} = D \vec{x_r}
+\vec{f_r} = D \vec{y _r}
 $$
 
 を計算する。鈴木M論ではこの疑似逆行列を用いる方法で最適WH駆動量ベクトルを求めた。
