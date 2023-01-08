@@ -501,19 +501,25 @@ class Constants:
             (self.zernike_max_degree, file_num - 3)
         )
 
-        a_idx = 0
+        # 作用行列からzernike近似作用行列でインデックスが36から33にズレるので
+        # インデックスずれも考慮して代入
+
+        a_idx = 0  # zernike近似作用行列のインデックス
         for d_idx in range(file_num):
             d_num = d_idx + 1
 
             if d_num in [6, 18, 30]:
+                # 縮退しているところはまとめる
                 operation_matrix_A[:, a_idx] = zernike_fitted_matrix[:, d_idx] - zernike_fitted_matrix[:, d_idx + 6]
                 a_idx += 1
 
             elif d_num in [12, 24, 36]:
                 # 何もしない
+                # d12, d24, d36 に対応するa_n は無いので、a_idxは増やさない
                 pass
 
             else:
+                # それ以外の所は普通に代入
                 operation_matrix_A[:, a_idx] = zernike_fitted_matrix[:, d_idx]
                 a_idx += 1
 
