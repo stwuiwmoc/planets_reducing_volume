@@ -248,3 +248,47 @@ if __name__ == "__main__":
         else:
             print(r"| $\mathcal{Z}( \vec{d _{" + str(i) + r"}})$ ", end="")
     print("|")
+
+    # %%
+    # cell 10
+    print(r"||||")
+    print(r"| - | - | - |")
+
+    for i in range(11):
+        for j in range(3):
+            x_num = (i + 1) + 11 * j
+            y_num = (i + 1) + 12 * j
+
+            if y_num in [6, 18, 30]:
+                print(r"| ", end="")
+                print(r"$x _{" + str(x_num) + r"}$", end="")
+                print(r" = ", end="")
+                print(r"$(y _{" + str(y_num) + r"} + y _{" + str(y_num + 6) + r"}) / 2$ ", end="")
+            else:
+                print(r"| ", end="")
+                print(r"$x _{" + str(x_num) + r"}$", end="")
+                print(r" = ", end="")
+                print(r"$y _{" + str(y_num) + r"}$ ", end="")
+        print("|")
+
+    # %%
+    # cell 11
+    print(r"||||")
+    print(r"| - | - | - |")
+
+    for i in range(11):
+        for j in range(3):
+            a_num = (i + 1) + 11 * j
+            d_num = (i + 1) + 12 * j
+
+            if d_num in [6, 18, 30]:
+                print(r"| ", end="")
+                print(r"$\vec{a _{" + str(a_num) + r"}}$", end="")
+                print(r" = ", end="")
+                print(r"$\mathcal{Z}(\vec{d _{" + str(d_num) + r"}} - \vec{d _{" + str(d_num + 6) + r"}})$ ", end="")
+            else:
+                print(r"| ", end="")
+                print(r"$\vec{a _{" + str(a_num) + r"}}$", end="")
+                print(r" = ", end="")
+                print(r"$\mathcal{Z}(\vec{d _{" + str(d_num) + r"}})$ ", end="")
+        print("|")
