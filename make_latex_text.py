@@ -1,5 +1,7 @@
 # %%
 if __name__ == "__main__":
+    # 出力結果はmake_latex_text_py_output.md で確認
+
     # cell 1
     A_index_list = [
         1, None, 5, 6, 7, None, 11,
